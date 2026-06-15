@@ -1,0 +1,30 @@
+1 Abrade (VOW) 139
+1 Backdraft Hellkite (2X2) 103
+3 Boltwave (FDN) 79
+1 Brash Taunter (DSC) 161
+2 Caldera Pyremaw (TDC) 33
+1 Chandra's Incinerator (M21) 136
+1 Coruscation Mage (BLB) 131
+4 Dwarven Mine (ELD) 243
+1 Fiery Confluence (TLE) 165
+2 Guttersnipe (J25) 138
+1 Imodane, the Pyrohammer (WOE) 137
+1 Iroh's Demonstration (TLA) 141
+1 Kher Keep (MKC) 270
+4 Lightning Bolt (CLU) 141
+1 Longshot, Rebel Bowman (TLE) 120
+14 Mountain (FDN) 278
+2 Mutiny (RIX) 106
+1 Ojer Axonil, Deepest Might (LCI) 158
+3 Satyr Firedancer (BNG) 108
+1 Sawhorn Nemesis (M3C) 60
+1 Shivan Gorge (DSC) 297
+2 Skullclamp (BLC) 283
+1 Sol Ring (FIC) 357
+1 Spinerock Tyrant (ECL) 159
+2 Sunscorched Desert (AKH) 249
+2 Suplex (FIN) 164
+2 Tectonic Hazard (LCI) 169
+1 Torbran, Thane of Red Fell (ELD) 147
+1 Tunneling Geopede (BFZ) 158
+1 Volcanic Spite (MOM) 170

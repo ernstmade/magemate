@@ -1,0 +1,49 @@
+name: magicsupport
+description: "MTG Trigger/Effekt-Support"
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Datenbank
+  drift: ^2.18.0
+  drift_flutter: ^0.2.0
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Navigation
+  go_router: ^14.2.0
+
+  # Lokalisierung
+  intl: ^0.20.2
+
+  # HTTP (Scryfall-Import)
+  http: ^1.2.0
+
+  # Datei-Import (Decklisten)
+  file_picker: ^8.0.0
+  material_symbols_icons: ^4.2928.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code-Generierung für Drift
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.9
+
+flutter:
+  generate: true
+  uses-material-design: true

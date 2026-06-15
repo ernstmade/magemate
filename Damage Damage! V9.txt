@@ -1,0 +1,85 @@
+1 Abrade (VOW) 139
+1 Backdraft Hellkite (2X2) 103
+3 Boltwave (FDN) 79
+1 Brash Taunter (DSC) 161
+2 Caldera Pyremaw (TDC) 33
+1 Chandra's Incinerator (M21) 136
+1 Coruscation Mage (BLB) 131
+4 Dwarven Mine (ELD) 243
+1 Fiery Confluence (TLE) 165
+2 Guttersnipe (J25) 138
+1 Imodane, the Pyrohammer (WOE) 137
+1 Iroh's Demonstration (TLA) 141
+1 Kher Keep (MKC) 270
+4 Lightning Bolt (CLU) 141
+1 Longshot, Rebel Bowman (TLE) 120
+14 Mountain (FDN) 278
+2 Mutiny (RIX) 106
+1 Ojer Axonil, Deepest Might (LCI) 158
+3 Satyr Firedancer (BNG) 108
+1 Sawhorn Nemesis (M3C) 60
+1 Shivan Gorge (DSC) 297
+2 Skullclamp (BLC) 283
+1 Sol Ring (FIC) 357
+1 Spinerock Tyrant (ECL) 159
+2 Sunscorched Desert (AKH) 249
+2 Suplex (FIN) 164
+2 Tectonic Hazard (LCI) 169
+1 Torbran, Thane of Red Fell (ELD) 147
+1 Tunneling Geopede (BFZ) 158
+1 Volcanic Spite (MOM) 170
+
+// SIDEBOARD
+1 Arcane Bombardment (OTC) 154
+1 Crash Through (FDN) 620
+1 Detection Tower (M19) 249
+1 Don't Try This at Home (UNF) 105
+1 Embermaw Hellion (ORI) 141
+1 Fiendish Duo (J25) 545
+1 Fire Servant (PLST) PD2-15
+1 Goblin Chainwhirler (PLST) DOM-129
+1 Hostility (CM2) 105
+1 Molten Gatekeeper (MH3) 128
+1 Pain for All (EOE) 151
+1 Panicked Altisaur (LCI) 159
+1 Playful Shove (BLB) 145
+1 Powerbalance (MH3) 131
+1 Purphoros, God of the Forge (CMM) 246
+1 Rekindling Phoenix (NCC) 273
+1 Screaming Nemesis (DSK) 157
+1 Sear (ECL) 154
+1 Solphim, Mayhem Dominus (ONE) 150
+1 Storm Caller (M21) 335
+1 Teapot Slinger (BLB) 157
+1 The Red Terror (40K) 83
+1 Twinflame Tyrant (FDN) 97
+1 Urza's Cave (MH3) 234
+
+// MAYBEBOARD
+1 Agate Instigator (BLC) 21
+1 Archetype of Aggression (PLST) BNG-88
+1 Artist's Talent (BLB) 124
+1 City on Fire (MOM) 135
+1 Court of Embereth (WOC) 24
+1 Court of Ire (LTC) 213
+1 Fated Firepower (TLA) 132
+1 Fiery Emancipation (M21) 143
+1 Fiery Inscription (LTR) 126
+1 Fire Prophecy (IKO) 116
+1 Gimli, Counter of Kills (LTR) 129
+1 Goblin Cratermaker (LTC) 218
+1 Isengard Unleashed (LTC) 495 *F*
+1 Kessig Flamebreather (VOW) 164
+1 Krenko, Mob Boss (FDN) 204
+1 Krenko, Tin Street Kingpin (MOC) 287
+1 Prisoner's Dilemma (MKC) 344
+1 Pyromancer's Gauntlet (M14) 214
+1 Raid Bombardment (UMA) 142
+1 Ruinous Rampage (EOE) 158
+3 Shock (MKM) 144
+1 Siege-Gang Commander (TDC) 232
+1 Spinerock Knoll (DSC) 300
+1 Terror of the Peaks (OTJ) 149
+1 Valakut, the Molten Pinnacle (ZEN) 228
+1 Village Pillagers (ECC) 34
+1 Warlord's Fury (DOM) 151

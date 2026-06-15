@@ -1,0 +1,93 @@
+{
+  "@@locale": "en",
+  "appTitle": "Magic Support",
+  "navPlay": "Play",
+  "navDecks": "Decks",
+  "navTriggers": "Triggers",
+  "navSettings": "Settings",
+  "noActiveDeck": "No active deck selected.",
+  "selectDeckHint": "Pick a deck below to use it as your active deck.",
+  "activeDeck": "Active deck",
+  "decksTitle": "Decks",
+  "decksEmpty": "No decks yet. Tap + to create one.",
+  "newDeck": "New deck",
+  "deckName": "Deck name",
+  "actionCancel": "Cancel",
+  "actionCreate": "Create",
+  "actionDelete": "Delete",
+  "actionClose": "Close",
+  "cardsTitle": "Cards",
+  "cardsEmpty": "No cards yet. Tap + to add one.",
+  "newCard": "New card",
+  "cardName": "Card name",
+  "inPlay": "In play",
+  "importDeck": "Import deck",
+  "importSuccess": "Imported {count} card lines.",
+  "@importSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importEmptyError": "No cards found in this file.",
+  "importFailed": "Import failed: {message}",
+  "@importFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "tabDeck": "Deck",
+  "tabInPlay": "In play",
+  "inPlayEmpty": "No cards in play yet. Mark cards on the Deck tab.",
+  "cardInfo": "Card info",
+  "cardHasEffects": "This card has effects",
+  "cardInfoOracleText": "Oracle text",
+  "cardInfoEffectsTitle": "Effects",
+  "cardInfoNoEffects": "No effects recorded yet.",
+  "cardInfoTriggerLabel": "Trigger",
+  "cardInfoSpellCategoryLabel": "Reacts to",
+  "cardInfoShortLabelLabel": "Short label",
+  "cardInfoEffectDescriptionLabel": "Effect description",
+  "cardInfoAddEffect": "Add effect",
+  "castSpell": "Cast",
+  "castSpellSheetTitle": "Effects when casting an instant/sorcery",
+  "castSpellSectionCast": "On cast",
+  "castSpellSectionCastHint": "Triggers from casting the instant/sorcery itself.",
+  "castSpellSectionDamage": "Caused damage to opponents",
+  "castSpellSectionDamageHint": "If the spell or one of the effects above dealt noncombat damage to an opponent, these also trigger.",
+  "castSpellSectionSpellDamage": "Spell damage to a creature/permanent",
+  "castSpellSectionSpellDamageHint": "If the spell dealt damage to a creature or permanent, these also trigger.",
+  "castSpellSectionStaticModifiers": "Damage modifiers",
+  "castSpellSectionStaticModifiersHint": "Apply to any damage from the effects above, if the condition matches (e.g. only red sources).",
+  "cardInfoNoData": "No additional data yet.",
+  "sortTooltip": "Sort",
+  "sortAlphabetical": "Alphabetical",
+  "sortByType": "By type",
+  "enrichFromScryfall": "Load card data",
+  "enrichSuccess": "Updated {count} cards from Scryfall.",
+  "@enrichSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "enrichFailed": "Loading card data failed: {message}",
+  "@enrichFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "triggersTitle": "Triggers",
+  "triggersHint": "Select a trigger to see matching effects from cards in play.",
+  "noMatchingEffects": "No effects in play match this trigger.",
+  "noActiveTriggers": "No cards in play have effects.",
+  "settingsTitle": "Settings",
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "System"
+}
