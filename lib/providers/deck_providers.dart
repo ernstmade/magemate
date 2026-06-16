@@ -307,8 +307,16 @@ class DeckRepository {
     int cardDefinitionId,
     TriggerType trigger,
     String shortLabel,
+    String shortLabelEn,
     String description, {
-    SpellCategory? spellCategory,
+    String? triggerDetail,
+    Set<EffectCondition> extraConditions = const {},
+    int? damageAmount,
+    DamageTarget? damageTarget,
+    int? damageMultiplier,
+    int? damageMinimum,
+    ReplacementScope? replacementScope,
+    bool dynamicDamage = false,
   }) {
     return _db
         .into(_db.cardEffects)
@@ -316,9 +324,21 @@ class DeckRepository {
           CardEffectsCompanion.insert(
             cardDefinitionId: cardDefinitionId,
             trigger: trigger.name,
-            spellCategory: drift.Value(spellCategory?.name),
+            triggerDetail: drift.Value(triggerDetail),
+            extraConditions: drift.Value(
+              extraConditions.isEmpty
+                  ? null
+                  : extraConditions.map((c) => c.name).join(','),
+            ),
             shortLabel: drift.Value(shortLabel),
+            shortLabelEn: drift.Value(shortLabelEn.isEmpty ? null : shortLabelEn),
             description: description,
+            damageAmount: drift.Value(damageAmount),
+            damageTarget: drift.Value(damageTarget?.name),
+            damageMultiplier: drift.Value(damageMultiplier),
+            damageMinimum: drift.Value(damageMinimum),
+            replacementScope: drift.Value(replacementScope?.name),
+            dynamicDamage: drift.Value(dynamicDamage ? true : null),
           ),
         );
   }
@@ -381,6 +401,9 @@ class DeckRepository {
                 power: drift.Value(card.power),
                 toughness: drift.Value(card.toughness),
                 imageUri: drift.Value(card.imageUri),
+                printedName: drift.Value(card.printedName),
+                printedText: drift.Value(card.printedText),
+                printedTypeLine: drift.Value(card.printedTypeLine),
               ),
             );
         updated++;

@@ -14,6 +14,9 @@ Future<void> showCardInfoSheet(
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.of(context).size.height * 0.8,
+    ),
     builder: (context) => _CardInfoSheet(definition: definition),
   );
 }
@@ -30,44 +33,100 @@ class _CardInfoSheet extends ConsumerStatefulWidget {
 class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
   TriggerType _selectedTrigger = TriggerType.values.first;
   SpellCategory? _selectedSpellCategory;
+  SourceFilter? _selectedSourceFilter;
+  bool _singleTarget = false;
+  DamageTarget? _selectedDamageTarget;
+  ReplacementScope? _selectedReplacementScope;
+  bool _dynamicDamage = false;
   final _shortLabelController = TextEditingController();
+  final _shortLabelEnController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _damageAmountController = TextEditingController();
+  final _damageMultiplierController = TextEditingController();
+  final _damageMinimumController = TextEditingController();
 
   CardDefinition get definition => widget.definition;
 
   @override
   void dispose() {
     _shortLabelController.dispose();
+    _shortLabelEnController.dispose();
     _descriptionController.dispose();
+    _damageAmountController.dispose();
+    _damageMultiplierController.dispose();
+    _damageMinimumController.dispose();
     super.dispose();
   }
 
   Future<void> _addEffect() async {
     final description = _descriptionController.text.trim();
     final shortLabel = _shortLabelController.text.trim();
+    final shortLabelEn = _shortLabelEnController.text.trim();
     if (description.isEmpty) return;
-    if (_selectedTrigger == TriggerType.castSpell &&
+    final detailKind = triggerDetailKind(_selectedTrigger);
+    if (detailKind == TriggerDetailKind.spellCategory &&
         _selectedSpellCategory == null) {
       return;
     }
+    if (detailKind == TriggerDetailKind.sourceFilter &&
+        _selectedSourceFilter == null) {
+      return;
+    }
+    String? triggerDetail;
+    switch (detailKind) {
+      case TriggerDetailKind.spellCategory:
+        triggerDetail = _selectedSpellCategory?.name;
+      case TriggerDetailKind.sourceFilter:
+        triggerDetail = _selectedSourceFilter?.name;
+      case TriggerDetailKind.none:
+        triggerDetail = null;
+    }
+    final damageAmount = int.tryParse(_damageAmountController.text.trim());
+    final damageMultiplier = int.tryParse(
+      _damageMultiplierController.text.trim(),
+    );
+    final damageMinimum = int.tryParse(
+      _damageMinimumController.text.trim(),
+    );
     await ref
         .read(deckRepositoryProvider)
         .addEffect(
           definition.id,
           _selectedTrigger,
           shortLabel,
+          shortLabelEn,
           description,
-          spellCategory: _selectedTrigger == TriggerType.castSpell
-              ? _selectedSpellCategory
-              : null,
+          triggerDetail: triggerDetail,
+          extraConditions: _singleTarget
+              ? {EffectCondition.singleTarget}
+              : {},
+          damageAmount: damageAmount,
+          damageTarget: damageAmount != null ? _selectedDamageTarget : null,
+          damageMultiplier: damageMultiplier,
+          damageMinimum: damageMinimum,
+          replacementScope: _selectedReplacementScope,
+          dynamicDamage: _dynamicDamage,
         );
     _shortLabelController.clear();
+    _shortLabelEnController.clear();
     _descriptionController.clear();
+    _damageAmountController.clear();
+    _damageMultiplierController.clear();
+    _damageMinimumController.clear();
+    setState(() {
+      _selectedSpellCategory = null;
+      _selectedSourceFilter = null;
+      _singleTarget = false;
+      _selectedDamageTarget = null;
+      _selectedReplacementScope = null;
+      _dynamicDamage = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
+    final isDe = Localizations.localeOf(context).languageCode == 'de';
     final effects = ref.watch(effectsForCardDefinitionProvider(definition.id));
 
     final powerToughness =
@@ -91,9 +150,28 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                   ColorIdentityDot(colors: definition.colors),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      definition.name,
-                      style: Theme.of(context).textTheme.titleLarge,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isDe
+                              ? (definition.printedName ?? definition.name)
+                              : definition.name,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        if (isDe && definition.printedName != null)
+                          Text(
+                            definition.name,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   if (definition.manaCost != null &&
@@ -105,8 +183,19 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    if (definition.typeLine?.isNotEmpty ?? false)
-                      Expanded(child: Text(definition.typeLine!)),
+                    if ((isDe
+                            ? (definition.printedTypeLine ?? definition.typeLine)
+                            : definition.typeLine)
+                        ?.isNotEmpty ??
+                        false)
+                      Expanded(
+                        child: Text(
+                          isDe
+                              ? (definition.printedTypeLine ??
+                                    definition.typeLine!)
+                              : definition.typeLine!,
+                        ),
+                      ),
                     if (powerToughness != null) Text(powerToughness),
                   ],
                 ),
@@ -114,14 +203,19 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
               const SizedBox(height: 12),
               if (!hasTypeRow && definition.oracleText == null)
                 Text(l10n.cardInfoNoData),
-              if (definition.oracleText != null) ...[
+              if (definition.printedText != null ||
+                  definition.oracleText != null) ...[
                 const SizedBox(height: 8),
                 Text(
                   l10n.cardInfoOracleText,
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: 4),
-                Text(definition.oracleText!),
+                Text(
+                  isDe
+                      ? (definition.printedText ?? definition.oracleText!)
+                      : (definition.oracleText ?? definition.printedText!),
+                ),
               ],
               const SizedBox(height: 16),
               Text(
@@ -140,6 +234,7 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                       for (final effect in effects)
                         EffectTile(
                           effect: effect,
+                          definition: definition,
                           cardName: effect.trigger,
                           subtitleFirst: true,
                           contentPadding: EdgeInsets.zero,
@@ -177,9 +272,8 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                         if (value != null) {
                           setState(() {
                             _selectedTrigger = value;
-                            if (value != TriggerType.castSpell) {
-                              _selectedSpellCategory = null;
-                            }
+                            _selectedSpellCategory = null;
+                            _selectedSourceFilter = null;
                           });
                         }
                       },
@@ -187,7 +281,8 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                   ),
                 ],
               ),
-              if (_selectedTrigger == TriggerType.castSpell) ...[
+              if (triggerDetailKind(_selectedTrigger) ==
+                  TriggerDetailKind.spellCategory) ...[
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -196,7 +291,7 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                         initialValue: _selectedSpellCategory,
                         isExpanded: true,
                         decoration: InputDecoration(
-                          labelText: l10n.cardInfoSpellCategoryLabel,
+                          labelText: l10n.cardInfoTriggerDetailLabel,
                         ),
                         items: [
                           for (final category in SpellCategory.values)
@@ -212,11 +307,150 @@ class _CardInfoSheetState extends ConsumerState<_CardInfoSheet> {
                   ],
                 ),
               ],
+              if (triggerDetailKind(_selectedTrigger) ==
+                  TriggerDetailKind.sourceFilter) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<SourceFilter>(
+                        initialValue: _selectedSourceFilter,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.cardInfoTriggerDetailLabel,
+                        ),
+                        items: [
+                          for (final filter in SourceFilter.values)
+                            DropdownMenuItem(
+                              value: filter,
+                              child: Text(filter.name),
+                            ),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _selectedSourceFilter = value),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (supportsSingleTargetCondition(_selectedTrigger))
+                CheckboxListTile(
+                  value: _singleTarget,
+                  onChanged: (value) =>
+                      setState(() => _singleTarget = value ?? false),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.cardInfoSingleTargetLabel),
+                ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: TextField(
+                      controller: _damageAmountController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: l10n.cardInfoDamageAmountLabel,
+                      ),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (_selectedTrigger == TriggerType.staticDamageModifier) ...[
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 90,
+                      child: TextField(
+                        controller: _damageMultiplierController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: l10n.cardInfoDamageMultiplierLabel,
+                        ),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 90,
+                      child: TextField(
+                        controller: _damageMinimumController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: l10n.cardInfoDamageMinimumLabel,
+                        ),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                  ],
+                  if (_selectedTrigger != TriggerType.staticDamageModifier &&
+                      _selectedTrigger != TriggerType.spellDealsDamage &&
+                      _damageAmountController.text.trim().isNotEmpty)
+                    Expanded(
+                      child: DropdownButtonFormField<DamageTarget>(
+                        initialValue: _selectedDamageTarget,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.cardInfoDamageTargetLabel,
+                        ),
+                        items: [
+                          for (final target in DamageTarget.values)
+                            DropdownMenuItem(
+                              value: target,
+                              child: Text(target.name),
+                            ),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _selectedDamageTarget = value),
+                      ),
+                    ),
+                ],
+              ),
+              // Replacement-Scope: nur bei staticDamageModifier
+              if (_selectedTrigger == TriggerType.staticDamageModifier) ...[
+                const SizedBox(height: 8),
+                DropdownButtonFormField<ReplacementScope>(
+                  initialValue: _selectedReplacementScope,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.cardInfoReplacementScopeLabel,
+                  ),
+                  items: [
+                    for (final scope in ReplacementScope.values)
+                      DropdownMenuItem(
+                        value: scope,
+                        child: Text(
+                          scope == ReplacementScope.all
+                              ? l10n.cardInfoReplacementScopeAll
+                              : l10n.cardInfoReplacementScopeOpponentOnly,
+                        ),
+                      ),
+                  ],
+                  onChanged: (v) =>
+                      setState(() => _selectedReplacementScope = v),
+                ),
+              ],
+              // Dynamischer Schaden: nur bei spellDealsDamage (z.B. Imodane)
+              if (_selectedTrigger == TriggerType.spellDealsDamage)
+                CheckboxListTile(
+                  value: _dynamicDamage,
+                  onChanged: (v) =>
+                      setState(() => _dynamicDamage = v ?? false),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.cardInfoDynamicDamageLabel),
+                ),
               const SizedBox(height: 8),
               TextField(
                 controller: _shortLabelController,
                 decoration: InputDecoration(
                   labelText: l10n.cardInfoShortLabelLabel,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _shortLabelEnController,
+                decoration: InputDecoration(
+                  labelText: l10n.cardInfoShortLabelEnLabel,
                 ),
               ),
               const SizedBox(height: 8),

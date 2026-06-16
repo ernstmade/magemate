@@ -15,6 +15,9 @@ class ScryfallCard {
     this.power,
     this.toughness,
     this.imageUri,
+    this.printedName,
+    this.printedText,
+    this.printedTypeLine,
   });
 
   final String setCode;
@@ -28,10 +31,14 @@ class ScryfallCard {
   final String? power;
   final String? toughness;
   final String? imageUri;
+  /// Lokalisierter Kartenname (z.B. Deutsch), null wenn nicht verfügbar.
+  final String? printedName;
+  /// Lokalisierter Regeltext (z.B. Deutsch), null wenn nicht verfügbar.
+  final String? printedText;
+  /// Lokalisierter Typ (z.B. Deutsch), null wenn nicht verfügbar.
+  final String? printedTypeLine;
 
   factory ScryfallCard.fromJson(Map<String, dynamic> json) {
-    // Bei doppelseitigen Karten stehen Mana-Kosten/Text oft nur auf der
-    // ersten "card_face" statt auf der obersten Ebene.
     final faces = json['card_faces'] as List<dynamic>?;
     final firstFace = faces != null && faces.isNotEmpty
         ? faces.first as Map<String, dynamic>
@@ -56,6 +63,30 @@ class ScryfallCard {
       power: str('power'),
       toughness: str('toughness'),
       imageUri: imageUris?['normal'] as String?,
+      // printed_* nur bei lokalisierten Einzelabrufen vorhanden
+      printedName: str('printed_name'),
+      printedText: str('printed_text'),
+      printedTypeLine: str('printed_type_line'),
+    );
+  }
+
+  /// Gibt eine Kopie mit den lokalisierten Feldern aus [localized] zurück.
+  ScryfallCard withLocalized(ScryfallCard localized) {
+    return ScryfallCard(
+      setCode: setCode,
+      collectorNumber: collectorNumber,
+      scryfallId: scryfallId,
+      manaCost: manaCost,
+      cmc: cmc,
+      typeLine: typeLine,
+      oracleText: oracleText,
+      colors: colors,
+      power: power,
+      toughness: toughness,
+      imageUri: imageUri,
+      printedName: localized.printedName,
+      printedText: localized.printedText,
+      printedTypeLine: localized.printedTypeLine,
     );
   }
 }
@@ -66,39 +97,96 @@ class ScryfallClient {
   static const _baseUrl = 'https://api.scryfall.com';
   static const _batchSize = 75;
 
-  /// Lädt Karteninfos für die übergebenen (Set, Sammelnummer)-Paare per
-  /// Collection-Endpoint (max. 75 Identifier pro Anfrage).
+  /// Lädt Karteninfos für die übergebenen (Set, Sammelnummer)-Paare.
+  ///
+  /// Schritt 1: Batch-Abruf aller Karten auf Englisch via /cards/collection.
+  /// Schritt 2: Für jede gefundene Karte individueller Abruf auf [localeLang]
+  /// (Standard: "de"). Karten ohne lokalisierte Version behalten nur den
+  /// englischen Text. Zwischen den Einzelabrufen wird kurz gewartet, um
+  /// Scryfall-Rate-Limits zu respektieren.
   Future<List<ScryfallCard>> fetchCards(
-    List<(String setCode, String collectorNumber)> identifiers,
-  ) async {
-    final results = <ScryfallCard>[];
+    List<(String setCode, String collectorNumber)> identifiers, {
+    String localeLang = 'de',
+  }) async {
+    // Schritt 1: Englische Basisdaten per Batch laden
+    final baseCards = <ScryfallCard>[];
     for (var i = 0; i < identifiers.length; i += _batchSize) {
       final batch = identifiers.skip(i).take(_batchSize).toList();
-      final response = await http.post(
-        Uri.parse('$_baseUrl/cards/collection'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'MagicSupportApp/1.0',
-        },
-        body: jsonEncode({
-          'identifiers': [
-            for (final (setCode, collectorNumber) in batch)
-              {'set': setCode.toLowerCase(), 'collector_number': collectorNumber},
-          ],
-        }),
+      final found = await _fetchBatch(batch);
+      baseCards.addAll(found);
+    }
+
+    // Schritt 2: Deutsche Texte per Einzelabruf nachladen
+    final results = <ScryfallCard>[];
+    for (final card in baseCards) {
+      final localized = await _fetchLocalized(
+        card.setCode,
+        card.collectorNumber,
+        localeLang,
       );
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Scryfall-Anfrage fehlgeschlagen (${response.statusCode})',
-        );
-      }
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final found = data['data'] as List<dynamic>;
-      for (final card in found) {
-        results.add(ScryfallCard.fromJson(card as Map<String, dynamic>));
-      }
+      results.add(localized != null ? card.withLocalized(localized) : card);
+      // Scryfall erlaubt ~10 Anfragen/Sekunde
+      await Future<void>.delayed(const Duration(milliseconds: 120));
     }
     return results;
+  }
+
+  /// Lädt einen Batch via POST /cards/collection (keine Sprachunterstützung).
+  Future<List<ScryfallCard>> _fetchBatch(
+    List<(String setCode, String collectorNumber)> batch,
+  ) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/cards/collection'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'MagicSupportApp/1.0',
+      },
+      body: jsonEncode({
+        'identifiers': [
+          for (final (setCode, collectorNumber) in batch)
+            {
+              'set': setCode.toLowerCase(),
+              'collector_number': collectorNumber,
+            },
+        ],
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Scryfall-Anfrage fehlgeschlagen (${response.statusCode})',
+      );
+    }
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (data['data'] as List<dynamic>)
+        .map((c) => ScryfallCard.fromJson(c as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Lädt eine einzelne Karte in [lang] via GET /cards/{set}/{number}/{lang}.
+  /// Gibt null zurück wenn keine lokalisierte Version existiert (404).
+  Future<ScryfallCard?> _fetchLocalized(
+    String setCode,
+    String collectorNumber,
+    String lang,
+  ) async {
+    final url = Uri.parse(
+      '$_baseUrl/cards/${setCode.toLowerCase()}/$collectorNumber/$lang',
+    );
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'MagicSupportApp/1.0',
+      },
+    );
+    if (response.statusCode == 404) return null;
+    if (response.statusCode != 200) {
+      // Fehler beim Einzelabruf ignorieren, englische Version bleibt
+      return null;
+    }
+    return ScryfallCard.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
   }
 }

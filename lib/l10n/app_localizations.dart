@@ -307,11 +307,113 @@ abstract class AppL10n {
   /// **'Reacts to'**
   String get cardInfoSpellCategoryLabel;
 
+  /// No description provided for @cardInfoTriggerDetailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition'**
+  String get cardInfoTriggerDetailLabel;
+
+  /// No description provided for @cardInfoSingleTargetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Single target only'**
+  String get cardInfoSingleTargetLabel;
+
+  /// No description provided for @effectConditionSingleTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Single target only'**
+  String get effectConditionSingleTarget;
+
+  /// No description provided for @cardInfoDamageAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Damage'**
+  String get cardInfoDamageAmountLabel;
+
+  /// No description provided for @cardInfoDamageMultiplierLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiplier (×)'**
+  String get cardInfoDamageMultiplierLabel;
+
+  /// No description provided for @cardInfoDamageMinimumLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum'**
+  String get cardInfoDamageMinimumLabel;
+
+  /// No description provided for @cardInfoReplacementScopeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to'**
+  String get cardInfoReplacementScopeLabel;
+
+  /// No description provided for @cardInfoReplacementScopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Opponents + creatures'**
+  String get cardInfoReplacementScopeAll;
+
+  /// No description provided for @cardInfoReplacementScopeOpponentOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Opponents only'**
+  String get cardInfoReplacementScopeOpponentOnly;
+
+  /// No description provided for @cardInfoDynamicDamageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Derive damage from spell (e.g. Imodane)'**
+  String get cardInfoDynamicDamageLabel;
+
+  /// No description provided for @cardInfoDamageTargetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get cardInfoDamageTargetLabel;
+
+  /// No description provided for @castSpellDamageSummaryEachOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total damage to each opponent'**
+  String get castSpellDamageSummaryEachOpponent;
+
+  /// No description provided for @castSpellDamageSummarySingleOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total damage to one opponent'**
+  String get castSpellDamageSummarySingleOpponent;
+
+  /// No description provided for @castSpellDamageSummarySingleCreature.
+  ///
+  /// In en, this message translates to:
+  /// **'Total damage to a creature/permanent'**
+  String get castSpellDamageSummarySingleCreature;
+
+  /// No description provided for @castSpellDamageSummaryEachCreature.
+  ///
+  /// In en, this message translates to:
+  /// **'Total damage to each creature'**
+  String get castSpellDamageSummaryEachCreature;
+
+  /// No description provided for @castSpellDamageSummaryEachOpponentCreatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Total damage to each opponent\'s creatures'**
+  String get castSpellDamageSummaryEachOpponentCreatures;
+
   /// No description provided for @cardInfoShortLabelLabel.
   ///
   /// In en, this message translates to:
-  /// **'Short label'**
+  /// **'Short label (DE)'**
   String get cardInfoShortLabelLabel;
+
+  /// No description provided for @cardInfoShortLabelEnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Short label (EN)'**
+  String get cardInfoShortLabelEnLabel;
 
   /// No description provided for @cardInfoEffectDescriptionLabel.
   ///
@@ -331,59 +433,53 @@ abstract class AppL10n {
   /// **'Cast'**
   String get castSpell;
 
-  /// No description provided for @castSpellSheetTitle.
+  /// No description provided for @castSpellSectionReplacement.
   ///
   /// In en, this message translates to:
-  /// **'Effects when casting an instant/sorcery'**
-  String get castSpellSheetTitle;
+  /// **'Replacement effects'**
+  String get castSpellSectionReplacement;
+
+  /// No description provided for @castSpellSectionReplacementHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify damage values at every level (own effect, triggered effects, follow-up effects) if the condition matches (e.g. only red sources). Apply these first.'**
+  String get castSpellSectionReplacementHint;
+
+  /// No description provided for @castSpellSectionOwnEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'Own effect'**
+  String get castSpellSectionOwnEffect;
 
   /// No description provided for @castSpellSectionCast.
   ///
   /// In en, this message translates to:
-  /// **'On cast'**
+  /// **'Triggered effects on other cards'**
   String get castSpellSectionCast;
 
   /// No description provided for @castSpellSectionCastHint.
   ///
   /// In en, this message translates to:
-  /// **'Triggers from casting the instant/sorcery itself.'**
+  /// **'Effects from other cards in play that trigger when this spell is cast.'**
   String get castSpellSectionCastHint;
 
-  /// No description provided for @castSpellSectionDamage.
+  /// No description provided for @castSpellSectionFollowUp.
   ///
   /// In en, this message translates to:
-  /// **'Caused damage to opponents'**
-  String get castSpellSectionDamage;
+  /// **'Follow-up effects'**
+  String get castSpellSectionFollowUp;
 
   /// No description provided for @castSpellSectionDamageHint.
   ///
   /// In en, this message translates to:
-  /// **'If the spell or one of the effects above dealt noncombat damage to an opponent, these also trigger.'**
+  /// **'Triggers if the spell or one of the effects above dealt noncombat damage to an opponent.'**
   String get castSpellSectionDamageHint;
-
-  /// No description provided for @castSpellSectionSpellDamage.
-  ///
-  /// In en, this message translates to:
-  /// **'Spell damage to a creature/permanent'**
-  String get castSpellSectionSpellDamage;
 
   /// No description provided for @castSpellSectionSpellDamageHint.
   ///
   /// In en, this message translates to:
-  /// **'If the spell dealt damage to a creature or permanent, these also trigger.'**
+  /// **'Triggers if the spell dealt damage to a creature or permanent.'**
   String get castSpellSectionSpellDamageHint;
-
-  /// No description provided for @castSpellSectionStaticModifiers.
-  ///
-  /// In en, this message translates to:
-  /// **'Damage modifiers'**
-  String get castSpellSectionStaticModifiers;
-
-  /// No description provided for @castSpellSectionStaticModifiersHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Apply to any damage from the effects above, if the condition matches (e.g. only red sources).'**
-  String get castSpellSectionStaticModifiersHint;
 
   /// No description provided for @cardInfoNoData.
   ///
@@ -438,12 +534,6 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Select a trigger to see matching effects from cards in play.'**
   String get triggersHint;
-
-  /// No description provided for @noMatchingEffects.
-  ///
-  /// In en, this message translates to:
-  /// **'No effects in play match this trigger.'**
-  String get noMatchingEffects;
 
   /// No description provided for @noActiveTriggers.
   ///

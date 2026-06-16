@@ -253,7 +253,8 @@ class _DeckTab extends ConsumerWidget {
                         color: triggerStyle(TriggerType.castSpell).color,
                       ),
                       tooltip: l10n.castSpell,
-                      onPressed: () => showCastSpellEffectsSheet(context),
+                      onPressed: () =>
+                          showCastSpellEffectsSheet(context, group.definition),
                     )
                   else
                     _InPlayStepper(group: group),
@@ -302,7 +303,12 @@ class _EffectIndicator extends ConsumerWidget {
     final effects = ref.watch(
       effectsForCardDefinitionProvider(cardDefinitionId),
     );
-    final entries = effects.valueOrNull ?? const [];
+    // spellResolved beschreibt nur den eigenen Effekt eines Instant/Sorcery
+    // beim Auflösen, kein Trigger, der während des Spiels "lauert" – daher
+    // hier nicht als Trigger-Icon anzeigen.
+    final entries = (effects.valueOrNull ?? const [])
+        .where((e) => e.trigger != TriggerType.spellResolved.name)
+        .toList();
     if (entries.isEmpty) return const SizedBox(width: 32);
 
     final styles = <TriggerStyle>{};

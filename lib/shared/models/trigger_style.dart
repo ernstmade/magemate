@@ -34,8 +34,14 @@ TriggerStyle triggerStyle(TriggerType trigger) {
 
     // Kreaturen-Events
     case TriggerType.enterBattlefield:
+      return const TriggerStyle(Icons.arrow_circle_right, Colors.green);
+
     case TriggerType.leaveBattlefield:
+      return const TriggerStyle(Icons.arrow_circle_left, Colors.green);
+
     case TriggerType.dies:
+      return const TriggerStyle(Symbols.skull, Colors.red);
+
     case TriggerType.blocks:
       return const TriggerStyle(Icons.shield_moon, Colors.orange);
 
@@ -44,10 +50,12 @@ TriggerStyle triggerStyle(TriggerType trigger) {
 
     // Schaden
     case TriggerType.dealsCombatDamage:
-    case TriggerType.dealsNoncombatDamage:
     case TriggerType.spellDealsDamage:
     case TriggerType.staticDamageModifier:
       return const TriggerStyle(Icons.local_fire_department, Colors.red);
+
+    case TriggerType.dealsNoncombatDamage:
+      return const TriggerStyle(Symbols.emergency_heat, Colors.red);
 
     case TriggerType.takesDamage:
       return const TriggerStyle(Icons.water_drop, Colors.red);

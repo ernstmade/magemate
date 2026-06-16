@@ -120,7 +120,64 @@ class AppL10nDe extends AppL10n {
   String get cardInfoSpellCategoryLabel => 'Reagiert auf';
 
   @override
-  String get cardInfoShortLabelLabel => 'Kurzform';
+  String get cardInfoTriggerDetailLabel => 'Bedingung';
+
+  @override
+  String get cardInfoSingleTargetLabel => 'Nur bei Einzelziel';
+
+  @override
+  String get effectConditionSingleTarget => 'Nur bei Einzelziel';
+
+  @override
+  String get cardInfoDamageAmountLabel => 'Schaden';
+
+  @override
+  String get cardInfoDamageMultiplierLabel => 'Multiplikator (×)';
+
+  @override
+  String get cardInfoDamageMinimumLabel => 'Minimum';
+
+  @override
+  String get cardInfoReplacementScopeLabel => 'Gilt für';
+
+  @override
+  String get cardInfoReplacementScopeAll => 'Gegner + Kreaturen';
+
+  @override
+  String get cardInfoReplacementScopeOpponentOnly => 'Nur Gegner';
+
+  @override
+  String get cardInfoDynamicDamageLabel =>
+      'Schaden vom Spell übernehmen (z.B. Imodane)';
+
+  @override
+  String get cardInfoDamageTargetLabel => 'Ziel';
+
+  @override
+  String get castSpellDamageSummaryEachOpponent =>
+      'Summe Schaden an jeden Gegner';
+
+  @override
+  String get castSpellDamageSummarySingleOpponent =>
+      'Summe Schaden an einen Gegner';
+
+  @override
+  String get castSpellDamageSummarySingleCreature =>
+      'Summe Schaden an eine Kreatur/Permanent';
+
+  @override
+  String get castSpellDamageSummaryEachCreature =>
+      'Summe Schaden an jede Kreatur';
+
+  @override
+  String get castSpellDamageSummaryEachOpponentCreatures =>
+      'Summe Schaden an Kreaturen jedes Gegners';
+
+  @override
+  String get cardInfoShortLabelLabel => 'Kurzform (DE)';
+
+  @override
+  String get cardInfoShortLabelEnLabel => 'Kurzform (EN)';
 
   @override
   String get cardInfoEffectDescriptionLabel => 'Effektbeschreibung';
@@ -132,37 +189,32 @@ class AppL10nDe extends AppL10n {
   String get castSpell => 'Gespielt';
 
   @override
-  String get castSpellSheetTitle =>
-      'Effekte beim Spielen eines Instant/Sorcery';
+  String get castSpellSectionReplacement => 'Replacement-Effekte';
 
   @override
-  String get castSpellSectionCast => 'Beim Spielen';
+  String get castSpellSectionReplacementHint =>
+      'Verändern Schadenswerte auf allen Ebenen (eigener Effekt, ausgelöste Effekte, Folgeeffekte), falls die Bedingung passt (z.B. nur rote Quellen). Zuerst berücksichtigen.';
+
+  @override
+  String get castSpellSectionOwnEffect => 'Eigener Effekt';
+
+  @override
+  String get castSpellSectionCast => 'Ausgelöste Effekte auf anderen Karten';
 
   @override
   String get castSpellSectionCastHint =>
-      'Trigger durch das Spielen des Instant/Sorcery selbst.';
+      'Effekte anderer Karten im Spiel, die ausgelöst werden, wenn dieser Spruch gespielt wird.';
 
   @override
-  String get castSpellSectionDamage => 'Dadurch verursachter Schaden an Gegner';
+  String get castSpellSectionFollowUp => 'Folgeeffekte';
 
   @override
   String get castSpellSectionDamageHint =>
-      'Falls der Spruch oder einer der obigen Effekte Noncombat-Schaden an einen Gegner verursacht hat, triggern auch diese.';
-
-  @override
-  String get castSpellSectionSpellDamage =>
-      'Spruch-Schaden an Kreatur/Permanent';
+      'Falls der Spruch oder einer der obigen Effekte Noncombat-Schaden an einen Gegner verursacht hat, triggert dies.';
 
   @override
   String get castSpellSectionSpellDamageHint =>
-      'Falls der Spruch Schaden an eine Kreatur oder ein Permanent verursacht hat, triggern auch diese.';
-
-  @override
-  String get castSpellSectionStaticModifiers => 'Schadensmodifikatoren';
-
-  @override
-  String get castSpellSectionStaticModifiersHint =>
-      'Gelten für jeglichen Schaden aus den obigen Effekten, falls die Bedingung passt (z.B. nur rote Quellen).';
+      'Falls der Spruch Schaden an eine Kreatur oder ein Permanent verursacht hat, triggert dies.';
 
   @override
   String get cardInfoNoData => 'Noch keine weiteren Daten vorhanden.';
@@ -195,10 +247,6 @@ class AppL10nDe extends AppL10n {
   @override
   String get triggersHint =>
       'Wähle einen Trigger, um passende Effekte der gespielten Karten zu sehen.';
-
-  @override
-  String get noMatchingEffects =>
-      'Keine im Spiel befindlichen Effekte passen zu diesem Trigger.';
 
   @override
   String get noActiveTriggers =>

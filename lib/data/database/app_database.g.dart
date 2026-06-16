@@ -443,6 +443,39 @@ class $CardDefinitionsTable extends CardDefinitions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _printedNameMeta = const VerificationMeta(
+    'printedName',
+  );
+  @override
+  late final GeneratedColumn<String> printedName = GeneratedColumn<String>(
+    'printed_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _printedTextMeta = const VerificationMeta(
+    'printedText',
+  );
+  @override
+  late final GeneratedColumn<String> printedText = GeneratedColumn<String>(
+    'printed_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _printedTypeLineMeta = const VerificationMeta(
+    'printedTypeLine',
+  );
+  @override
+  late final GeneratedColumn<String> printedTypeLine = GeneratedColumn<String>(
+    'printed_type_line',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -458,6 +491,9 @@ class $CardDefinitionsTable extends CardDefinitions
     power,
     toughness,
     imageUri,
+    printedName,
+    printedText,
+    printedTypeLine,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -551,6 +587,33 @@ class $CardDefinitionsTable extends CardDefinitions
         imageUri.isAcceptableOrUnknown(data['image_uri']!, _imageUriMeta),
       );
     }
+    if (data.containsKey('printed_name')) {
+      context.handle(
+        _printedNameMeta,
+        printedName.isAcceptableOrUnknown(
+          data['printed_name']!,
+          _printedNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('printed_text')) {
+      context.handle(
+        _printedTextMeta,
+        printedText.isAcceptableOrUnknown(
+          data['printed_text']!,
+          _printedTextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('printed_type_line')) {
+      context.handle(
+        _printedTypeLineMeta,
+        printedTypeLine.isAcceptableOrUnknown(
+          data['printed_type_line']!,
+          _printedTypeLineMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -612,6 +675,18 @@ class $CardDefinitionsTable extends CardDefinitions
         DriftSqlType.string,
         data['${effectivePrefix}image_uri'],
       ),
+      printedName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}printed_name'],
+      ),
+      printedText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}printed_text'],
+      ),
+      printedTypeLine: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}printed_type_line'],
+      ),
     );
   }
 
@@ -635,6 +710,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
   final String? power;
   final String? toughness;
   final String? imageUri;
+  final String? printedName;
+  final String? printedText;
+  final String? printedTypeLine;
   const CardDefinition({
     required this.id,
     required this.name,
@@ -649,6 +727,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     this.power,
     this.toughness,
     this.imageUri,
+    this.printedName,
+    this.printedText,
+    this.printedTypeLine,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -688,6 +769,15 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     if (!nullToAbsent || imageUri != null) {
       map['image_uri'] = Variable<String>(imageUri);
     }
+    if (!nullToAbsent || printedName != null) {
+      map['printed_name'] = Variable<String>(printedName);
+    }
+    if (!nullToAbsent || printedText != null) {
+      map['printed_text'] = Variable<String>(printedText);
+    }
+    if (!nullToAbsent || printedTypeLine != null) {
+      map['printed_type_line'] = Variable<String>(printedTypeLine);
+    }
     return map;
   }
 
@@ -726,6 +816,15 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       imageUri: imageUri == null && nullToAbsent
           ? const Value.absent()
           : Value(imageUri),
+      printedName: printedName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(printedName),
+      printedText: printedText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(printedText),
+      printedTypeLine: printedTypeLine == null && nullToAbsent
+          ? const Value.absent()
+          : Value(printedTypeLine),
     );
   }
 
@@ -748,6 +847,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       power: serializer.fromJson<String?>(json['power']),
       toughness: serializer.fromJson<String?>(json['toughness']),
       imageUri: serializer.fromJson<String?>(json['imageUri']),
+      printedName: serializer.fromJson<String?>(json['printedName']),
+      printedText: serializer.fromJson<String?>(json['printedText']),
+      printedTypeLine: serializer.fromJson<String?>(json['printedTypeLine']),
     );
   }
   @override
@@ -767,6 +869,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       'power': serializer.toJson<String?>(power),
       'toughness': serializer.toJson<String?>(toughness),
       'imageUri': serializer.toJson<String?>(imageUri),
+      'printedName': serializer.toJson<String?>(printedName),
+      'printedText': serializer.toJson<String?>(printedText),
+      'printedTypeLine': serializer.toJson<String?>(printedTypeLine),
     };
   }
 
@@ -784,6 +889,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     Value<String?> power = const Value.absent(),
     Value<String?> toughness = const Value.absent(),
     Value<String?> imageUri = const Value.absent(),
+    Value<String?> printedName = const Value.absent(),
+    Value<String?> printedText = const Value.absent(),
+    Value<String?> printedTypeLine = const Value.absent(),
   }) => CardDefinition(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -800,6 +908,11 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     power: power.present ? power.value : this.power,
     toughness: toughness.present ? toughness.value : this.toughness,
     imageUri: imageUri.present ? imageUri.value : this.imageUri,
+    printedName: printedName.present ? printedName.value : this.printedName,
+    printedText: printedText.present ? printedText.value : this.printedText,
+    printedTypeLine: printedTypeLine.present
+        ? printedTypeLine.value
+        : this.printedTypeLine,
   );
   CardDefinition copyWithCompanion(CardDefinitionsCompanion data) {
     return CardDefinition(
@@ -822,6 +935,15 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       power: data.power.present ? data.power.value : this.power,
       toughness: data.toughness.present ? data.toughness.value : this.toughness,
       imageUri: data.imageUri.present ? data.imageUri.value : this.imageUri,
+      printedName: data.printedName.present
+          ? data.printedName.value
+          : this.printedName,
+      printedText: data.printedText.present
+          ? data.printedText.value
+          : this.printedText,
+      printedTypeLine: data.printedTypeLine.present
+          ? data.printedTypeLine.value
+          : this.printedTypeLine,
     );
   }
 
@@ -840,7 +962,10 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           ..write('colors: $colors, ')
           ..write('power: $power, ')
           ..write('toughness: $toughness, ')
-          ..write('imageUri: $imageUri')
+          ..write('imageUri: $imageUri, ')
+          ..write('printedName: $printedName, ')
+          ..write('printedText: $printedText, ')
+          ..write('printedTypeLine: $printedTypeLine')
           ..write(')'))
         .toString();
   }
@@ -860,6 +985,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     power,
     toughness,
     imageUri,
+    printedName,
+    printedText,
+    printedTypeLine,
   );
   @override
   bool operator ==(Object other) =>
@@ -877,7 +1005,10 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           other.colors == this.colors &&
           other.power == this.power &&
           other.toughness == this.toughness &&
-          other.imageUri == this.imageUri);
+          other.imageUri == this.imageUri &&
+          other.printedName == this.printedName &&
+          other.printedText == this.printedText &&
+          other.printedTypeLine == this.printedTypeLine);
 }
 
 class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
@@ -894,6 +1025,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
   final Value<String?> power;
   final Value<String?> toughness;
   final Value<String?> imageUri;
+  final Value<String?> printedName;
+  final Value<String?> printedText;
+  final Value<String?> printedTypeLine;
   const CardDefinitionsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -908,6 +1042,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     this.power = const Value.absent(),
     this.toughness = const Value.absent(),
     this.imageUri = const Value.absent(),
+    this.printedName = const Value.absent(),
+    this.printedText = const Value.absent(),
+    this.printedTypeLine = const Value.absent(),
   });
   CardDefinitionsCompanion.insert({
     this.id = const Value.absent(),
@@ -923,6 +1060,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     this.power = const Value.absent(),
     this.toughness = const Value.absent(),
     this.imageUri = const Value.absent(),
+    this.printedName = const Value.absent(),
+    this.printedText = const Value.absent(),
+    this.printedTypeLine = const Value.absent(),
   }) : name = Value(name);
   static Insertable<CardDefinition> custom({
     Expression<int>? id,
@@ -938,6 +1078,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     Expression<String>? power,
     Expression<String>? toughness,
     Expression<String>? imageUri,
+    Expression<String>? printedName,
+    Expression<String>? printedText,
+    Expression<String>? printedTypeLine,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -953,6 +1096,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
       if (power != null) 'power': power,
       if (toughness != null) 'toughness': toughness,
       if (imageUri != null) 'image_uri': imageUri,
+      if (printedName != null) 'printed_name': printedName,
+      if (printedText != null) 'printed_text': printedText,
+      if (printedTypeLine != null) 'printed_type_line': printedTypeLine,
     });
   }
 
@@ -970,6 +1116,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     Value<String?>? power,
     Value<String?>? toughness,
     Value<String?>? imageUri,
+    Value<String?>? printedName,
+    Value<String?>? printedText,
+    Value<String?>? printedTypeLine,
   }) {
     return CardDefinitionsCompanion(
       id: id ?? this.id,
@@ -985,6 +1134,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
       power: power ?? this.power,
       toughness: toughness ?? this.toughness,
       imageUri: imageUri ?? this.imageUri,
+      printedName: printedName ?? this.printedName,
+      printedText: printedText ?? this.printedText,
+      printedTypeLine: printedTypeLine ?? this.printedTypeLine,
     );
   }
 
@@ -1030,6 +1182,15 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     if (imageUri.present) {
       map['image_uri'] = Variable<String>(imageUri.value);
     }
+    if (printedName.present) {
+      map['printed_name'] = Variable<String>(printedName.value);
+    }
+    if (printedText.present) {
+      map['printed_text'] = Variable<String>(printedText.value);
+    }
+    if (printedTypeLine.present) {
+      map['printed_type_line'] = Variable<String>(printedTypeLine.value);
+    }
     return map;
   }
 
@@ -1048,7 +1209,10 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
           ..write('colors: $colors, ')
           ..write('power: $power, ')
           ..write('toughness: $toughness, ')
-          ..write('imageUri: $imageUri')
+          ..write('imageUri: $imageUri, ')
+          ..write('printedName: $printedName, ')
+          ..write('printedText: $printedText, ')
+          ..write('printedTypeLine: $printedTypeLine')
           ..write(')'))
         .toString();
   }
@@ -1445,12 +1609,23 @@ class $CardEffectsTable extends CardEffects
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _spellCategoryMeta = const VerificationMeta(
-    'spellCategory',
+  static const VerificationMeta _triggerDetailMeta = const VerificationMeta(
+    'triggerDetail',
   );
   @override
-  late final GeneratedColumn<String> spellCategory = GeneratedColumn<String>(
+  late final GeneratedColumn<String> triggerDetail = GeneratedColumn<String>(
     'spell_category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _extraConditionsMeta = const VerificationMeta(
+    'extraConditions',
+  );
+  @override
+  late final GeneratedColumn<String> extraConditions = GeneratedColumn<String>(
+    'extra_conditions',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -1468,6 +1643,17 @@ class $CardEffectsTable extends CardEffects
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _shortLabelEnMeta = const VerificationMeta(
+    'shortLabelEn',
+  );
+  @override
+  late final GeneratedColumn<String> shortLabelEn = GeneratedColumn<String>(
+    'short_label_en',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _descriptionMeta = const VerificationMeta(
     'description',
   );
@@ -1478,6 +1664,75 @@ class $CardEffectsTable extends CardEffects
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _damageAmountMeta = const VerificationMeta(
+    'damageAmount',
+  );
+  @override
+  late final GeneratedColumn<int> damageAmount = GeneratedColumn<int>(
+    'damage_amount',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _damageTargetMeta = const VerificationMeta(
+    'damageTarget',
+  );
+  @override
+  late final GeneratedColumn<String> damageTarget = GeneratedColumn<String>(
+    'damage_target',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _replacementScopeMeta = const VerificationMeta(
+    'replacementScope',
+  );
+  @override
+  late final GeneratedColumn<String> replacementScope = GeneratedColumn<String>(
+    'replacement_scope',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dynamicDamageMeta = const VerificationMeta(
+    'dynamicDamage',
+  );
+  @override
+  late final GeneratedColumn<bool> dynamicDamage = GeneratedColumn<bool>(
+    'dynamic_damage',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dynamic_damage" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _damageMultiplierMeta = const VerificationMeta(
+    'damageMultiplier',
+  );
+  @override
+  late final GeneratedColumn<int> damageMultiplier = GeneratedColumn<int>(
+    'damage_multiplier',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _damageMinimumMeta = const VerificationMeta(
+    'damageMinimum',
+  );
+  @override
+  late final GeneratedColumn<int> damageMinimum = GeneratedColumn<int>(
+    'damage_minimum',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _triggersEffectIdMeta = const VerificationMeta(
     'triggersEffectId',
@@ -1495,9 +1750,17 @@ class $CardEffectsTable extends CardEffects
     id,
     cardDefinitionId,
     trigger,
-    spellCategory,
+    triggerDetail,
+    extraConditions,
     shortLabel,
+    shortLabelEn,
     description,
+    damageAmount,
+    damageTarget,
+    replacementScope,
+    dynamicDamage,
+    damageMultiplier,
+    damageMinimum,
     triggersEffectId,
   ];
   @override
@@ -1536,10 +1799,19 @@ class $CardEffectsTable extends CardEffects
     }
     if (data.containsKey('spell_category')) {
       context.handle(
-        _spellCategoryMeta,
-        spellCategory.isAcceptableOrUnknown(
+        _triggerDetailMeta,
+        triggerDetail.isAcceptableOrUnknown(
           data['spell_category']!,
-          _spellCategoryMeta,
+          _triggerDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('extra_conditions')) {
+      context.handle(
+        _extraConditionsMeta,
+        extraConditions.isAcceptableOrUnknown(
+          data['extra_conditions']!,
+          _extraConditionsMeta,
         ),
       );
     }
@@ -1547,6 +1819,15 @@ class $CardEffectsTable extends CardEffects
       context.handle(
         _shortLabelMeta,
         shortLabel.isAcceptableOrUnknown(data['short_label']!, _shortLabelMeta),
+      );
+    }
+    if (data.containsKey('short_label_en')) {
+      context.handle(
+        _shortLabelEnMeta,
+        shortLabelEn.isAcceptableOrUnknown(
+          data['short_label_en']!,
+          _shortLabelEnMeta,
+        ),
       );
     }
     if (data.containsKey('description')) {
@@ -1559,6 +1840,60 @@ class $CardEffectsTable extends CardEffects
       );
     } else if (isInserting) {
       context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('damage_amount')) {
+      context.handle(
+        _damageAmountMeta,
+        damageAmount.isAcceptableOrUnknown(
+          data['damage_amount']!,
+          _damageAmountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('damage_target')) {
+      context.handle(
+        _damageTargetMeta,
+        damageTarget.isAcceptableOrUnknown(
+          data['damage_target']!,
+          _damageTargetMeta,
+        ),
+      );
+    }
+    if (data.containsKey('replacement_scope')) {
+      context.handle(
+        _replacementScopeMeta,
+        replacementScope.isAcceptableOrUnknown(
+          data['replacement_scope']!,
+          _replacementScopeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dynamic_damage')) {
+      context.handle(
+        _dynamicDamageMeta,
+        dynamicDamage.isAcceptableOrUnknown(
+          data['dynamic_damage']!,
+          _dynamicDamageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('damage_multiplier')) {
+      context.handle(
+        _damageMultiplierMeta,
+        damageMultiplier.isAcceptableOrUnknown(
+          data['damage_multiplier']!,
+          _damageMultiplierMeta,
+        ),
+      );
+    }
+    if (data.containsKey('damage_minimum')) {
+      context.handle(
+        _damageMinimumMeta,
+        damageMinimum.isAcceptableOrUnknown(
+          data['damage_minimum']!,
+          _damageMinimumMeta,
+        ),
+      );
     }
     if (data.containsKey('triggers_effect_id')) {
       context.handle(
@@ -1590,18 +1925,50 @@ class $CardEffectsTable extends CardEffects
         DriftSqlType.string,
         data['${effectivePrefix}trigger'],
       )!,
-      spellCategory: attachedDatabase.typeMapping.read(
+      triggerDetail: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}spell_category'],
+      ),
+      extraConditions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}extra_conditions'],
       ),
       shortLabel: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}short_label'],
       )!,
+      shortLabelEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}short_label_en'],
+      ),
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       )!,
+      damageAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}damage_amount'],
+      ),
+      damageTarget: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}damage_target'],
+      ),
+      replacementScope: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}replacement_scope'],
+      ),
+      dynamicDamage: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dynamic_damage'],
+      ),
+      damageMultiplier: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}damage_multiplier'],
+      ),
+      damageMinimum: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}damage_minimum'],
+      ),
       triggersEffectId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}triggers_effect_id'],
@@ -1619,17 +1986,33 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
   final int id;
   final int cardDefinitionId;
   final String trigger;
-  final String? spellCategory;
+  final String? triggerDetail;
+  final String? extraConditions;
   final String shortLabel;
+  final String? shortLabelEn;
   final String description;
+  final int? damageAmount;
+  final String? damageTarget;
+  final String? replacementScope;
+  final bool? dynamicDamage;
+  final int? damageMultiplier;
+  final int? damageMinimum;
   final int? triggersEffectId;
   const CardEffect({
     required this.id,
     required this.cardDefinitionId,
     required this.trigger,
-    this.spellCategory,
+    this.triggerDetail,
+    this.extraConditions,
     required this.shortLabel,
+    this.shortLabelEn,
     required this.description,
+    this.damageAmount,
+    this.damageTarget,
+    this.replacementScope,
+    this.dynamicDamage,
+    this.damageMultiplier,
+    this.damageMinimum,
     this.triggersEffectId,
   });
   @override
@@ -1638,11 +2021,35 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     map['id'] = Variable<int>(id);
     map['card_definition_id'] = Variable<int>(cardDefinitionId);
     map['trigger'] = Variable<String>(trigger);
-    if (!nullToAbsent || spellCategory != null) {
-      map['spell_category'] = Variable<String>(spellCategory);
+    if (!nullToAbsent || triggerDetail != null) {
+      map['spell_category'] = Variable<String>(triggerDetail);
+    }
+    if (!nullToAbsent || extraConditions != null) {
+      map['extra_conditions'] = Variable<String>(extraConditions);
     }
     map['short_label'] = Variable<String>(shortLabel);
+    if (!nullToAbsent || shortLabelEn != null) {
+      map['short_label_en'] = Variable<String>(shortLabelEn);
+    }
     map['description'] = Variable<String>(description);
+    if (!nullToAbsent || damageAmount != null) {
+      map['damage_amount'] = Variable<int>(damageAmount);
+    }
+    if (!nullToAbsent || damageTarget != null) {
+      map['damage_target'] = Variable<String>(damageTarget);
+    }
+    if (!nullToAbsent || replacementScope != null) {
+      map['replacement_scope'] = Variable<String>(replacementScope);
+    }
+    if (!nullToAbsent || dynamicDamage != null) {
+      map['dynamic_damage'] = Variable<bool>(dynamicDamage);
+    }
+    if (!nullToAbsent || damageMultiplier != null) {
+      map['damage_multiplier'] = Variable<int>(damageMultiplier);
+    }
+    if (!nullToAbsent || damageMinimum != null) {
+      map['damage_minimum'] = Variable<int>(damageMinimum);
+    }
     if (!nullToAbsent || triggersEffectId != null) {
       map['triggers_effect_id'] = Variable<int>(triggersEffectId);
     }
@@ -1654,11 +2061,35 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       id: Value(id),
       cardDefinitionId: Value(cardDefinitionId),
       trigger: Value(trigger),
-      spellCategory: spellCategory == null && nullToAbsent
+      triggerDetail: triggerDetail == null && nullToAbsent
           ? const Value.absent()
-          : Value(spellCategory),
+          : Value(triggerDetail),
+      extraConditions: extraConditions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(extraConditions),
       shortLabel: Value(shortLabel),
+      shortLabelEn: shortLabelEn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shortLabelEn),
       description: Value(description),
+      damageAmount: damageAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageAmount),
+      damageTarget: damageTarget == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageTarget),
+      replacementScope: replacementScope == null && nullToAbsent
+          ? const Value.absent()
+          : Value(replacementScope),
+      dynamicDamage: dynamicDamage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dynamicDamage),
+      damageMultiplier: damageMultiplier == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageMultiplier),
+      damageMinimum: damageMinimum == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageMinimum),
       triggersEffectId: triggersEffectId == null && nullToAbsent
           ? const Value.absent()
           : Value(triggersEffectId),
@@ -1674,9 +2105,17 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       id: serializer.fromJson<int>(json['id']),
       cardDefinitionId: serializer.fromJson<int>(json['cardDefinitionId']),
       trigger: serializer.fromJson<String>(json['trigger']),
-      spellCategory: serializer.fromJson<String?>(json['spellCategory']),
+      triggerDetail: serializer.fromJson<String?>(json['triggerDetail']),
+      extraConditions: serializer.fromJson<String?>(json['extraConditions']),
       shortLabel: serializer.fromJson<String>(json['shortLabel']),
+      shortLabelEn: serializer.fromJson<String?>(json['shortLabelEn']),
       description: serializer.fromJson<String>(json['description']),
+      damageAmount: serializer.fromJson<int?>(json['damageAmount']),
+      damageTarget: serializer.fromJson<String?>(json['damageTarget']),
+      replacementScope: serializer.fromJson<String?>(json['replacementScope']),
+      dynamicDamage: serializer.fromJson<bool?>(json['dynamicDamage']),
+      damageMultiplier: serializer.fromJson<int?>(json['damageMultiplier']),
+      damageMinimum: serializer.fromJson<int?>(json['damageMinimum']),
       triggersEffectId: serializer.fromJson<int?>(json['triggersEffectId']),
     );
   }
@@ -1687,9 +2126,17 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       'id': serializer.toJson<int>(id),
       'cardDefinitionId': serializer.toJson<int>(cardDefinitionId),
       'trigger': serializer.toJson<String>(trigger),
-      'spellCategory': serializer.toJson<String?>(spellCategory),
+      'triggerDetail': serializer.toJson<String?>(triggerDetail),
+      'extraConditions': serializer.toJson<String?>(extraConditions),
       'shortLabel': serializer.toJson<String>(shortLabel),
+      'shortLabelEn': serializer.toJson<String?>(shortLabelEn),
       'description': serializer.toJson<String>(description),
+      'damageAmount': serializer.toJson<int?>(damageAmount),
+      'damageTarget': serializer.toJson<String?>(damageTarget),
+      'replacementScope': serializer.toJson<String?>(replacementScope),
+      'dynamicDamage': serializer.toJson<bool?>(dynamicDamage),
+      'damageMultiplier': serializer.toJson<int?>(damageMultiplier),
+      'damageMinimum': serializer.toJson<int?>(damageMinimum),
       'triggersEffectId': serializer.toJson<int?>(triggersEffectId),
     };
   }
@@ -1698,19 +2145,45 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     int? id,
     int? cardDefinitionId,
     String? trigger,
-    Value<String?> spellCategory = const Value.absent(),
+    Value<String?> triggerDetail = const Value.absent(),
+    Value<String?> extraConditions = const Value.absent(),
     String? shortLabel,
+    Value<String?> shortLabelEn = const Value.absent(),
     String? description,
+    Value<int?> damageAmount = const Value.absent(),
+    Value<String?> damageTarget = const Value.absent(),
+    Value<String?> replacementScope = const Value.absent(),
+    Value<bool?> dynamicDamage = const Value.absent(),
+    Value<int?> damageMultiplier = const Value.absent(),
+    Value<int?> damageMinimum = const Value.absent(),
     Value<int?> triggersEffectId = const Value.absent(),
   }) => CardEffect(
     id: id ?? this.id,
     cardDefinitionId: cardDefinitionId ?? this.cardDefinitionId,
     trigger: trigger ?? this.trigger,
-    spellCategory: spellCategory.present
-        ? spellCategory.value
-        : this.spellCategory,
+    triggerDetail: triggerDetail.present
+        ? triggerDetail.value
+        : this.triggerDetail,
+    extraConditions: extraConditions.present
+        ? extraConditions.value
+        : this.extraConditions,
     shortLabel: shortLabel ?? this.shortLabel,
+    shortLabelEn: shortLabelEn.present ? shortLabelEn.value : this.shortLabelEn,
     description: description ?? this.description,
+    damageAmount: damageAmount.present ? damageAmount.value : this.damageAmount,
+    damageTarget: damageTarget.present ? damageTarget.value : this.damageTarget,
+    replacementScope: replacementScope.present
+        ? replacementScope.value
+        : this.replacementScope,
+    dynamicDamage: dynamicDamage.present
+        ? dynamicDamage.value
+        : this.dynamicDamage,
+    damageMultiplier: damageMultiplier.present
+        ? damageMultiplier.value
+        : this.damageMultiplier,
+    damageMinimum: damageMinimum.present
+        ? damageMinimum.value
+        : this.damageMinimum,
     triggersEffectId: triggersEffectId.present
         ? triggersEffectId.value
         : this.triggersEffectId,
@@ -1722,15 +2195,39 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
           ? data.cardDefinitionId.value
           : this.cardDefinitionId,
       trigger: data.trigger.present ? data.trigger.value : this.trigger,
-      spellCategory: data.spellCategory.present
-          ? data.spellCategory.value
-          : this.spellCategory,
+      triggerDetail: data.triggerDetail.present
+          ? data.triggerDetail.value
+          : this.triggerDetail,
+      extraConditions: data.extraConditions.present
+          ? data.extraConditions.value
+          : this.extraConditions,
       shortLabel: data.shortLabel.present
           ? data.shortLabel.value
           : this.shortLabel,
+      shortLabelEn: data.shortLabelEn.present
+          ? data.shortLabelEn.value
+          : this.shortLabelEn,
       description: data.description.present
           ? data.description.value
           : this.description,
+      damageAmount: data.damageAmount.present
+          ? data.damageAmount.value
+          : this.damageAmount,
+      damageTarget: data.damageTarget.present
+          ? data.damageTarget.value
+          : this.damageTarget,
+      replacementScope: data.replacementScope.present
+          ? data.replacementScope.value
+          : this.replacementScope,
+      dynamicDamage: data.dynamicDamage.present
+          ? data.dynamicDamage.value
+          : this.dynamicDamage,
+      damageMultiplier: data.damageMultiplier.present
+          ? data.damageMultiplier.value
+          : this.damageMultiplier,
+      damageMinimum: data.damageMinimum.present
+          ? data.damageMinimum.value
+          : this.damageMinimum,
       triggersEffectId: data.triggersEffectId.present
           ? data.triggersEffectId.value
           : this.triggersEffectId,
@@ -1743,9 +2240,17 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
           ..write('id: $id, ')
           ..write('cardDefinitionId: $cardDefinitionId, ')
           ..write('trigger: $trigger, ')
-          ..write('spellCategory: $spellCategory, ')
+          ..write('triggerDetail: $triggerDetail, ')
+          ..write('extraConditions: $extraConditions, ')
           ..write('shortLabel: $shortLabel, ')
+          ..write('shortLabelEn: $shortLabelEn, ')
           ..write('description: $description, ')
+          ..write('damageAmount: $damageAmount, ')
+          ..write('damageTarget: $damageTarget, ')
+          ..write('replacementScope: $replacementScope, ')
+          ..write('dynamicDamage: $dynamicDamage, ')
+          ..write('damageMultiplier: $damageMultiplier, ')
+          ..write('damageMinimum: $damageMinimum, ')
           ..write('triggersEffectId: $triggersEffectId')
           ..write(')'))
         .toString();
@@ -1756,9 +2261,17 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     id,
     cardDefinitionId,
     trigger,
-    spellCategory,
+    triggerDetail,
+    extraConditions,
     shortLabel,
+    shortLabelEn,
     description,
+    damageAmount,
+    damageTarget,
+    replacementScope,
+    dynamicDamage,
+    damageMultiplier,
+    damageMinimum,
     triggersEffectId,
   );
   @override
@@ -1768,9 +2281,17 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
           other.id == this.id &&
           other.cardDefinitionId == this.cardDefinitionId &&
           other.trigger == this.trigger &&
-          other.spellCategory == this.spellCategory &&
+          other.triggerDetail == this.triggerDetail &&
+          other.extraConditions == this.extraConditions &&
           other.shortLabel == this.shortLabel &&
+          other.shortLabelEn == this.shortLabelEn &&
           other.description == this.description &&
+          other.damageAmount == this.damageAmount &&
+          other.damageTarget == this.damageTarget &&
+          other.replacementScope == this.replacementScope &&
+          other.dynamicDamage == this.dynamicDamage &&
+          other.damageMultiplier == this.damageMultiplier &&
+          other.damageMinimum == this.damageMinimum &&
           other.triggersEffectId == this.triggersEffectId);
 }
 
@@ -1778,26 +2299,50 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
   final Value<int> id;
   final Value<int> cardDefinitionId;
   final Value<String> trigger;
-  final Value<String?> spellCategory;
+  final Value<String?> triggerDetail;
+  final Value<String?> extraConditions;
   final Value<String> shortLabel;
+  final Value<String?> shortLabelEn;
   final Value<String> description;
+  final Value<int?> damageAmount;
+  final Value<String?> damageTarget;
+  final Value<String?> replacementScope;
+  final Value<bool?> dynamicDamage;
+  final Value<int?> damageMultiplier;
+  final Value<int?> damageMinimum;
   final Value<int?> triggersEffectId;
   const CardEffectsCompanion({
     this.id = const Value.absent(),
     this.cardDefinitionId = const Value.absent(),
     this.trigger = const Value.absent(),
-    this.spellCategory = const Value.absent(),
+    this.triggerDetail = const Value.absent(),
+    this.extraConditions = const Value.absent(),
     this.shortLabel = const Value.absent(),
+    this.shortLabelEn = const Value.absent(),
     this.description = const Value.absent(),
+    this.damageAmount = const Value.absent(),
+    this.damageTarget = const Value.absent(),
+    this.replacementScope = const Value.absent(),
+    this.dynamicDamage = const Value.absent(),
+    this.damageMultiplier = const Value.absent(),
+    this.damageMinimum = const Value.absent(),
     this.triggersEffectId = const Value.absent(),
   });
   CardEffectsCompanion.insert({
     this.id = const Value.absent(),
     required int cardDefinitionId,
     required String trigger,
-    this.spellCategory = const Value.absent(),
+    this.triggerDetail = const Value.absent(),
+    this.extraConditions = const Value.absent(),
     this.shortLabel = const Value.absent(),
+    this.shortLabelEn = const Value.absent(),
     required String description,
+    this.damageAmount = const Value.absent(),
+    this.damageTarget = const Value.absent(),
+    this.replacementScope = const Value.absent(),
+    this.dynamicDamage = const Value.absent(),
+    this.damageMultiplier = const Value.absent(),
+    this.damageMinimum = const Value.absent(),
     this.triggersEffectId = const Value.absent(),
   }) : cardDefinitionId = Value(cardDefinitionId),
        trigger = Value(trigger),
@@ -1806,18 +2351,34 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     Expression<int>? id,
     Expression<int>? cardDefinitionId,
     Expression<String>? trigger,
-    Expression<String>? spellCategory,
+    Expression<String>? triggerDetail,
+    Expression<String>? extraConditions,
     Expression<String>? shortLabel,
+    Expression<String>? shortLabelEn,
     Expression<String>? description,
+    Expression<int>? damageAmount,
+    Expression<String>? damageTarget,
+    Expression<String>? replacementScope,
+    Expression<bool>? dynamicDamage,
+    Expression<int>? damageMultiplier,
+    Expression<int>? damageMinimum,
     Expression<int>? triggersEffectId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (cardDefinitionId != null) 'card_definition_id': cardDefinitionId,
       if (trigger != null) 'trigger': trigger,
-      if (spellCategory != null) 'spell_category': spellCategory,
+      if (triggerDetail != null) 'spell_category': triggerDetail,
+      if (extraConditions != null) 'extra_conditions': extraConditions,
       if (shortLabel != null) 'short_label': shortLabel,
+      if (shortLabelEn != null) 'short_label_en': shortLabelEn,
       if (description != null) 'description': description,
+      if (damageAmount != null) 'damage_amount': damageAmount,
+      if (damageTarget != null) 'damage_target': damageTarget,
+      if (replacementScope != null) 'replacement_scope': replacementScope,
+      if (dynamicDamage != null) 'dynamic_damage': dynamicDamage,
+      if (damageMultiplier != null) 'damage_multiplier': damageMultiplier,
+      if (damageMinimum != null) 'damage_minimum': damageMinimum,
       if (triggersEffectId != null) 'triggers_effect_id': triggersEffectId,
     });
   }
@@ -1826,18 +2387,34 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     Value<int>? id,
     Value<int>? cardDefinitionId,
     Value<String>? trigger,
-    Value<String?>? spellCategory,
+    Value<String?>? triggerDetail,
+    Value<String?>? extraConditions,
     Value<String>? shortLabel,
+    Value<String?>? shortLabelEn,
     Value<String>? description,
+    Value<int?>? damageAmount,
+    Value<String?>? damageTarget,
+    Value<String?>? replacementScope,
+    Value<bool?>? dynamicDamage,
+    Value<int?>? damageMultiplier,
+    Value<int?>? damageMinimum,
     Value<int?>? triggersEffectId,
   }) {
     return CardEffectsCompanion(
       id: id ?? this.id,
       cardDefinitionId: cardDefinitionId ?? this.cardDefinitionId,
       trigger: trigger ?? this.trigger,
-      spellCategory: spellCategory ?? this.spellCategory,
+      triggerDetail: triggerDetail ?? this.triggerDetail,
+      extraConditions: extraConditions ?? this.extraConditions,
       shortLabel: shortLabel ?? this.shortLabel,
+      shortLabelEn: shortLabelEn ?? this.shortLabelEn,
       description: description ?? this.description,
+      damageAmount: damageAmount ?? this.damageAmount,
+      damageTarget: damageTarget ?? this.damageTarget,
+      replacementScope: replacementScope ?? this.replacementScope,
+      dynamicDamage: dynamicDamage ?? this.dynamicDamage,
+      damageMultiplier: damageMultiplier ?? this.damageMultiplier,
+      damageMinimum: damageMinimum ?? this.damageMinimum,
       triggersEffectId: triggersEffectId ?? this.triggersEffectId,
     );
   }
@@ -1854,14 +2431,38 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     if (trigger.present) {
       map['trigger'] = Variable<String>(trigger.value);
     }
-    if (spellCategory.present) {
-      map['spell_category'] = Variable<String>(spellCategory.value);
+    if (triggerDetail.present) {
+      map['spell_category'] = Variable<String>(triggerDetail.value);
+    }
+    if (extraConditions.present) {
+      map['extra_conditions'] = Variable<String>(extraConditions.value);
     }
     if (shortLabel.present) {
       map['short_label'] = Variable<String>(shortLabel.value);
     }
+    if (shortLabelEn.present) {
+      map['short_label_en'] = Variable<String>(shortLabelEn.value);
+    }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
+    }
+    if (damageAmount.present) {
+      map['damage_amount'] = Variable<int>(damageAmount.value);
+    }
+    if (damageTarget.present) {
+      map['damage_target'] = Variable<String>(damageTarget.value);
+    }
+    if (replacementScope.present) {
+      map['replacement_scope'] = Variable<String>(replacementScope.value);
+    }
+    if (dynamicDamage.present) {
+      map['dynamic_damage'] = Variable<bool>(dynamicDamage.value);
+    }
+    if (damageMultiplier.present) {
+      map['damage_multiplier'] = Variable<int>(damageMultiplier.value);
+    }
+    if (damageMinimum.present) {
+      map['damage_minimum'] = Variable<int>(damageMinimum.value);
     }
     if (triggersEffectId.present) {
       map['triggers_effect_id'] = Variable<int>(triggersEffectId.value);
@@ -1875,9 +2476,17 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
           ..write('id: $id, ')
           ..write('cardDefinitionId: $cardDefinitionId, ')
           ..write('trigger: $trigger, ')
-          ..write('spellCategory: $spellCategory, ')
+          ..write('triggerDetail: $triggerDetail, ')
+          ..write('extraConditions: $extraConditions, ')
           ..write('shortLabel: $shortLabel, ')
+          ..write('shortLabelEn: $shortLabelEn, ')
           ..write('description: $description, ')
+          ..write('damageAmount: $damageAmount, ')
+          ..write('damageTarget: $damageTarget, ')
+          ..write('replacementScope: $replacementScope, ')
+          ..write('dynamicDamage: $dynamicDamage, ')
+          ..write('damageMultiplier: $damageMultiplier, ')
+          ..write('damageMinimum: $damageMinimum, ')
           ..write('triggersEffectId: $triggersEffectId')
           ..write(')'))
         .toString();
@@ -2088,6 +2697,9 @@ typedef $$CardDefinitionsTableCreateCompanionBuilder =
       Value<String?> power,
       Value<String?> toughness,
       Value<String?> imageUri,
+      Value<String?> printedName,
+      Value<String?> printedText,
+      Value<String?> printedTypeLine,
     });
 typedef $$CardDefinitionsTableUpdateCompanionBuilder =
     CardDefinitionsCompanion Function({
@@ -2104,6 +2716,9 @@ typedef $$CardDefinitionsTableUpdateCompanionBuilder =
       Value<String?> power,
       Value<String?> toughness,
       Value<String?> imageUri,
+      Value<String?> printedName,
+      Value<String?> printedText,
+      Value<String?> printedTypeLine,
     });
 
 class $$CardDefinitionsTableFilterComposer
@@ -2177,6 +2792,21 @@ class $$CardDefinitionsTableFilterComposer
 
   ColumnFilters<String> get imageUri => $composableBuilder(
     column: $table.imageUri,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get printedName => $composableBuilder(
+    column: $table.printedName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get printedText => $composableBuilder(
+    column: $table.printedText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get printedTypeLine => $composableBuilder(
+    column: $table.printedTypeLine,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2254,6 +2884,21 @@ class $$CardDefinitionsTableOrderingComposer
     column: $table.imageUri,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get printedName => $composableBuilder(
+    column: $table.printedName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get printedText => $composableBuilder(
+    column: $table.printedText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get printedTypeLine => $composableBuilder(
+    column: $table.printedTypeLine,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CardDefinitionsTableAnnotationComposer
@@ -2309,6 +2954,21 @@ class $$CardDefinitionsTableAnnotationComposer
 
   GeneratedColumn<String> get imageUri =>
       $composableBuilder(column: $table.imageUri, builder: (column) => column);
+
+  GeneratedColumn<String> get printedName => $composableBuilder(
+    column: $table.printedName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get printedText => $composableBuilder(
+    column: $table.printedText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get printedTypeLine => $composableBuilder(
+    column: $table.printedTypeLine,
+    builder: (column) => column,
+  );
 }
 
 class $$CardDefinitionsTableTableManager
@@ -2361,6 +3021,9 @@ class $$CardDefinitionsTableTableManager
                 Value<String?> power = const Value.absent(),
                 Value<String?> toughness = const Value.absent(),
                 Value<String?> imageUri = const Value.absent(),
+                Value<String?> printedName = const Value.absent(),
+                Value<String?> printedText = const Value.absent(),
+                Value<String?> printedTypeLine = const Value.absent(),
               }) => CardDefinitionsCompanion(
                 id: id,
                 name: name,
@@ -2375,6 +3038,9 @@ class $$CardDefinitionsTableTableManager
                 power: power,
                 toughness: toughness,
                 imageUri: imageUri,
+                printedName: printedName,
+                printedText: printedText,
+                printedTypeLine: printedTypeLine,
               ),
           createCompanionCallback:
               ({
@@ -2391,6 +3057,9 @@ class $$CardDefinitionsTableTableManager
                 Value<String?> power = const Value.absent(),
                 Value<String?> toughness = const Value.absent(),
                 Value<String?> imageUri = const Value.absent(),
+                Value<String?> printedName = const Value.absent(),
+                Value<String?> printedText = const Value.absent(),
+                Value<String?> printedTypeLine = const Value.absent(),
               }) => CardDefinitionsCompanion.insert(
                 id: id,
                 name: name,
@@ -2405,6 +3074,9 @@ class $$CardDefinitionsTableTableManager
                 power: power,
                 toughness: toughness,
                 imageUri: imageUri,
+                printedName: printedName,
+                printedText: printedText,
+                printedTypeLine: printedTypeLine,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2626,9 +3298,17 @@ typedef $$CardEffectsTableCreateCompanionBuilder =
       Value<int> id,
       required int cardDefinitionId,
       required String trigger,
-      Value<String?> spellCategory,
+      Value<String?> triggerDetail,
+      Value<String?> extraConditions,
       Value<String> shortLabel,
+      Value<String?> shortLabelEn,
       required String description,
+      Value<int?> damageAmount,
+      Value<String?> damageTarget,
+      Value<String?> replacementScope,
+      Value<bool?> dynamicDamage,
+      Value<int?> damageMultiplier,
+      Value<int?> damageMinimum,
       Value<int?> triggersEffectId,
     });
 typedef $$CardEffectsTableUpdateCompanionBuilder =
@@ -2636,9 +3316,17 @@ typedef $$CardEffectsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> cardDefinitionId,
       Value<String> trigger,
-      Value<String?> spellCategory,
+      Value<String?> triggerDetail,
+      Value<String?> extraConditions,
       Value<String> shortLabel,
+      Value<String?> shortLabelEn,
       Value<String> description,
+      Value<int?> damageAmount,
+      Value<String?> damageTarget,
+      Value<String?> replacementScope,
+      Value<bool?> dynamicDamage,
+      Value<int?> damageMultiplier,
+      Value<int?> damageMinimum,
       Value<int?> triggersEffectId,
     });
 
@@ -2666,8 +3354,13 @@ class $$CardEffectsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get spellCategory => $composableBuilder(
-    column: $table.spellCategory,
+  ColumnFilters<String> get triggerDetail => $composableBuilder(
+    column: $table.triggerDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get extraConditions => $composableBuilder(
+    column: $table.extraConditions,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2676,8 +3369,43 @@ class $$CardEffectsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get shortLabelEn => $composableBuilder(
+    column: $table.shortLabelEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get damageAmount => $composableBuilder(
+    column: $table.damageAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get damageTarget => $composableBuilder(
+    column: $table.damageTarget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get replacementScope => $composableBuilder(
+    column: $table.replacementScope,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dynamicDamage => $composableBuilder(
+    column: $table.dynamicDamage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get damageMultiplier => $composableBuilder(
+    column: $table.damageMultiplier,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get damageMinimum => $composableBuilder(
+    column: $table.damageMinimum,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2711,8 +3439,13 @@ class $$CardEffectsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get spellCategory => $composableBuilder(
-    column: $table.spellCategory,
+  ColumnOrderings<String> get triggerDetail => $composableBuilder(
+    column: $table.triggerDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get extraConditions => $composableBuilder(
+    column: $table.extraConditions,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2721,8 +3454,43 @@ class $$CardEffectsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get shortLabelEn => $composableBuilder(
+    column: $table.shortLabelEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get damageAmount => $composableBuilder(
+    column: $table.damageAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get damageTarget => $composableBuilder(
+    column: $table.damageTarget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get replacementScope => $composableBuilder(
+    column: $table.replacementScope,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dynamicDamage => $composableBuilder(
+    column: $table.dynamicDamage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get damageMultiplier => $composableBuilder(
+    column: $table.damageMultiplier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get damageMinimum => $composableBuilder(
+    column: $table.damageMinimum,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2752,8 +3520,13 @@ class $$CardEffectsTableAnnotationComposer
   GeneratedColumn<String> get trigger =>
       $composableBuilder(column: $table.trigger, builder: (column) => column);
 
-  GeneratedColumn<String> get spellCategory => $composableBuilder(
-    column: $table.spellCategory,
+  GeneratedColumn<String> get triggerDetail => $composableBuilder(
+    column: $table.triggerDetail,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get extraConditions => $composableBuilder(
+    column: $table.extraConditions,
     builder: (column) => column,
   );
 
@@ -2762,8 +3535,43 @@ class $$CardEffectsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get shortLabelEn => $composableBuilder(
+    column: $table.shortLabelEn,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get damageAmount => $composableBuilder(
+    column: $table.damageAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get damageTarget => $composableBuilder(
+    column: $table.damageTarget,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get replacementScope => $composableBuilder(
+    column: $table.replacementScope,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get dynamicDamage => $composableBuilder(
+    column: $table.dynamicDamage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get damageMultiplier => $composableBuilder(
+    column: $table.damageMultiplier,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get damageMinimum => $composableBuilder(
+    column: $table.damageMinimum,
     builder: (column) => column,
   );
 
@@ -2807,17 +3615,33 @@ class $$CardEffectsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> cardDefinitionId = const Value.absent(),
                 Value<String> trigger = const Value.absent(),
-                Value<String?> spellCategory = const Value.absent(),
+                Value<String?> triggerDetail = const Value.absent(),
+                Value<String?> extraConditions = const Value.absent(),
                 Value<String> shortLabel = const Value.absent(),
+                Value<String?> shortLabelEn = const Value.absent(),
                 Value<String> description = const Value.absent(),
+                Value<int?> damageAmount = const Value.absent(),
+                Value<String?> damageTarget = const Value.absent(),
+                Value<String?> replacementScope = const Value.absent(),
+                Value<bool?> dynamicDamage = const Value.absent(),
+                Value<int?> damageMultiplier = const Value.absent(),
+                Value<int?> damageMinimum = const Value.absent(),
                 Value<int?> triggersEffectId = const Value.absent(),
               }) => CardEffectsCompanion(
                 id: id,
                 cardDefinitionId: cardDefinitionId,
                 trigger: trigger,
-                spellCategory: spellCategory,
+                triggerDetail: triggerDetail,
+                extraConditions: extraConditions,
                 shortLabel: shortLabel,
+                shortLabelEn: shortLabelEn,
                 description: description,
+                damageAmount: damageAmount,
+                damageTarget: damageTarget,
+                replacementScope: replacementScope,
+                dynamicDamage: dynamicDamage,
+                damageMultiplier: damageMultiplier,
+                damageMinimum: damageMinimum,
                 triggersEffectId: triggersEffectId,
               ),
           createCompanionCallback:
@@ -2825,17 +3649,33 @@ class $$CardEffectsTableTableManager
                 Value<int> id = const Value.absent(),
                 required int cardDefinitionId,
                 required String trigger,
-                Value<String?> spellCategory = const Value.absent(),
+                Value<String?> triggerDetail = const Value.absent(),
+                Value<String?> extraConditions = const Value.absent(),
                 Value<String> shortLabel = const Value.absent(),
+                Value<String?> shortLabelEn = const Value.absent(),
                 required String description,
+                Value<int?> damageAmount = const Value.absent(),
+                Value<String?> damageTarget = const Value.absent(),
+                Value<String?> replacementScope = const Value.absent(),
+                Value<bool?> dynamicDamage = const Value.absent(),
+                Value<int?> damageMultiplier = const Value.absent(),
+                Value<int?> damageMinimum = const Value.absent(),
                 Value<int?> triggersEffectId = const Value.absent(),
               }) => CardEffectsCompanion.insert(
                 id: id,
                 cardDefinitionId: cardDefinitionId,
                 trigger: trigger,
-                spellCategory: spellCategory,
+                triggerDetail: triggerDetail,
+                extraConditions: extraConditions,
                 shortLabel: shortLabel,
+                shortLabelEn: shortLabelEn,
                 description: description,
+                damageAmount: damageAmount,
+                damageTarget: damageTarget,
+                replacementScope: replacementScope,
+                dynamicDamage: dynamicDamage,
+                damageMultiplier: damageMultiplier,
+                damageMinimum: damageMinimum,
                 triggersEffectId: triggersEffectId,
               ),
           withReferenceMapper: (p0) => p0

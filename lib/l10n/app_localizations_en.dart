@@ -119,7 +119,64 @@ class AppL10nEn extends AppL10n {
   String get cardInfoSpellCategoryLabel => 'Reacts to';
 
   @override
-  String get cardInfoShortLabelLabel => 'Short label';
+  String get cardInfoTriggerDetailLabel => 'Condition';
+
+  @override
+  String get cardInfoSingleTargetLabel => 'Single target only';
+
+  @override
+  String get effectConditionSingleTarget => 'Single target only';
+
+  @override
+  String get cardInfoDamageAmountLabel => 'Damage';
+
+  @override
+  String get cardInfoDamageMultiplierLabel => 'Multiplier (×)';
+
+  @override
+  String get cardInfoDamageMinimumLabel => 'Minimum';
+
+  @override
+  String get cardInfoReplacementScopeLabel => 'Applies to';
+
+  @override
+  String get cardInfoReplacementScopeAll => 'Opponents + creatures';
+
+  @override
+  String get cardInfoReplacementScopeOpponentOnly => 'Opponents only';
+
+  @override
+  String get cardInfoDynamicDamageLabel =>
+      'Derive damage from spell (e.g. Imodane)';
+
+  @override
+  String get cardInfoDamageTargetLabel => 'Target';
+
+  @override
+  String get castSpellDamageSummaryEachOpponent =>
+      'Total damage to each opponent';
+
+  @override
+  String get castSpellDamageSummarySingleOpponent =>
+      'Total damage to one opponent';
+
+  @override
+  String get castSpellDamageSummarySingleCreature =>
+      'Total damage to a creature/permanent';
+
+  @override
+  String get castSpellDamageSummaryEachCreature =>
+      'Total damage to each creature';
+
+  @override
+  String get castSpellDamageSummaryEachOpponentCreatures =>
+      'Total damage to each opponent\'s creatures';
+
+  @override
+  String get cardInfoShortLabelLabel => 'Short label (DE)';
+
+  @override
+  String get cardInfoShortLabelEnLabel => 'Short label (EN)';
 
   @override
   String get cardInfoEffectDescriptionLabel => 'Effect description';
@@ -131,36 +188,32 @@ class AppL10nEn extends AppL10n {
   String get castSpell => 'Cast';
 
   @override
-  String get castSpellSheetTitle => 'Effects when casting an instant/sorcery';
+  String get castSpellSectionReplacement => 'Replacement effects';
 
   @override
-  String get castSpellSectionCast => 'On cast';
+  String get castSpellSectionReplacementHint =>
+      'Modify damage values at every level (own effect, triggered effects, follow-up effects) if the condition matches (e.g. only red sources). Apply these first.';
+
+  @override
+  String get castSpellSectionOwnEffect => 'Own effect';
+
+  @override
+  String get castSpellSectionCast => 'Triggered effects on other cards';
 
   @override
   String get castSpellSectionCastHint =>
-      'Triggers from casting the instant/sorcery itself.';
+      'Effects from other cards in play that trigger when this spell is cast.';
 
   @override
-  String get castSpellSectionDamage => 'Caused damage to opponents';
+  String get castSpellSectionFollowUp => 'Follow-up effects';
 
   @override
   String get castSpellSectionDamageHint =>
-      'If the spell or one of the effects above dealt noncombat damage to an opponent, these also trigger.';
-
-  @override
-  String get castSpellSectionSpellDamage =>
-      'Spell damage to a creature/permanent';
+      'Triggers if the spell or one of the effects above dealt noncombat damage to an opponent.';
 
   @override
   String get castSpellSectionSpellDamageHint =>
-      'If the spell dealt damage to a creature or permanent, these also trigger.';
-
-  @override
-  String get castSpellSectionStaticModifiers => 'Damage modifiers';
-
-  @override
-  String get castSpellSectionStaticModifiersHint =>
-      'Apply to any damage from the effects above, if the condition matches (e.g. only red sources).';
+      'Triggers if the spell dealt damage to a creature or permanent.';
 
   @override
   String get cardInfoNoData => 'No additional data yet.';
@@ -193,9 +246,6 @@ class AppL10nEn extends AppL10n {
   @override
   String get triggersHint =>
       'Select a trigger to see matching effects from cards in play.';
-
-  @override
-  String get noMatchingEffects => 'No effects in play match this trigger.';
 
   @override
   String get noActiveTriggers => 'No cards in play have effects.';

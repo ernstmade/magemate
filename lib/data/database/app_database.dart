@@ -13,7 +13,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -33,7 +33,32 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(cardEffects, cardEffects.shortLabel);
       }
       if (from < 4) {
-        await m.addColumn(cardEffects, cardEffects.spellCategory);
+        await m.addColumn(cardEffects, cardEffects.triggerDetail);
+      }
+      if (from < 5) {
+        await m.addColumn(cardEffects, cardEffects.extraConditions);
+      }
+      if (from < 6) {
+        await m.addColumn(cardEffects, cardEffects.damageAmount);
+        await m.addColumn(cardEffects, cardEffects.damageTarget);
+      }
+      if (from < 7) {
+        await m.addColumn(cardEffects, cardEffects.damageMultiplier);
+      }
+      if (from < 8) {
+        await m.addColumn(cardEffects, cardEffects.damageMinimum);
+      }
+      if (from < 9) {
+        await m.addColumn(cardEffects, cardEffects.replacementScope);
+        await m.addColumn(cardEffects, cardEffects.dynamicDamage);
+      }
+      if (from < 10) {
+        await m.addColumn(cardDefinitions, cardDefinitions.printedName);
+        await m.addColumn(cardDefinitions, cardDefinitions.printedText);
+        await m.addColumn(cardDefinitions, cardDefinitions.printedTypeLine);
+      }
+      if (from < 11) {
+        await m.addColumn(cardEffects, cardEffects.shortLabelEn);
       }
     },
   );
