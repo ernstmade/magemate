@@ -5,7 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/deck_providers.dart';
 import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
-import '../play/effect_tile.dart';
+import '../../shared/widgets/trigger_effect_section.dart';
 
 class TriggersScreen extends ConsumerWidget {
   const TriggersScreen({super.key});
@@ -64,17 +64,18 @@ class _TriggerSections extends StatefulWidget {
 
 class _TriggerSectionsState extends State<_TriggerSections> {
   final _scrollController = ScrollController();
-  final _sectionKeys = <TriggerType, GlobalKey>{};
 
-  GlobalKey _keyFor(TriggerType trigger) {
-    return _sectionKeys.putIfAbsent(trigger, () => GlobalKey());
-  }
+  /// Ein Key pro Trigger-Klasse als unsichtbarer Scroll-Anker.
+  final _groupKeys = <String, GlobalKey>{};
 
-  void _scrollTo(TriggerType trigger) {
-    final context = _keyFor(trigger).currentContext;
-    if (context == null) return;
+  GlobalKey _keyForGroup(TriggerGroupDef group) =>
+      _groupKeys.putIfAbsent(group.label, () => GlobalKey());
+
+  void _scrollToGroup(TriggerGroupDef group) {
+    final ctx = _keyForGroup(group).currentContext;
+    if (ctx == null) return;
     Scrollable.ensureVisible(
-      context,
+      ctx,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
@@ -88,78 +89,74 @@ class _TriggerSectionsState extends State<_TriggerSections> {
 
   @override
   Widget build(BuildContext context) {
+    final activeSet = widget.activeTriggers.toSet();
+    final theme = Theme.of(context);
+
+    // Nur Klassen mit mind. einem aktiven Trigger, in fester Reihenfolge
+    final activeGroups = triggerGroupDefs
+        .where((g) => g.triggers.any(activeSet.contains))
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ── Navigations-Chips (eine Klasse = ein Chip) ──────────────────────
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final trigger in widget.activeTriggers)
+            for (final group in activeGroups)
               ActionChip(
-                avatar: Icon(
-                  triggerStyle(trigger).icon,
-                  color: triggerStyle(trigger).color,
-                  size: 18,
-                ),
-                label: Text(trigger.name),
-                onPressed: () => _scrollTo(trigger),
+                avatar: Icon(group.icon, color: group.color, size: 18),
+                label: Text(group.label),
+                onPressed: () => _scrollToGroup(group),
               ),
           ],
         ),
         const SizedBox(height: 8),
+
+        // ── Scrollbarer Inhalt ───────────────────────────────────────────────
         Expanded(
-          child: ListView(
+          child: SingleChildScrollView(
             controller: _scrollController,
-            children: [
-              for (final trigger in widget.activeTriggers)
-                _TriggerSection(
-                  key: _keyFor(trigger),
-                  trigger: trigger,
-                  entries: widget.effectsByTrigger[trigger] ?? const [],
-                ),
-            ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (int i = 0; i < activeGroups.length; i++) ...[
+                  // Unsichtbarer Anker ganz oben in der Gruppe
+                  SizedBox(key: _keyForGroup(activeGroups[i]), height: 0),
+
+                  // Ab Gruppe 2: Trennstrich + Klassenüberschrift
+                  if (i > 0) ...[
+                    const Divider(thickness: 1, height: 1),
+                    const SizedBox(height: 10),
+                    Text(
+                      activeGroups[i].label.toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: activeGroups[i].color,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  // Einzelne Trigger-Abschnitte innerhalb der Klasse
+                  for (final trigger
+                      in activeGroups[i].triggers.where(activeSet.contains))
+                    TriggerEffectSection(
+                      title: trigger.name,
+                      trigger: trigger,
+                      entries: widget.effectsByTrigger[trigger] ?? const [],
+                      highlighted: trigger == TriggerType.staticDamageModifier,
+                      showCount: true,
+                    ),
+                ],
+              ],
+            ),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _TriggerSection extends StatelessWidget {
-  const _TriggerSection({
-    super.key,
-    required this.trigger,
-    required this.entries,
-  });
-
-  final TriggerType trigger;
-  final List<(CardDefinition, CardEffect)> entries;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                triggerStyle(trigger).icon,
-                color: triggerStyle(trigger).color,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                trigger.name,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ],
-          ),
-          for (final (definition, effect) in entries)
-            EffectTile(effect: effect, cardName: definition.name),
-        ],
-      ),
     );
   }
 }

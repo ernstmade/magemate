@@ -3,6 +3,7 @@ import '../../data/database/app_database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/models/trigger_type.dart';
 import '../../shared/models/trigger_style.dart';
+import '../../shared/widgets/oracle_text.dart';
 
 /// Stellt einen Karteneffekt dar: Kurzschreibweise prominent, der
 /// ausführliche Text steckt hinter einem Info-Icon.
@@ -15,6 +16,7 @@ class EffectTile extends StatelessWidget {
     this.onDelete,
     this.contentPadding,
     this.subtitleFirst = false,
+    this.showLeadingIcon = true,
     this.extraInfo,
   });
 
@@ -32,6 +34,11 @@ class EffectTile extends StatelessWidget {
   /// Zeigt [cardName] als Titel (erste Zeile) und den Effekt als Untertitel
   /// (zweite Zeile), statt umgekehrt.
   final bool subtitleFirst;
+
+  /// Ob das Trigger-Icon links angezeigt werden soll. Standardmäßig true;
+  /// kann auf false gesetzt werden, wenn das Icon bereits im übergeordneten
+  /// Abschnitts-Header erscheint (z.B. TriggerEffectSection).
+  final bool showLeadingIcon;
 
   /// Zusätzliche Erklärung (z.B. wann/warum dieser Effekt in diesem Kontext
   /// triggert), die im Info-Dialog unter dem Kartentext angezeigt wird.
@@ -66,8 +73,19 @@ class EffectTile extends StatelessWidget {
     final hasSingleTarget = conditions.contains(
       EffectCondition.singleTarget.name,
     );
+    final hasDamageToOpponent = conditions.contains(
+      EffectCondition.damageToOpponent.name,
+    );
     final triggerDetail = effect.triggerDetail;
-    final lvl23Line = [?cardName, ?triggerDetail].join(' · ');
+    final conditionLabel = [
+      if (hasSingleTarget) l10n.effectConditionSingleTarget,
+      if (hasDamageToOpponent) l10n.effectConditionDamageToOpponent,
+    ].join(', ');
+    final lvl23Line = [
+      ?cardName,
+      ?triggerDetail,
+      if (conditionLabel.isNotEmpty) conditionLabel,
+    ].join(' · ');
 
     final theme = Theme.of(context);
     final lvl23Style = theme.textTheme.bodyMedium?.copyWith(
@@ -97,7 +115,7 @@ class EffectTile extends StatelessWidget {
 
     return ListTile(
       contentPadding: contentPadding,
-      leading: Icon(style.icon, color: style.color),
+      leading: showLeadingIcon ? Icon(style.icon, color: style.color) : null,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -106,14 +124,6 @@ class EffectTile extends StatelessWidget {
           Text(subtitleFirst ? '→ $title' : title),
         ],
       ),
-      subtitle: hasSingleTarget
-          ? Text(
-              l10n.effectConditionSingleTarget,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontStyle: FontStyle.italic,
-              ),
-            )
-          : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -128,7 +138,7 @@ class EffectTile extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(infoText),
+                    OracleText(infoText),
                     if (extraInfo != null) ...[
                       const SizedBox(height: 12),
                       Text(

@@ -325,6 +325,12 @@ abstract class AppL10n {
   /// **'Single target only'**
   String get effectConditionSingleTarget;
 
+  /// No description provided for @effectConditionDamageToOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Damage to opponent only'**
+  String get effectConditionDamageToOpponent;
+
   /// No description provided for @cardInfoDamageAmountLabel.
   ///
   /// In en, this message translates to:
@@ -420,6 +426,12 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Effect description'**
   String get cardInfoEffectDescriptionLabel;
+
+  /// No description provided for @cardInfoEditEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit effects'**
+  String get cardInfoEditEffects;
 
   /// No description provided for @cardInfoAddEffect.
   ///
@@ -540,6 +552,36 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'No cards in play have effects.'**
   String get noActiveTriggers;
+
+  /// No description provided for @actionSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get actionSave;
+
+  /// No description provided for @roundReset.
+  ///
+  /// In en, this message translates to:
+  /// **'New round'**
+  String get roundReset;
+
+  /// No description provided for @roundResetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Return all cards to hand?'**
+  String get roundResetConfirm;
+
+  /// No description provided for @cardRatingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get cardRatingTitle;
+
+  /// No description provided for @cardRatingNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not rated'**
+  String get cardRatingNone;
 
   /// No description provided for @settingsTitle.
   ///

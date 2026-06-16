@@ -476,6 +476,15 @@ class $CardDefinitionsTable extends CardDefinitions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
+  @override
+  late final GeneratedColumn<double> rating = GeneratedColumn<double>(
+    'rating',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -494,6 +503,7 @@ class $CardDefinitionsTable extends CardDefinitions
     printedName,
     printedText,
     printedTypeLine,
+    rating,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -614,6 +624,12 @@ class $CardDefinitionsTable extends CardDefinitions
         ),
       );
     }
+    if (data.containsKey('rating')) {
+      context.handle(
+        _ratingMeta,
+        rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
+      );
+    }
     return context;
   }
 
@@ -687,6 +703,10 @@ class $CardDefinitionsTable extends CardDefinitions
         DriftSqlType.string,
         data['${effectivePrefix}printed_type_line'],
       ),
+      rating: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}rating'],
+      ),
     );
   }
 
@@ -713,6 +733,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
   final String? printedName;
   final String? printedText;
   final String? printedTypeLine;
+  final double? rating;
   const CardDefinition({
     required this.id,
     required this.name,
@@ -730,6 +751,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     this.printedName,
     this.printedText,
     this.printedTypeLine,
+    this.rating,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -778,6 +800,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     if (!nullToAbsent || printedTypeLine != null) {
       map['printed_type_line'] = Variable<String>(printedTypeLine);
     }
+    if (!nullToAbsent || rating != null) {
+      map['rating'] = Variable<double>(rating);
+    }
     return map;
   }
 
@@ -825,6 +850,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       printedTypeLine: printedTypeLine == null && nullToAbsent
           ? const Value.absent()
           : Value(printedTypeLine),
+      rating: rating == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rating),
     );
   }
 
@@ -850,6 +878,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       printedName: serializer.fromJson<String?>(json['printedName']),
       printedText: serializer.fromJson<String?>(json['printedText']),
       printedTypeLine: serializer.fromJson<String?>(json['printedTypeLine']),
+      rating: serializer.fromJson<double?>(json['rating']),
     );
   }
   @override
@@ -872,6 +901,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       'printedName': serializer.toJson<String?>(printedName),
       'printedText': serializer.toJson<String?>(printedText),
       'printedTypeLine': serializer.toJson<String?>(printedTypeLine),
+      'rating': serializer.toJson<double?>(rating),
     };
   }
 
@@ -892,6 +922,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     Value<String?> printedName = const Value.absent(),
     Value<String?> printedText = const Value.absent(),
     Value<String?> printedTypeLine = const Value.absent(),
+    Value<double?> rating = const Value.absent(),
   }) => CardDefinition(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -913,6 +944,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     printedTypeLine: printedTypeLine.present
         ? printedTypeLine.value
         : this.printedTypeLine,
+    rating: rating.present ? rating.value : this.rating,
   );
   CardDefinition copyWithCompanion(CardDefinitionsCompanion data) {
     return CardDefinition(
@@ -944,6 +976,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       printedTypeLine: data.printedTypeLine.present
           ? data.printedTypeLine.value
           : this.printedTypeLine,
+      rating: data.rating.present ? data.rating.value : this.rating,
     );
   }
 
@@ -965,7 +998,8 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           ..write('imageUri: $imageUri, ')
           ..write('printedName: $printedName, ')
           ..write('printedText: $printedText, ')
-          ..write('printedTypeLine: $printedTypeLine')
+          ..write('printedTypeLine: $printedTypeLine, ')
+          ..write('rating: $rating')
           ..write(')'))
         .toString();
   }
@@ -988,6 +1022,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     printedName,
     printedText,
     printedTypeLine,
+    rating,
   );
   @override
   bool operator ==(Object other) =>
@@ -1008,7 +1043,8 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           other.imageUri == this.imageUri &&
           other.printedName == this.printedName &&
           other.printedText == this.printedText &&
-          other.printedTypeLine == this.printedTypeLine);
+          other.printedTypeLine == this.printedTypeLine &&
+          other.rating == this.rating);
 }
 
 class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
@@ -1028,6 +1064,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
   final Value<String?> printedName;
   final Value<String?> printedText;
   final Value<String?> printedTypeLine;
+  final Value<double?> rating;
   const CardDefinitionsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1045,6 +1082,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     this.printedName = const Value.absent(),
     this.printedText = const Value.absent(),
     this.printedTypeLine = const Value.absent(),
+    this.rating = const Value.absent(),
   });
   CardDefinitionsCompanion.insert({
     this.id = const Value.absent(),
@@ -1063,6 +1101,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     this.printedName = const Value.absent(),
     this.printedText = const Value.absent(),
     this.printedTypeLine = const Value.absent(),
+    this.rating = const Value.absent(),
   }) : name = Value(name);
   static Insertable<CardDefinition> custom({
     Expression<int>? id,
@@ -1081,6 +1120,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     Expression<String>? printedName,
     Expression<String>? printedText,
     Expression<String>? printedTypeLine,
+    Expression<double>? rating,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1099,6 +1139,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
       if (printedName != null) 'printed_name': printedName,
       if (printedText != null) 'printed_text': printedText,
       if (printedTypeLine != null) 'printed_type_line': printedTypeLine,
+      if (rating != null) 'rating': rating,
     });
   }
 
@@ -1119,6 +1160,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     Value<String?>? printedName,
     Value<String?>? printedText,
     Value<String?>? printedTypeLine,
+    Value<double?>? rating,
   }) {
     return CardDefinitionsCompanion(
       id: id ?? this.id,
@@ -1137,6 +1179,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
       printedName: printedName ?? this.printedName,
       printedText: printedText ?? this.printedText,
       printedTypeLine: printedTypeLine ?? this.printedTypeLine,
+      rating: rating ?? this.rating,
     );
   }
 
@@ -1191,6 +1234,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     if (printedTypeLine.present) {
       map['printed_type_line'] = Variable<String>(printedTypeLine.value);
     }
+    if (rating.present) {
+      map['rating'] = Variable<double>(rating.value);
+    }
     return map;
   }
 
@@ -1212,7 +1258,8 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
           ..write('imageUri: $imageUri, ')
           ..write('printedName: $printedName, ')
           ..write('printedText: $printedText, ')
-          ..write('printedTypeLine: $printedTypeLine')
+          ..write('printedTypeLine: $printedTypeLine, ')
+          ..write('rating: $rating')
           ..write(')'))
         .toString();
   }
@@ -2700,6 +2747,7 @@ typedef $$CardDefinitionsTableCreateCompanionBuilder =
       Value<String?> printedName,
       Value<String?> printedText,
       Value<String?> printedTypeLine,
+      Value<double?> rating,
     });
 typedef $$CardDefinitionsTableUpdateCompanionBuilder =
     CardDefinitionsCompanion Function({
@@ -2719,6 +2767,7 @@ typedef $$CardDefinitionsTableUpdateCompanionBuilder =
       Value<String?> printedName,
       Value<String?> printedText,
       Value<String?> printedTypeLine,
+      Value<double?> rating,
     });
 
 class $$CardDefinitionsTableFilterComposer
@@ -2807,6 +2856,11 @@ class $$CardDefinitionsTableFilterComposer
 
   ColumnFilters<String> get printedTypeLine => $composableBuilder(
     column: $table.printedTypeLine,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get rating => $composableBuilder(
+    column: $table.rating,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2899,6 +2953,11 @@ class $$CardDefinitionsTableOrderingComposer
     column: $table.printedTypeLine,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CardDefinitionsTableAnnotationComposer
@@ -2969,6 +3028,9 @@ class $$CardDefinitionsTableAnnotationComposer
     column: $table.printedTypeLine,
     builder: (column) => column,
   );
+
+  GeneratedColumn<double> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => column);
 }
 
 class $$CardDefinitionsTableTableManager
@@ -3024,6 +3086,7 @@ class $$CardDefinitionsTableTableManager
                 Value<String?> printedName = const Value.absent(),
                 Value<String?> printedText = const Value.absent(),
                 Value<String?> printedTypeLine = const Value.absent(),
+                Value<double?> rating = const Value.absent(),
               }) => CardDefinitionsCompanion(
                 id: id,
                 name: name,
@@ -3041,6 +3104,7 @@ class $$CardDefinitionsTableTableManager
                 printedName: printedName,
                 printedText: printedText,
                 printedTypeLine: printedTypeLine,
+                rating: rating,
               ),
           createCompanionCallback:
               ({
@@ -3060,6 +3124,7 @@ class $$CardDefinitionsTableTableManager
                 Value<String?> printedName = const Value.absent(),
                 Value<String?> printedText = const Value.absent(),
                 Value<String?> printedTypeLine = const Value.absent(),
+                Value<double?> rating = const Value.absent(),
               }) => CardDefinitionsCompanion.insert(
                 id: id,
                 name: name,
@@ -3077,6 +3142,7 @@ class $$CardDefinitionsTableTableManager
                 printedName: printedName,
                 printedText: printedText,
                 printedTypeLine: printedTypeLine,
+                rating: rating,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

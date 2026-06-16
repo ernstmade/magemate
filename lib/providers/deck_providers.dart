@@ -343,6 +343,18 @@ class DeckRepository {
         );
   }
 
+  /// Setzt alle Karten eines Decks auf "nicht im Spiel" (Rundenreset).
+  Future<void> resetAllInPlay(int deckId) {
+    return (_db.update(_db.deckCards)..where((c) => c.deckId.equals(deckId)))
+        .write(const DeckCardsCompanion(inPlay: drift.Value(false)));
+  }
+
+  Future<void> updateRating(int cardDefinitionId, double? rating) {
+    return (_db.update(_db.cardDefinitions)
+          ..where((d) => d.id.equals(cardDefinitionId)))
+        .write(CardDefinitionsCompanion(rating: drift.Value(rating)));
+  }
+
   Future<void> deleteEffect(int effectId) {
     return (_db.delete(
       _db.cardEffects,

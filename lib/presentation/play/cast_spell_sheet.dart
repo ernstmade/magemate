@@ -4,6 +4,7 @@ import '../../data/database/app_database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/deck_providers.dart';
 import '../../shared/models/trigger_type.dart';
+import '../../shared/widgets/trigger_effect_section.dart';
 import 'effect_tile.dart';
 
 /// Zeigt in einem Modal alle Effekte, die ausgelöst werden, wenn ein
@@ -56,7 +57,7 @@ class _CastSpellEffectsSheet extends ConsumerWidget {
               const SizedBox(height: 8),
               _ReplacementEffectsBox(definition: definition),
               _OwnEffectSection(definition: definition),
-              _Section(
+              _FilteredSection(
                 title: l10n.castSpellSectionCast,
                 hint: l10n.castSpellSectionCastHint,
                 trigger: TriggerType.castSpell,
@@ -349,40 +350,12 @@ class _ReplacementEffectsBox extends ConsumerWidget {
               ),
             )
             .toList();
-        if (matching.isEmpty) return const SizedBox.shrink();
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: Text(
-                    l10n.castSpellSectionReplacement,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
-                    ),
-                  ),
-                ),
-                for (final (cardDefinition, effect) in matching)
-                  EffectTile(
-                    effect: effect,
-                    definition: cardDefinition,
-                    cardName: cardDefinition.name,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    extraInfo: l10n.castSpellSectionReplacementHint,
-                  ),
-                const SizedBox(height: 4),
-              ],
-            ),
-          ),
+        return TriggerEffectSection(
+          title: l10n.castSpellSectionReplacement,
+          trigger: TriggerType.staticDamageModifier,
+          entries: matching,
+          extraInfo: l10n.castSpellSectionReplacementHint,
+          highlighted: true,
         );
       },
       error: (e, _) => Text('Error: $e'),
@@ -409,25 +382,9 @@ class _OwnEffectSection extends ConsumerWidget {
         final resolveEffects = effects
             .where((e) => e.trigger == TriggerType.spellResolved.name)
             .toList();
-        if (resolveEffects.isEmpty) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.castSpellSectionOwnEffect,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 4),
-              for (final effect in resolveEffects)
-                EffectTile(
-                  effect: effect,
-                  definition: definition,
-                  contentPadding: EdgeInsets.zero,
-                ),
-            ],
-          ),
+        return TriggerEffectSection(
+          title: l10n.castSpellSectionOwnEffect,
+          entries: resolveEffects.map((e) => (definition, e)).toList(),
         );
       },
       error: (e, _) => Text('Error: $e'),
@@ -499,6 +456,7 @@ class _FollowUpSection extends ConsumerWidget {
               definition: cardDefinition,
               cardName: cardDefinition.name,
               contentPadding: EdgeInsets.zero,
+              subtitleFirst: true,
               extraInfo: hint,
             ),
         ],
@@ -507,8 +465,10 @@ class _FollowUpSection extends ConsumerWidget {
   }
 }
 
-class _Section extends ConsumerWidget {
-  const _Section({
+/// Wie [TriggerEffectSection], filtert aber zuerst nach [triggerDetailMatches]
+/// für die gespielte Karte. Wird nur im Cast-Spell-Sheet benötigt.
+class _FilteredSection extends ConsumerWidget {
+  const _FilteredSection({
     required this.title,
     required this.hint,
     required this.trigger,
@@ -518,9 +478,6 @@ class _Section extends ConsumerWidget {
   final String title;
   final String hint;
   final TriggerType trigger;
-
-  /// Die Karte, die gerade gespielt wird/wurde – für den Abgleich mit
-  /// `triggerDetail` (z.B. Instant/Sorcery vs. Noncreature-Spell).
   final CardDefinition castDefinition;
 
   @override
@@ -538,24 +495,10 @@ class _Section extends ConsumerWidget {
               ),
             )
             .toList();
-        if (matching.isEmpty) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 4),
-              for (final (definition, effect) in matching)
-                EffectTile(
-                  effect: effect,
-                  definition: definition,
-                  cardName: definition.name,
-                  contentPadding: EdgeInsets.zero,
-                  extraInfo: hint,
-                ),
-            ],
-          ),
+        return TriggerEffectSection(
+          title: title,
+          entries: matching,
+          extraInfo: hint,
         );
       },
       error: (e, _) => Text('Error: $e'),

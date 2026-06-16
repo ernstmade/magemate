@@ -180,4 +180,7 @@ enum EffectCondition {
   // Effekt greift nur, wenn der auslösende Spruch/Fähigkeit genau ein
   // einziges Ziel hatte (z.B. Imodane, Spinerock Tyrant).
   singleTarget,
+  // Effekt greift nur, wenn der Schaden an einen Gegner (Spieler) geht,
+  // nicht an Kreaturen (z.B. Chandra's Incinerator).
+  damageToOpponent,
 }

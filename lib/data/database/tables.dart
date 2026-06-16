@@ -38,6 +38,8 @@ class CardDefinitions extends Table {
   TextColumn get printedText => text().nullable()();
   // Lokalisierter Typ (z.B. Deutsch), falls von Scryfall verfügbar.
   TextColumn get printedTypeLine => text().nullable()();
+  // Persönliche Bewertung der Karte: 0–5,5 in 0,25-Schritten. Null = nicht bewertet.
+  RealColumn get rating => real().nullable()();
 }
 
 // ─── Deck-Karte (konkretes Exemplar im Deck) ────────────────────────────────

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/database/app_database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/active_deck_provider.dart';
 import '../../providers/deck_providers.dart';
@@ -99,6 +100,11 @@ class PlayScreen extends ConsumerWidget {
         appBar: AppBar(
           title: Text(l10n.navPlay),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.replay),
+              tooltip: l10n.roundReset,
+              onPressed: () => _resetRound(context, ref, activeDeckId),
+            ),
             PopupMenuButton<SortMode>(
               icon: const Icon(Icons.sort),
               tooltip: l10n.sortTooltip,
@@ -137,6 +143,33 @@ class PlayScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _resetRound(
+    BuildContext context,
+    WidgetRef ref,
+    int deckId,
+  ) async {
+    final l10n = AppL10n.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.roundReset),
+        content: Text(l10n.roundResetConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.roundReset),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(deckRepositoryProvider).resetAllInPlay(deckId);
   }
 
   Future<void> _enrichDeck(
@@ -233,10 +266,7 @@ class _DeckTab extends ConsumerWidget {
                 typeLine.contains('Instant') || typeLine.contains('Sorcery');
             return ListTile(
               leading: _EffectIndicator(cardDefinitionId: group.definition.id),
-              title: Text(group.definition.name),
-              subtitle: group.definition.typeLine != null
-                  ? Text(group.definition.typeLine!)
-                  : null,
+              title: _cardTitleWidget(group.definition),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -246,7 +276,11 @@ class _DeckTab extends ConsumerWidget {
                     onPressed: () =>
                         showCardInfoSheet(context, group.definition),
                   ),
-                  if (isSpell)
+                  if (isSpell) ...[
+                    Text(
+                      '${group.total}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                     IconButton(
                       icon: Icon(
                         triggerStyle(TriggerType.castSpell).icon,
@@ -255,8 +289,8 @@ class _DeckTab extends ConsumerWidget {
                       tooltip: l10n.castSpell,
                       onPressed: () =>
                           showCastSpellEffectsSheet(context, group.definition),
-                    )
-                  else
+                    ),
+                  ] else
                     _InPlayStepper(group: group),
                 ],
               ),
@@ -268,6 +302,68 @@ class _DeckTab extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/// "(3)" für ganze CMC-Werte, "(3.5)" für nicht-ganzzahlige. Leerer String
+/// wenn [cmc] null ist.
+String _formatCmc(double? cmc) {
+  if (cmc == null) return '';
+  final isWhole = cmc == cmc.truncateToDouble();
+  return '(${isWhole ? cmc.toInt() : cmc})';
+}
+
+/// "4" oder "4.5" als Text. "–" wenn [rating] null ist.
+String _formatRating(double? rating) {
+  if (rating == null) return '–';
+  final isWhole = rating == rating.truncateToDouble();
+  return isWhole ? rating.toInt().toString() : rating.toString();
+}
+
+/// Zweiteilige Titelzeile: links eine schmale Spalte mit CMC (Zeile 1) und
+/// Rating (Zeile 2), rechts der Kartenname und Typ.
+Widget _cardTitleWidget(CardDefinition definition) {
+  final cmcText = _formatCmc(definition.cmc);
+  final ratingText = _formatRating(definition.rating);
+  final hasTypeLine = definition.typeLine != null;
+
+  const leftWidth = 40.0;
+
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(
+        width: leftWidth,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(cmcText, style: const TextStyle(fontSize: 13)),
+            if (hasTypeLine)
+              Text(
+                ratingText,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+          ],
+        ),
+      ),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(definition.name),
+            if (hasTypeLine)
+              Text(
+                definition.typeLine!,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 /// Zwischenüberschrift für eine Typ-Kategorie bei Sortierung "nach Typ".
@@ -397,10 +493,7 @@ class _InPlayTab extends ConsumerWidget {
             final group = item as DeckCardGroup;
             return ListTile(
               leading: _EffectIndicator(cardDefinitionId: group.definition.id),
-              title: Text(group.definition.name),
-              subtitle: group.definition.typeLine != null
-                  ? Text(group.definition.typeLine!)
-                  : null,
+              title: _cardTitleWidget(group.definition),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

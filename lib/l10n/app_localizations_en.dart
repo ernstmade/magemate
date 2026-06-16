@@ -128,6 +128,9 @@ class AppL10nEn extends AppL10n {
   String get effectConditionSingleTarget => 'Single target only';
 
   @override
+  String get effectConditionDamageToOpponent => 'Damage to opponent only';
+
+  @override
   String get cardInfoDamageAmountLabel => 'Damage';
 
   @override
@@ -180,6 +183,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get cardInfoEffectDescriptionLabel => 'Effect description';
+
+  @override
+  String get cardInfoEditEffects => 'Edit effects';
 
   @override
   String get cardInfoAddEffect => 'Add effect';
@@ -249,6 +255,21 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get noActiveTriggers => 'No cards in play have effects.';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String get roundReset => 'New round';
+
+  @override
+  String get roundResetConfirm => 'Return all cards to hand?';
+
+  @override
+  String get cardRatingTitle => 'Rating';
+
+  @override
+  String get cardRatingNone => 'Not rated';
 
   @override
   String get settingsTitle => 'Settings';
