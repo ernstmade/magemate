@@ -7,18 +7,18 @@ import 'shared/utils/app_theme.dart';
 import 'router.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MagicSupportApp()));
+  runApp(const ProviderScope(child: MagemateApp()));
 }
 
-class MagicSupportApp extends ConsumerWidget {
-  const MagicSupportApp({super.key});
+class MagemateApp extends ConsumerWidget {
+  const MagemateApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
 
     return MaterialApp.router(
-      title: 'Magic Support',
+      title: 'Magemate',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: router,

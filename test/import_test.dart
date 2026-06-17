@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:magicsupport/data/database/app_database.dart';
-import 'package:magicsupport/data/import/deck_list_parser.dart';
-import 'package:magicsupport/providers/deck_providers.dart';
+import 'package:magemate/data/database/app_database.dart';
+import 'package:magemate/data/import/deck_list_parser.dart';
+import 'package:magemate/providers/deck_providers.dart';
 
 void main() {
   test('Deck-Import legt DeckCards an, die im Deck-Tab sichtbar sind', () async {

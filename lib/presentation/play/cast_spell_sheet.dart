@@ -73,17 +73,24 @@ class _CastSpellEffectsSheet extends ConsumerWidget {
 }
 
 /// Zeigt die Summe des fixen Schadens aller relevanten Effekte, gruppiert
-/// nach [DamageTarget] (z.B. "Summe Schaden an jeden Gegner: 5"), mit der
-/// Einzelrechnung darunter (z.B. "Volcanic Spite: 3 +2 (Torbran) = 5").
-class _DamageSummary extends ConsumerWidget {
+/// nach [DamageTarget]. Per Tap aufklappbar für die Detailrechnung.
+class _DamageSummary extends ConsumerStatefulWidget {
   const _DamageSummary({required this.definition});
 
   final CardDefinition definition;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DamageSummary> createState() => _DamageSummaryState();
+}
+
+class _DamageSummaryState extends ConsumerState<_DamageSummary> {
+  final _expanded = <DamageTarget>{};
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final isDe = Localizations.localeOf(context).languageCode == 'de';
+    final definition = widget.definition;
 
     final ownEffects =
         ref.watch(effectsForCardDefinitionProvider(definition.id)).valueOrNull ??
@@ -169,52 +176,6 @@ class _DamageSummary extends ConsumerWidget {
       return (afterFloor + bonus) * mult;
     }
 
-    // Formel-String für eine einzelne Schadensquelle, z.B.:
-    //   "Volcanic Spite: 3 +2 (Torbran) = 5"
-    //   "Volcanic Spite: 3"  ← wenn keine Replacement-Änderung
-    String termFormula(
-      String label,
-      int base,
-      List<(CardDefinition, CardEffect)> repPairs,
-    ) {
-      final steps = <String>[];
-      var current = base;
-
-      // 1. Floor (Minimum, z.B. Ojer Axonil)
-      int floorVal = 0;
-      String? floorCardName;
-      for (final (def, e) in repPairs) {
-        if (e.damageMinimum != null && e.damageMinimum! > floorVal) {
-          floorVal = e.damageMinimum!;
-          floorCardName = def.name;
-        }
-      }
-      if (current < floorVal) {
-        steps.add('↑$floorVal ($floorCardName)');
-        current = floorVal;
-      }
-
-      // 2. Additiv (z.B. Torbran +2)
-      for (final (def, e) in repPairs) {
-        final amt = e.damageAmount ?? 0;
-        if (amt != 0) {
-          steps.add('${amt >= 0 ? '+' : ''}$amt (${def.name})');
-          current += amt;
-        }
-      }
-
-      // 3. Multiplikativ (z.B. Fiendish Duo ×2)
-      for (final (def, e) in repPairs) {
-        final mult = e.damageMultiplier ?? 1;
-        if (mult != 1) {
-          steps.add('×$mult (${def.name})');
-          current *= mult;
-        }
-      }
-
-      if (steps.isEmpty) return '$label: $base';
-      return '$label: $base ${steps.join(' ')} = $current';
-    }
 
     // Effektiver Spell→Kreatur-Schaden (für dynamische Effekte wie Imodane)
     final spellCreatureDamage = relevant
@@ -253,37 +214,68 @@ class _DamageSummary extends ConsumerWidget {
       final effective = applyReplacements(base, replacements);
       sums[target] = (sums[target] ?? 0) + effective;
 
-      // Locale-abhängiges Label (shortLabel bevorzugt, sonst Kartenname)
-      final shortLabelDe = effect.shortLabel.trim();
-      final shortLabelEn = (effect.shortLabelEn ?? '').trim();
-      final label = isDe
-          ? (shortLabelDe.isNotEmpty ? shortLabelDe : cardName)
-          : (shortLabelEn.isNotEmpty
-                ? shortLabelEn
-                : (shortLabelDe.isNotEmpty ? shortLabelDe : cardName));
-
-      contributions.putIfAbsent(target, () => []).add((label, base));
+      contributions.putIfAbsent(target, () => []).add((cardName, base));
     }
 
     if (sums.isEmpty) return const SizedBox.shrink();
 
-    String labelFor(DamageTarget target) {
-      switch (target) {
-        case DamageTarget.singleOpponent:
-          return l10n.castSpellDamageSummarySingleOpponent;
-        case DamageTarget.eachOpponent:
-          return l10n.castSpellDamageSummaryEachOpponent;
-        case DamageTarget.singleCreature:
-          return l10n.castSpellDamageSummarySingleCreature;
-        case DamageTarget.eachCreature:
-          return l10n.castSpellDamageSummaryEachCreature;
-        case DamageTarget.eachOpponentCreatures:
-          return l10n.castSpellDamageSummaryEachOpponentCreatures;
+    final hasFollowUps = [
+      ...noncombatEffects,
+      ...spellDamageEffects,
+    ].any((e) => triggerDetailMatches(
+          e.$2.triggerDetail,
+          typeLine: definition.typeLine,
+          colors: definition.colors,
+        ));
+
+    String labelFor(DamageTarget target) => switch (target) {
+          DamageTarget.singleOpponent =>
+            l10n.castSpellDamageSummarySingleOpponent,
+          DamageTarget.eachOpponent => l10n.castSpellDamageSummaryEachOpponent,
+          DamageTarget.singleCreature =>
+            l10n.castSpellDamageSummarySingleCreature,
+          DamageTarget.eachCreature => l10n.castSpellDamageSummaryEachCreature,
+          DamageTarget.eachOpponentCreatures =>
+            l10n.castSpellDamageSummaryEachOpponentCreatures,
+        };
+
+    // Replacement-Zeilen in Rechenreihenfolge: 1. Minimum, 2. Additiv, 3. Multiplikativ.
+    List<(String, String)> repLines(List<(CardDefinition, CardEffect)> reps) {
+      final lines = <(String, String)>[];
+      for (final (def, e) in reps) {
+        if (e.damageMinimum != null && e.damageMinimum! > 0) {
+          lines.add((isDe ? (def.printedName ?? def.name) : def.name, '↑${e.damageMinimum}'));
+        }
       }
+      for (final (def, e) in reps) {
+        if (e.damageAmount != null && e.damageAmount != 0) {
+          final amt = e.damageAmount!;
+          lines.add((isDe ? (def.printedName ?? def.name) : def.name, '${amt >= 0 ? '+' : ''}$amt'));
+        }
+      }
+      for (final (def, e) in reps) {
+        if (e.damageMultiplier != null && e.damageMultiplier != 1) {
+          lines.add((isDe ? (def.printedName ?? def.name) : def.name, '×${e.damageMultiplier}'));
+        }
+      }
+      return lines;
+    }
+
+    // Pro Quellkarte eine Gruppe: (Kartenname, Basiswert, Replacement-Zeilen).
+    // Replacements gelten je Quelle separat → jede Gruppe bekommt ihre eigene Kette.
+    List<(String, String, List<(String, String)>)> detailGroups(
+        DamageTarget target) {
+      final reps = isOpponentTarget(target) ? matchingRepPairs : creatureRepPairs;
+      final rl = repLines(reps);
+      return [
+        for (final entry in contributions[target] ?? <(String, int)>[])
+          (entry.$1, '${entry.$2}', rl),
+      ];
     }
 
     final theme = Theme.of(context);
-    final formulaStyle = theme.textTheme.bodySmall?.copyWith(
+    final summaryStyle = theme.textTheme.titleSmall;
+    final detailStyle = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
 
@@ -293,29 +285,78 @@ class _DamageSummary extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (final entry in sums.entries) ...[
-            Text(
-              '${labelFor(entry.key)}: ${entry.value}',
-              style: theme.textTheme.titleSmall,
-            ),
-            // Formelzeilen: immer wenn mehrere Quellen, oder wenn Replacements
-            // den Wert verändert haben (steps.isNotEmpty → Label enthält "=")
-            ...() {
-              final contribs = contributions[entry.key] ?? [];
-              final repPairs = isOpponentTarget(entry.key)
-                  ? matchingRepPairs
-                  : creatureRepPairs;
-              // Einzeilig ohne Replacements und nur eine Quelle → trivial, kein Extra
-              final alwaysShow =
-                  contribs.length > 1 || repPairs.isNotEmpty;
-              if (!alwaysShow) return const <Widget>[];
-              return [
-                for (final (label, base) in contribs)
-                  Text(
-                    termFormula(label, base, repPairs),
-                    style: formulaStyle,
+            // ── Zusammenfassungszeile (aufklappbar) ─────────────────────────
+            InkWell(
+              onTap: () => setState(() {
+                if (_expanded.contains(entry.key)) {
+                  _expanded.remove(entry.key);
+                } else {
+                  _expanded.add(entry.key);
+                }
+              }),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(labelFor(entry.key), style: summaryStyle),
                   ),
-              ];
-            }(),
+                  Text('${entry.value}', style: summaryStyle),
+                  const SizedBox(width: 4),
+                  Icon(
+                    _expanded.contains(entry.key)
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+            // ── Detailzeilen (aufgeklappt) ───────────────────────────────
+            if (_expanded.contains(entry.key))
+              ...() {
+                final groups = detailGroups(entry.key);
+                final widgets = <Widget>[];
+                for (int i = 0; i < groups.length; i++) {
+                  final (srcLabel, srcValue, reps) = groups[i];
+                  if (i > 0 && reps.isNotEmpty) {
+                    widgets.add(const SizedBox(height: 4));
+                  }
+                  // Quellkarte
+                  widgets.add(Padding(
+                    padding: const EdgeInsets.only(left: 16, top: 3),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(srcLabel, style: detailStyle)),
+                        Text(srcValue, style: detailStyle),
+                      ],
+                    ),
+                  ));
+                  // Replacement-Kette dieser Quelle (tiefer eingerückt)
+                  for (final (repLabel, repValue) in reps) {
+                    widgets.add(Padding(
+                      padding: const EdgeInsets.only(left: 32, top: 2),
+                      child: Row(
+                        children: [
+                          Expanded(child: Text(repLabel, style: detailStyle)),
+                          Text(repValue, style: detailStyle),
+                        ],
+                      ),
+                    ));
+                  }
+                }
+                return widgets;
+              }(),
+            const SizedBox(height: 4),
+          ],
+          if (hasFollowUps) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.info_outline, size: 16,
+                    color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: 4),
+                Text(l10n.followUpHint, style: summaryStyle),
+              ],
+            ),
           ],
         ],
       ),
@@ -356,6 +397,7 @@ class _ReplacementEffectsBox extends ConsumerWidget {
           entries: matching,
           extraInfo: l10n.castSpellSectionReplacementHint,
           highlighted: true,
+          showDividerAbove: true,
         );
       },
       error: (e, _) => Text('Error: $e'),
@@ -385,6 +427,7 @@ class _OwnEffectSection extends ConsumerWidget {
         return TriggerEffectSection(
           title: l10n.castSpellSectionOwnEffect,
           entries: resolveEffects.map((e) => (definition, e)).toList(),
+          showDividerAbove: true,
         );
       },
       error: (e, _) => Text('Error: $e'),
@@ -440,7 +483,12 @@ class _FollowUpSection extends ConsumerWidget {
 
     if (entries.isEmpty) return const SizedBox.shrink();
 
-    return Padding(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Divider(height: 24),
+        Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -461,6 +509,8 @@ class _FollowUpSection extends ConsumerWidget {
             ),
         ],
       ),
+    ),
+      ],
     );
   }
 }
@@ -499,6 +549,7 @@ class _FilteredSection extends ConsumerWidget {
           title: title,
           entries: matching,
           extraInfo: hint,
+          showDividerAbove: true,
         );
       },
       error: (e, _) => Text('Error: $e'),

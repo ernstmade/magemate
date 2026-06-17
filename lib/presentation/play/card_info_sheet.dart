@@ -89,16 +89,6 @@ class _CardInfoSheet extends ConsumerWidget {
                       _RatingChip(definition: definition),
                     ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.edit_outlined),
-                    tooltip: l10n.cardInfoEditEffects,
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) =>
-                            CardEffectEditScreen(definition: definition),
-                      ),
-                    ),
-                  ),
                 ],
               ),
 
@@ -170,6 +160,22 @@ class _CardInfoSheet extends ConsumerWidget {
                 loading: () => const SizedBox(
                   height: 24,
                   child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+
+              // ── Edit-Button ───────────────────────────────────────────────
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.edit_outlined),
+                  label: Text(l10n.cardInfoEditEffects),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          CardEffectEditScreen(definition: definition),
+                    ),
+                  ),
                 ),
               ),
             ],

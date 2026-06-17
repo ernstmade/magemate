@@ -6,6 +6,7 @@ import '../../providers/deck_providers.dart';
 import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
 import '../../shared/widgets/trigger_effect_section.dart';
+import '../play/play_screen.dart' show LocaleToggleButton;
 
 class TriggersScreen extends ConsumerWidget {
   const TriggersScreen({super.key});
@@ -16,7 +17,10 @@ class TriggersScreen extends ConsumerWidget {
     final activeEffects = ref.watch(activeTriggerEffectsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.triggersTitle)),
+      appBar: AppBar(
+        title: Text(l10n.triggersTitle),
+        actions: const [LocaleToggleButton()],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -126,20 +130,21 @@ class _TriggerSectionsState extends State<_TriggerSections> {
                   // Unsichtbarer Anker ganz oben in der Gruppe
                   SizedBox(key: _keyForGroup(activeGroups[i]), height: 0),
 
-                  // Ab Gruppe 2: Trennstrich + Klassenüberschrift
+                  // Ab Gruppe 2: Trennstrich davor
                   if (i > 0) ...[
                     const Divider(thickness: 1, height: 1),
                     const SizedBox(height: 10),
-                    Text(
-                      activeGroups[i].label.toUpperCase(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: activeGroups[i].color,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                   ],
+                  // Klassenüberschrift immer anzeigen
+                  Text(
+                    activeGroups[i].label.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: activeGroups[i].color,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   // Einzelne Trigger-Abschnitte innerhalb der Klasse
                   for (final trigger

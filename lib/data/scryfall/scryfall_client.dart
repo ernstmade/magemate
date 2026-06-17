@@ -140,7 +140,7 @@ class ScryfallClient {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': 'MagicSupportApp/1.0',
+        'User-Agent': 'MagemateApp/1.0',
       },
       body: jsonEncode({
         'identifiers': [
@@ -177,7 +177,7 @@ class ScryfallClient {
       url,
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'MagicSupportApp/1.0',
+        'User-Agent': 'MagemateApp/1.0',
       },
     );
     if (response.statusCode == 404) return null;

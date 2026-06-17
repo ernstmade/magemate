@@ -1,18 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/database/app_database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/active_deck_provider.dart';
 import '../../providers/deck_providers.dart';
+import '../../providers/locale_provider.dart';
 import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
 import 'card_info_sheet.dart';
 import 'cast_spell_sheet.dart';
 
 /// Sortieroptionen für die Kartenlisten in "Deck" und "Im Spiel".
-enum SortMode { alphabetical, byType }
+enum SortMode { alphabetical, byTypeAlpha, byTypeCmc }
 
-final sortModeProvider = StateProvider<SortMode>((ref) => SortMode.alphabetical);
+extension SortModeX on SortMode {
+  bool get isByType => this == SortMode.byTypeAlpha || this == SortMode.byTypeCmc;
+}
+
+/// Speichert die Sortiereinstellung persistent und lädt sie beim Start.
+/// Default: [SortMode.byTypeCmc].
+class _SortModeNotifier extends StateNotifier<SortMode> {
+  _SortModeNotifier() : super(SortMode.byTypeCmc) {
+    _load();
+  }
+
+  static const _key = 'deck_sort_mode';
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_key);
+    if (saved != null) {
+      state = SortMode.values.firstWhere(
+        (m) => m.name == saved,
+        // 'byType' war der alte Name vor der Aufspaltung → CMC als Standard
+        orElse: () => SortMode.byTypeCmc,
+      );
+    }
+  }
+
+  Future<void> set(SortMode mode) async {
+    state = mode;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, mode.name);
+  }
+}
+
+final sortModeProvider =
+    StateNotifierProvider<_SortModeNotifier, SortMode>((_) => _SortModeNotifier());
 
 /// Reihenfolge der Typ-Zwischenüberschriften bei Sortierung "nach Typ". Hat
 /// eine Karte mehrere dieser Typen, zählt der erste Treffer in dieser Liste.
@@ -44,27 +80,37 @@ List<DeckCardGroup> sortGroups(List<DeckCardGroup> groups, SortMode mode) {
   switch (mode) {
     case SortMode.alphabetical:
       sorted.sort((a, b) => a.definition.name.compareTo(b.definition.name));
-    case SortMode.byType:
+    case SortMode.byTypeAlpha:
       sorted.sort((a, b) {
-        final categoryA = typeCategory(a.definition.typeLine);
-        final categoryB = typeCategory(b.definition.typeLine);
-        final rankCompare = _typeCategoryRank(
-          categoryA,
-        ).compareTo(_typeCategoryRank(categoryB));
-        if (rankCompare != 0) return rankCompare;
-        final categoryCompare = categoryA.compareTo(categoryB);
-        if (categoryCompare != 0) return categoryCompare;
+        final catA = typeCategory(a.definition.typeLine);
+        final catB = typeCategory(b.definition.typeLine);
+        final rankCmp = _typeCategoryRank(catA).compareTo(_typeCategoryRank(catB));
+        if (rankCmp != 0) return rankCmp;
+        final catCmp = catA.compareTo(catB);
+        if (catCmp != 0) return catCmp;
+        return a.definition.name.compareTo(b.definition.name);
+      });
+    case SortMode.byTypeCmc:
+      sorted.sort((a, b) {
+        final catA = typeCategory(a.definition.typeLine);
+        final catB = typeCategory(b.definition.typeLine);
+        final rankCmp = _typeCategoryRank(catA).compareTo(_typeCategoryRank(catB));
+        if (rankCmp != 0) return rankCmp;
+        final catCmp = catA.compareTo(catB);
+        if (catCmp != 0) return catCmp;
+        final cmcCmp = (a.definition.cmc ?? 0).compareTo(b.definition.cmc ?? 0);
+        if (cmcCmp != 0) return cmcCmp;
         return a.definition.name.compareTo(b.definition.name);
       });
   }
   return sorted;
 }
 
-/// Baut die Listeneinträge inkl. Zwischenüberschriften für [SortMode.byType].
+/// Baut die Listeneinträge inkl. Zwischenüberschriften für Typ-Sortierung.
 /// Strings sind Überschriften, [DeckCardGroup]s sind Karten-Einträge.
 List<Object> buildSortedListItems(List<DeckCardGroup> groups, SortMode mode) {
   final sorted = sortGroups(groups, mode);
-  if (mode != SortMode.byType) return sorted;
+  if (!mode.isByType) return sorted;
 
   final items = <Object>[];
   String? currentCategory;
@@ -100,6 +146,7 @@ class PlayScreen extends ConsumerWidget {
         appBar: AppBar(
           title: Text(l10n.navPlay),
           actions: [
+            const LocaleToggleButton(),
             IconButton(
               icon: const Icon(Icons.replay),
               tooltip: l10n.roundReset,
@@ -110,15 +157,19 @@ class PlayScreen extends ConsumerWidget {
               tooltip: l10n.sortTooltip,
               initialValue: ref.watch(sortModeProvider),
               onSelected: (mode) =>
-                  ref.read(sortModeProvider.notifier).state = mode,
+                  ref.read(sortModeProvider.notifier).set(mode),
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: SortMode.alphabetical,
                   child: Text(l10n.sortAlphabetical),
                 ),
                 PopupMenuItem(
-                  value: SortMode.byType,
-                  child: Text(l10n.sortByType),
+                  value: SortMode.byTypeCmc,
+                  child: Text(l10n.sortByTypeCmc),
+                ),
+                PopupMenuItem(
+                  value: SortMode.byTypeAlpha,
+                  child: Text(l10n.sortByTypeAlpha),
                 ),
               ],
             ),
@@ -236,15 +287,42 @@ class _NoActiveDeck extends ConsumerWidget {
   }
 }
 
-class _DeckTab extends ConsumerWidget {
+class _DeckTab extends ConsumerStatefulWidget {
   const _DeckTab({required this.deckId});
 
   final int deckId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DeckTab> createState() => _DeckTabState();
+}
+
+class _DeckTabState extends ConsumerState<_DeckTab> {
+  final _scrollController = ScrollController();
+  final _typeKeys = <String, GlobalKey>{};
+
+  GlobalKey _keyForType(String category) =>
+      _typeKeys.putIfAbsent(category, () => GlobalKey());
+
+  void _scrollToType(String category) {
+    final ctx = _keyForType(category).currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
-    final groups = ref.watch(groupedCardsForDeckProvider(deckId));
+    final groups = ref.watch(groupedCardsForDeckProvider(widget.deckId));
     final sortMode = ref.watch(sortModeProvider);
 
     return groups.when(
@@ -253,49 +331,92 @@ class _DeckTab extends ConsumerWidget {
           return Center(child: Text(l10n.cardsEmpty));
         }
         final items = buildSortedListItems(groups, sortMode);
-        return ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            if (item is String) {
-              return _TypeHeader(title: item);
-            }
-            final group = item as DeckCardGroup;
-            final typeLine = group.definition.typeLine ?? '';
-            final isSpell =
-                typeLine.contains('Instant') || typeLine.contains('Sorcery');
-            return ListTile(
-              leading: _EffectIndicator(cardDefinitionId: group.definition.id),
-              title: _cardTitleWidget(group.definition),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.info_outline),
-                    tooltip: l10n.cardInfo,
-                    onPressed: () =>
-                        showCardInfoSheet(context, group.definition),
-                  ),
-                  if (isSpell) ...[
-                    Text(
-                      '${group.total}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        triggerStyle(TriggerType.castSpell).icon,
-                        color: triggerStyle(TriggerType.castSpell).color,
+        final typeCategories = sortMode.isByType
+            ? items.whereType<String>().toList()
+            : <String>[];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Typ-Navigations-Chips (nur bei Sortierung "nach Typ")
+            if (typeCategories.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: Row(
+                  children: [
+                    for (int i = 0; i < typeCategories.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 8),
+                      Expanded(
+                        child: Tooltip(
+                          message: _localizeCategory(typeCategories[i], l10n),
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(0, 36),
+                            ),
+                            onPressed: () => _scrollToType(typeCategories[i]),
+                            child: Icon(_typeIcon(typeCategories[i])),
+                          ),
+                        ),
                       ),
-                      tooltip: l10n.castSpell,
-                      onPressed: () =>
-                          showCastSpellEffectsSheet(context, group.definition),
-                    ),
-                  ] else
-                    _InPlayStepper(group: group),
-                ],
+                    ],
+                  ],
+                ),
               ),
-            );
-          },
+            // Kartenliste
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Column(
+                  children: [
+                    for (final item in items)
+                      if (item is String) ...[
+                        SizedBox(key: _keyForType(item), height: 0),
+                        _TypeHeader(title: item),
+                      ]
+                      else
+                        Builder(
+                          builder: (context) {
+                            final group = item as DeckCardGroup;
+                            final typeLine = group.definition.typeLine ?? '';
+                            final isSpell = typeLine.contains('Instant') ||
+                                typeLine.contains('Sorcery');
+                            return ListTile(
+                              contentPadding: const EdgeInsets.only(left: 16, right: 8),
+                              leading: _EffectIndicator(
+                                  cardDefinitionId: group.definition.id),
+                              title: _cardTitleWidget(context, group.definition),
+                              onTap: () =>
+                                  showCardInfoSheet(context, group.definition),
+                              trailing: isSpell
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '${group.total}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium,
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.style),
+                                          tooltip: l10n.castSpell,
+                                          onPressed: () =>
+                                              showCastSpellEffectsSheet(
+                                                  context, group.definition),
+                                        ),
+                                      ],
+                                    )
+                                  : _InPlayStepper(
+                                      group: group, showRemove: false),
+                            );
+                          },
+                        ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       },
       error: (e, _) => Center(child: Text('Error: $e')),
@@ -321,50 +442,80 @@ String _formatRating(double? rating) {
   return isWhole ? rating.toInt().toString() : rating.toString();
 }
 
-/// Zweiteilige Titelzeile: links eine schmale Spalte mit CMC (Zeile 1) und
-/// Rating (Zeile 2), rechts der Kartenname und Typ.
-Widget _cardTitleWidget(CardDefinition definition) {
+/// Titelzeile: Kartenname + optionale Sternebewertung (kleiner, mit ★).
+/// Darunter: (CMC) Typenzeile in gedimmter Schrift.
+Widget _cardTitleWidget(BuildContext context, CardDefinition definition) {
+  final isDe = Localizations.localeOf(context).languageCode == 'de';
+  final displayName = isDe
+      ? (definition.printedName ?? definition.name)
+      : definition.name;
+  final displayTypeLine = isDe
+      ? (definition.printedTypeLine ?? definition.typeLine)
+      : definition.typeLine;
+
   final cmcText = _formatCmc(definition.cmc);
-  final ratingText = _formatRating(definition.rating);
-  final hasTypeLine = definition.typeLine != null;
+  final hasTypeLine = displayTypeLine != null;
+  final subtitleText = [
+    if (cmcText.isNotEmpty) cmcText,
+    if (hasTypeLine) displayTypeLine,
+  ].join(' ');
 
-  const leftWidth = 40.0;
+  final theme = Theme.of(context);
+  final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
+    color: theme.colorScheme.onSurfaceVariant,
+  );
 
-  return Row(
+  return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
     children: [
-      SizedBox(
-        width: leftWidth,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(cmcText, style: const TextStyle(fontSize: 13)),
-            if (hasTypeLine)
-              Text(
-                ratingText,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+      // Titelzeile: Name + Bewertung
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Flexible(child: Text(displayName)),
+          if (definition.rating != null) ...[
+            const SizedBox(width: 6),
+            Text(
+              '${_formatRating(definition.rating)} ★',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
+            ),
           ],
-        ),
+        ],
       ),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(definition.name),
-            if (hasTypeLine)
-              Text(
-                definition.typeLine!,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-          ],
-        ),
-      ),
+      // Typ-Zeile: (CMC) Typ
+      if (subtitleText.isNotEmpty)
+        Text(subtitleText, style: subtitleStyle),
     ],
   );
 }
+
+/// Übersetzt den englischen Kategorienamen in die aktuelle Sprache.
+String _localizeCategory(String category, AppL10n l10n) => switch (category) {
+      'Creature' => l10n.cardTypeCreature,
+      'Artifact' => l10n.cardTypeArtifact,
+      'Instant' => l10n.cardTypeInstant,
+      'Sorcery' => l10n.cardTypeSorcery,
+      'Land' => l10n.cardTypeLand,
+      'Enchantment' => l10n.cardTypeEnchantment,
+      'Planeswalker' => l10n.cardTypePlaneswalker,
+      _ => category,
+    };
+
+/// Liefert das passende Material-Icon für einen MTG-Kartentyp.
+IconData _typeIcon(String category) => switch (category) {
+      'Creature' => Icons.pets,
+      'Artifact' => Icons.diamond,
+      'Instant' => Icons.bolt,
+      'Sorcery' => Icons.auto_fix_high,
+      'Enchantment' => Icons.auto_awesome,
+      'Land' => Icons.landscape,
+      'Planeswalker' => Icons.face,
+      _ => Icons.category,
+    };
 
 /// Zwischenüberschrift für eine Typ-Kategorie bei Sortierung "nach Typ".
 class _TypeHeader extends StatelessWidget {
@@ -374,14 +525,23 @@ class _TypeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.primary;
+    final l10n = AppL10n.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Row(
+        children: [
+          Icon(_typeIcon(title), size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            _localizeCategory(title, l10n),
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -405,7 +565,7 @@ class _EffectIndicator extends ConsumerWidget {
     final entries = (effects.valueOrNull ?? const [])
         .where((e) => e.trigger != TriggerType.spellResolved.name)
         .toList();
-    if (entries.isEmpty) return const SizedBox(width: 32);
+    if (entries.isEmpty) return const SizedBox(width: 20);
 
     final styles = <TriggerStyle>{};
     for (final effect in entries) {
@@ -417,7 +577,7 @@ class _EffectIndicator extends ConsumerWidget {
     }
 
     return SizedBox(
-      width: 32,
+      width: 20,
       child: Wrap(
         spacing: 2,
         runSpacing: 2,
@@ -426,7 +586,7 @@ class _EffectIndicator extends ConsumerWidget {
             Icon(
               style.icon,
               color: style.color,
-              size: 16,
+              size: 20,
               semanticLabel: l10n.cardHasEffects,
             ),
         ],
@@ -436,9 +596,15 @@ class _EffectIndicator extends ConsumerWidget {
 }
 
 class _InPlayStepper extends ConsumerWidget {
-  const _InPlayStepper({required this.group});
+  const _InPlayStepper({
+    required this.group,
+    this.showAdd = true,
+    this.showRemove = true,
+  });
 
   final DeckCardGroup group;
+  final bool showAdd;
+  final bool showRemove;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -447,20 +613,46 @@ class _InPlayStepper extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          icon: const Icon(Icons.remove_circle_outline),
-          onPressed: group.inPlayCount > 0
-              ? () => repo.setInPlayCount(group, group.inPlayCount - 1)
-              : null,
-        ),
         Text('${group.inPlayCount} / ${group.total}'),
-        IconButton(
-          icon: const Icon(Icons.add_circle_outline),
-          onPressed: group.inPlayCount < group.total
-              ? () => repo.setInPlayCount(group, group.inPlayCount + 1)
-              : null,
-        ),
+        if (showRemove)
+          IconButton(
+            icon: const Icon(Symbols.computer_cancel),
+            onPressed: group.inPlayCount > 0
+                ? () => repo.setInPlayCount(group, group.inPlayCount - 1)
+                : null,
+          ),
+        if (showAdd)
+          IconButton(
+            icon: const Icon(Icons.style),
+            onPressed: group.inPlayCount < group.total
+                ? () => repo.setInPlayCount(group, group.inPlayCount + 1)
+                : null,
+          ),
       ],
+    );
+  }
+}
+
+/// Kompakter Sprach-Toggle-Button für AppBars.
+/// Wechselt zwischen DE und EN; zeigt jeweils die *andere* Sprache als Label.
+class LocaleToggleButton extends ConsumerWidget {
+  const LocaleToggleButton({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
+    final effectiveCode =
+        locale?.languageCode ?? Localizations.localeOf(context).languageCode;
+    final isDE = effectiveCode == 'de';
+    return TextButton(
+      onPressed: () {
+        ref.read(localeProvider.notifier).state =
+            isDE ? const Locale('en') : const Locale('de');
+      },
+      child: Text(
+        isDE ? 'EN' : 'DE',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
     );
   }
 }
@@ -492,20 +684,11 @@ class _InPlayTab extends ConsumerWidget {
             }
             final group = item as DeckCardGroup;
             return ListTile(
+              contentPadding: const EdgeInsets.only(left: 16, right: 8),
               leading: _EffectIndicator(cardDefinitionId: group.definition.id),
-              title: _cardTitleWidget(group.definition),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.info_outline),
-                    tooltip: l10n.cardInfo,
-                    onPressed: () =>
-                        showCardInfoSheet(context, group.definition),
-                  ),
-                  _InPlayStepper(group: group),
-                ],
-              ),
+              title: _cardTitleWidget(context, group.definition),
+              onTap: () => showCardInfoSheet(context, group.definition),
+              trailing: _InPlayStepper(group: group, showAdd: false),
             );
           },
         );

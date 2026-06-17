@@ -100,7 +100,7 @@ abstract class AppL10n {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Magic Support'**
+  /// **'Magemate'**
   String get appTitle;
 
   /// No description provided for @navPlay.
@@ -475,6 +475,12 @@ abstract class AppL10n {
   /// **'Effects from other cards in play that trigger when this spell is cast.'**
   String get castSpellSectionCastHint;
 
+  /// No description provided for @followUpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for possible follow-up effects'**
+  String get followUpHint;
+
   /// No description provided for @castSpellSectionFollowUp.
   ///
   /// In en, this message translates to:
@@ -499,6 +505,48 @@ abstract class AppL10n {
   /// **'No additional data yet.'**
   String get cardInfoNoData;
 
+  /// No description provided for @cardTypeCreature.
+  ///
+  /// In en, this message translates to:
+  /// **'Creature'**
+  String get cardTypeCreature;
+
+  /// No description provided for @cardTypeArtifact.
+  ///
+  /// In en, this message translates to:
+  /// **'Artifact'**
+  String get cardTypeArtifact;
+
+  /// No description provided for @cardTypeInstant.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant'**
+  String get cardTypeInstant;
+
+  /// No description provided for @cardTypeSorcery.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorcery'**
+  String get cardTypeSorcery;
+
+  /// No description provided for @cardTypeLand.
+  ///
+  /// In en, this message translates to:
+  /// **'Land'**
+  String get cardTypeLand;
+
+  /// No description provided for @cardTypeEnchantment.
+  ///
+  /// In en, this message translates to:
+  /// **'Enchantment'**
+  String get cardTypeEnchantment;
+
+  /// No description provided for @cardTypePlaneswalker.
+  ///
+  /// In en, this message translates to:
+  /// **'Planeswalker'**
+  String get cardTypePlaneswalker;
+
   /// No description provided for @sortTooltip.
   ///
   /// In en, this message translates to:
@@ -516,6 +564,18 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'By type'**
   String get sortByType;
+
+  /// No description provided for @sortByTypeCmc.
+  ///
+  /// In en, this message translates to:
+  /// **'By type / CMC'**
+  String get sortByTypeCmc;
+
+  /// No description provided for @sortByTypeAlpha.
+  ///
+  /// In en, this message translates to:
+  /// **'By type / Alphabet'**
+  String get sortByTypeAlpha;
 
   /// No description provided for @enrichFromScryfall.
   ///

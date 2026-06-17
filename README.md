@@ -1,4 +1,4 @@
-# magicsupport
+# magemate
 
 MTG Trigger/Effekt-Support
 

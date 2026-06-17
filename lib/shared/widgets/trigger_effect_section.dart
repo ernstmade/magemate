@@ -9,7 +9,7 @@ import '../../presentation/play/effect_tile.dart';
 /// oben, Kurztext mit Pfeil darunter).
 ///
 /// Mit [highlighted] = true wird der gesamte Block in einem farbigen Container
-/// (errorContainer) dargestellt – für Replacement-Effekte (staticDamageModifier).
+/// dargestellt – für Replacement-Effekte (staticDamageModifier).
 ///
 /// Wird sowohl auf dem Trigger-Screen als auch im Cast-Spell-Bottom-Sheet
 /// verwendet, damit die Darstellung überall identisch ist.
@@ -22,6 +22,7 @@ class TriggerEffectSection extends StatelessWidget {
     this.extraInfo,
     this.highlighted = false,
     this.showCount = false,
+    this.showDividerAbove = false,
   });
 
   final String title;
@@ -39,12 +40,16 @@ class TriggerEffectSection extends StatelessWidget {
   /// Zeigt die Anzahl der Einträge in Klammern hinter dem Titel.
   final bool showCount;
 
+  /// Zeigt einen Divider oberhalb der Section (nur wenn entries nicht leer).
+  final bool showDividerAbove;
+
   @override
   Widget build(BuildContext context) {
     if (entries.isEmpty) return const SizedBox.shrink();
 
     final style = trigger != null ? triggerStyle(trigger!) : null;
     final theme = Theme.of(context);
+    final isDe = Localizations.localeOf(context).languageCode == 'de';
 
     final titleWidget = Row(
       children: [
@@ -68,8 +73,9 @@ class TriggerEffectSection extends StatelessWidget {
       for (final (definition, effect) in entries)
         EffectTile(
           effect: effect,
-          definition: definition,
-          cardName: definition.name,
+          cardName: isDe
+              ? (definition.printedName ?? definition.name)
+              : definition.name,
           contentPadding: highlighted
               ? const EdgeInsets.symmetric(horizontal: 8)
               : EdgeInsets.zero,
@@ -79,40 +85,49 @@ class TriggerEffectSection extends StatelessWidget {
         ),
     ];
 
-    if (highlighted) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.orange.shade800,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                child: titleWidget,
+    final content = highlighted
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.orange.shade800,
+                borderRadius: BorderRadius.circular(8),
               ),
-              ...tiles,
-              const SizedBox(height: 4),
-            ],
-          ),
-        ),
-      );
-    }
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                    child: titleWidget,
+                  ),
+                  ...tiles,
+                  const SizedBox(height: 4),
+                ],
+              ),
+            ),
+          )
+        : Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                titleWidget,
+                const SizedBox(height: 4),
+                ...tiles,
+              ],
+            ),
+          );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          titleWidget,
-          const SizedBox(height: 4),
-          ...tiles,
-        ],
-      ),
+    if (!showDividerAbove) return content;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Divider(height: 24),
+        content,
+      ],
     );
   }
 }

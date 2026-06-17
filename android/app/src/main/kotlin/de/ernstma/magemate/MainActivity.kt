@@ -1,4 +1,4 @@
-package de.ernstma.magicsupport
+package de.ernstma.magemate
 
 import io.flutter.embedding.android.FlutterActivity
 

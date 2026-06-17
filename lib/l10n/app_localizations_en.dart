@@ -9,7 +9,7 @@ class AppL10nEn extends AppL10n {
   AppL10nEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Magic Support';
+  String get appTitle => 'Magemate';
 
   @override
   String get navPlay => 'Play';
@@ -211,6 +211,9 @@ class AppL10nEn extends AppL10n {
       'Effects from other cards in play that trigger when this spell is cast.';
 
   @override
+  String get followUpHint => 'Check for possible follow-up effects';
+
+  @override
   String get castSpellSectionFollowUp => 'Follow-up effects';
 
   @override
@@ -225,6 +228,27 @@ class AppL10nEn extends AppL10n {
   String get cardInfoNoData => 'No additional data yet.';
 
   @override
+  String get cardTypeCreature => 'Creature';
+
+  @override
+  String get cardTypeArtifact => 'Artifact';
+
+  @override
+  String get cardTypeInstant => 'Instant';
+
+  @override
+  String get cardTypeSorcery => 'Sorcery';
+
+  @override
+  String get cardTypeLand => 'Land';
+
+  @override
+  String get cardTypeEnchantment => 'Enchantment';
+
+  @override
+  String get cardTypePlaneswalker => 'Planeswalker';
+
+  @override
   String get sortTooltip => 'Sort';
 
   @override
@@ -232,6 +256,12 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get sortByType => 'By type';
+
+  @override
+  String get sortByTypeCmc => 'By type / CMC';
+
+  @override
+  String get sortByTypeAlpha => 'By type / Alphabet';
 
   @override
   String get enrichFromScryfall => 'Load card data';

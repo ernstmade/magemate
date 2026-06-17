@@ -9,7 +9,7 @@ class AppL10nDe extends AppL10n {
   AppL10nDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appTitle => 'Magic Support';
+  String get appTitle => 'Magemate';
 
   @override
   String get navPlay => 'Spiel';
@@ -192,7 +192,7 @@ class AppL10nDe extends AppL10n {
   String get cardInfoAddEffect => 'Effekt hinzufügen';
 
   @override
-  String get castSpell => 'Gespielt';
+  String get castSpell => 'Spielen';
 
   @override
   String get castSpellSectionReplacement => 'Replacement-Effekte';
@@ -212,6 +212,9 @@ class AppL10nDe extends AppL10n {
       'Effekte anderer Karten im Spiel, die ausgelöst werden, wenn dieser Spruch gespielt wird.';
 
   @override
+  String get followUpHint => 'Eventuelle Folgeeffekte beachten';
+
+  @override
   String get castSpellSectionFollowUp => 'Folgeeffekte';
 
   @override
@@ -226,6 +229,27 @@ class AppL10nDe extends AppL10n {
   String get cardInfoNoData => 'Noch keine weiteren Daten vorhanden.';
 
   @override
+  String get cardTypeCreature => 'Kreatur';
+
+  @override
+  String get cardTypeArtifact => 'Artefakt';
+
+  @override
+  String get cardTypeInstant => 'Spontanzauber';
+
+  @override
+  String get cardTypeSorcery => 'Hexerei';
+
+  @override
+  String get cardTypeLand => 'Land';
+
+  @override
+  String get cardTypeEnchantment => 'Verzauberung';
+
+  @override
+  String get cardTypePlaneswalker => 'Planeswalker';
+
+  @override
   String get sortTooltip => 'Sortierung';
 
   @override
@@ -233,6 +257,12 @@ class AppL10nDe extends AppL10n {
 
   @override
   String get sortByType => 'Nach Typ';
+
+  @override
+  String get sortByTypeCmc => 'Nach Typ / Mana';
+
+  @override
+  String get sortByTypeAlpha => 'Nach Typ / Alphabet';
 
   @override
   String get enrichFromScryfall => 'Karteninfos laden';

@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
+import 'package:drift/native.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -179,6 +184,22 @@ class AppDatabase extends _$AppDatabase {
   );
 }
 
+/// Öffnet die Datenbank. Beim ersten Start (Datei fehlt) wird die mitgelieferte
+/// Seed-DB aus den App-Assets in den Dokumentenordner kopiert, sodass das
+/// "Damage Damage!"-Deck bereits vorgeladen ist. Spätere Starts nutzen die
+/// Gerätekopie inklusive aller Nutzeränderungen.
 QueryExecutor _openDatabase() {
-  return driftDatabase(name: 'magicsupport');
+  return LazyDatabase(() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dir.path, 'magemate.sqlite'));
+
+    if (!file.existsSync()) {
+      final blob = await rootBundle.load('assets/magemate.sqlite');
+      await file.writeAsBytes(
+        blob.buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes),
+      );
+    }
+
+    return NativeDatabase(file);
+  });
 }
