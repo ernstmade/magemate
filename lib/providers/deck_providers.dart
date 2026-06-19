@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/database/app_database.dart';
 import '../data/import/deck_list_parser.dart';
+import '../data/parser/card_text_parser.dart';
 import '../data/scryfall/scryfall_client.dart';
 import '../shared/models/trigger_type.dart';
 import 'database_provider.dart';
@@ -359,6 +360,103 @@ class DeckRepository {
     return (_db.delete(
       _db.cardEffects,
     )..where((e) => e.id.equals(effectId))).go();
+  }
+
+  // ── Learned Rules ───────────────────────────────────────────────────────────
+
+  Future<List<LearnedRuleEntry>> getAllLearnedRules() async {
+    final rows = await _db.select(_db.learnedRules).get();
+    return rows.map((r) => LearnedRuleEntry(
+      normalizedPattern: r.normalizedPattern,
+      trigger: r.trigger,
+      shortLabelTemplate: r.shortLabelTemplate,
+      shortLabelEnTemplate: r.shortLabelEnTemplate,
+      hasDamageAmount: r.hasDamageAmount,
+      triggerDetail: r.triggerDetail,
+      extraConditions: r.extraConditions,
+      damageTarget: r.damageTarget,
+      damageMultiplier: r.damageMultiplier,
+      damageMinimum: r.damageMinimum,
+      replacementScope: r.replacementScope,
+      dynamicDamage: r.dynamicDamage,
+    )).toList();
+  }
+
+  /// Fügt eine neue Regel ein oder erhöht die Konfidenz einer bestehenden.
+  /// Das Upsert geschieht über den UNIQUE-Index auf `normalized_pattern`.
+  Future<void> upsertLearnedRule({
+    required String pattern,
+    required String trigger,
+    required String shortLabelTemplate,
+    required String shortLabelEnTemplate,
+    required bool hasDamageAmount,
+    String? triggerDetail,
+    String? extraConditions,
+    String? damageTarget,
+    int? damageMultiplier,
+    int? damageMinimum,
+    String? replacementScope,
+    bool? dynamicDamage,
+  }) {
+    return _db.customStatement(
+      '''
+      INSERT INTO learned_rules (
+        normalized_pattern, trigger, trigger_detail, extra_conditions,
+        short_label_template, short_label_en_template, has_damage_amount,
+        damage_target, damage_multiplier, damage_minimum,
+        replacement_scope, dynamic_damage, confidence
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      ON CONFLICT(normalized_pattern) DO UPDATE SET
+        confidence      = confidence + 1,
+        trigger         = excluded.trigger,
+        trigger_detail  = excluded.trigger_detail,
+        extra_conditions= excluded.extra_conditions,
+        short_label_template    = excluded.short_label_template,
+        short_label_en_template = excluded.short_label_en_template,
+        has_damage_amount= excluded.has_damage_amount,
+        damage_target   = excluded.damage_target,
+        damage_multiplier= excluded.damage_multiplier,
+        damage_minimum  = excluded.damage_minimum,
+        replacement_scope= excluded.replacement_scope,
+        dynamic_damage  = excluded.dynamic_damage
+      ''',
+      [
+        pattern,
+        trigger,
+        triggerDetail,
+        extraConditions,
+        shortLabelTemplate,
+        shortLabelEnTemplate,
+        hasDamageAmount ? 1 : 0,
+        damageTarget,
+        damageMultiplier,
+        damageMinimum,
+        replacementScope,
+        dynamicDamage == true ? 1 : 0,
+      ],
+    );
+  }
+
+  // ── Card Definitions ────────────────────────────────────────────────────────
+
+  Future<List<CardDefinition>> getCardDefinitionsForDeck(int deckId) async {
+    final rows = await (_db.select(_db.cardDefinitions).join([
+      drift.innerJoin(
+        _db.deckCards,
+        _db.deckCards.cardDefinitionId.equalsExp(_db.cardDefinitions.id),
+      ),
+    ])
+          ..where(_db.deckCards.deckId.equals(deckId))
+          ..groupBy([_db.cardDefinitions.id]))
+        .get();
+    return rows.map((row) => row.readTable(_db.cardDefinitions)).toList();
+  }
+
+  Future<bool> hasEffects(int cardDefinitionId) async {
+    final list = await (_db.select(_db.cardEffects)
+          ..where((e) => e.cardDefinitionId.equals(cardDefinitionId)))
+        .get();
+    return list.isNotEmpty;
   }
 
   /// Lädt für alle Karten-Definitionen eines Decks mit Set + Sammelnummer

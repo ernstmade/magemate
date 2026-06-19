@@ -9,8 +9,10 @@ import '../../providers/deck_providers.dart';
 import '../../providers/locale_provider.dart';
 import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
+import '../../data/parser/card_text_parser.dart';
 import 'card_info_sheet.dart';
 import 'cast_spell_sheet.dart';
+import 'effect_suggestion_screen.dart';
 
 /// Sortieroptionen für die Kartenlisten in "Deck" und "Im Spiel".
 enum SortMode { alphabetical, byTypeAlpha, byTypeCmc }
@@ -230,12 +232,29 @@ class PlayScreen extends ConsumerWidget {
   ) async {
     final l10n = AppL10n.of(context);
     try {
-      final count = await ref
-          .read(deckRepositoryProvider)
-          .enrichDeckFromScryfall(deckId);
+      final repo = ref.read(deckRepositoryProvider);
+      final count = await repo.enrichDeckFromScryfall(deckId);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.enrichSuccess(count))),
+      );
+
+      // Parse card text for cards without effects and show review screen
+      final definitions = await repo.getCardDefinitionsForDeck(deckId);
+      final learnedRules = await repo.getAllLearnedRules();
+      final suggestions = <(CardDefinition, ParsedEffect)>[];
+      for (final def in definitions) {
+        if (def.oracleText == null) continue;
+        if (await repo.hasEffects(def.id)) continue;
+        for (final effect in CardTextParser.parse(def.oracleText!, cardName: def.name, learnedRules: learnedRules)) {
+          suggestions.add((def, effect));
+        }
+      }
+      if (suggestions.isEmpty || !context.mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => EffectSuggestionScreen(suggestions: suggestions),
+        ),
       );
     } catch (e) {
       if (!context.mounted) return;

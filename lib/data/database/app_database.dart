@@ -9,7 +9,7 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Decks, CardDefinitions, DeckCards, CardEffects])
+@DriftDatabase(tables: [Decks, CardDefinitions, DeckCards, CardEffects, LearnedRules])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openDatabase());
 
@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -118,6 +118,9 @@ class AppDatabase extends _$AppDatabase {
         await customStatement(
           "UPDATE card_effects SET spell_category = 'anySource' WHERE spell_category IS NULL AND trigger = 'dealsNoncombatDamage' AND short_label = 'Gleicher Schaden an Kreatur/PW'",
         );
+      }
+      if (from < 14) {
+        await m.createTable(learnedRules);
       }
       if (from < 13) {
         await m.addColumn(cardDefinitions, cardDefinitions.rating);

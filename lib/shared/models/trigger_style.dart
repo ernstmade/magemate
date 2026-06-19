@@ -98,6 +98,69 @@ const triggerGroupDefs = <TriggerGroupDef>[
 
 // ─── Einzel-Trigger-Styles ───────────────────────────────────────────────────
 
+/// Lokalisierter Anzeigename für einen [TriggerType].
+String triggerTypeLabel(TriggerType trigger, {required bool isDe}) {
+  if (isDe) {
+    return switch (trigger) {
+      TriggerType.upkeep              => 'Unterhalt',
+      TriggerType.draw                => 'Ziehphase',
+      TriggerType.endStep             => 'Endschritt',
+      TriggerType.castSpell           => 'Spruch gespielt',
+      TriggerType.spellResolved       => 'Spruch aufgelöst',
+      TriggerType.enterBattlefield    => 'Kommt ins Spiel',
+      TriggerType.leaveBattlefield    => 'Verlässt Spiel',
+      TriggerType.dies                => 'Stirbt',
+      TriggerType.attacks             => 'Greift an',
+      TriggerType.blocks              => 'Blockt',
+      TriggerType.dealsCombatDamage   => 'Kampfschaden',
+      TriggerType.takesDamage         => 'Erhält Schaden',
+      TriggerType.dealsNoncombatDamage => 'Nicht-Kampfschaden',
+      TriggerType.spellDealsDamage    => 'Spruchschaden',
+      TriggerType.landfall            => 'Landfall',
+      TriggerType.lifeGain            => 'Leben gewinnen',
+      TriggerType.lifeLoss            => 'Leben verlieren',
+      TriggerType.cardDrawn           => 'Karte gezogen',
+      TriggerType.discard             => 'Abwerfen',
+      TriggerType.staticDamageModifier => 'Ersetzungseffekt',
+    };
+  } else {
+    return switch (trigger) {
+      TriggerType.upkeep              => 'Upkeep',
+      TriggerType.draw                => 'Draw step',
+      TriggerType.endStep             => 'End step',
+      TriggerType.castSpell           => 'Spell cast',
+      TriggerType.spellResolved       => 'Spell resolved',
+      TriggerType.enterBattlefield    => 'Enters',
+      TriggerType.leaveBattlefield    => 'Leaves battlefield',
+      TriggerType.dies                => 'Dies',
+      TriggerType.attacks             => 'Attacks',
+      TriggerType.blocks              => 'Blocks',
+      TriggerType.dealsCombatDamage   => 'Combat damage',
+      TriggerType.takesDamage         => 'Takes damage',
+      TriggerType.dealsNoncombatDamage => 'Noncombat damage',
+      TriggerType.spellDealsDamage    => 'Spell damage',
+      TriggerType.landfall            => 'Landfall',
+      TriggerType.lifeGain            => 'Life gain',
+      TriggerType.lifeLoss            => 'Life loss',
+      TriggerType.cardDrawn           => 'Card drawn',
+      TriggerType.discard             => 'Discard',
+      TriggerType.staticDamageModifier => 'Replacement effect',
+    };
+  }
+}
+
+/// Lokalisierter Anzeigename für einen triggerDetail-Wert (SpellCategory /
+/// SourceFilter). Gibt null zurück wenn der Wert keinen sinnvollen
+/// Anzeigetext hat (z.B. anySource — implizit, kein Mehrwert).
+String? triggerDetailLabel(String? detail, {required bool isDe}) {
+  return switch (detail) {
+    'instantOrSorcery'  => 'Instant / Sorcery',
+    'noncreatureSpell'  => isDe ? 'Nicht-Kreatur-Spruch' : 'Noncreature spell',
+    'redSource'         => isDe ? 'Rote Quelle' : 'Red source',
+    _                   => null, // anySource und null: zu generisch für Anzeige
+  };
+}
+
 /// Liefert Icon und Farbe für einen einzelnen [TriggerType].
 /// Die Farbe orientiert sich an der übergeordneten [TriggerGroupDef].
 TriggerStyle triggerStyle(TriggerType trigger) {

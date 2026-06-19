@@ -129,7 +129,11 @@ class AppL10nDe extends AppL10n {
   String get effectConditionSingleTarget => 'Nur bei Einzelziel';
 
   @override
-  String get effectConditionDamageToOpponent => 'Nur Schaden an Gegner';
+  String get effectConditionSingleCreatureTarget =>
+      'Nur einzelne Kreatur als Ziel';
+
+  @override
+  String get effectConditionDamageToOpponent => 'Schaden an Gegner';
 
   @override
   String get cardInfoDamageAmountLabel => 'Schaden';
@@ -311,4 +315,25 @@ class AppL10nDe extends AppL10n {
 
   @override
   String get settingsLanguageSystem => 'System';
+
+  @override
+  String get effectSuggestionTitle => 'Erkannte Effekte';
+
+  @override
+  String get effectSuggestionHint =>
+      'Effekte aus dem Kartentext prüfen und speichern. Nicht passende einfach abwählen.';
+
+  @override
+  String effectSuggestionSave(int count) {
+    return 'Auswahl speichern ($count)';
+  }
+
+  @override
+  String get effectSuggestionSelectAll => 'Alle auswählen';
+
+  @override
+  String get effectSuggestionDeselectAll => 'Alle abwählen';
+
+  @override
+  String get effectSuggestionNone => 'Keine neuen Effekte erkannt.';
 }

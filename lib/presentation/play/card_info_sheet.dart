@@ -6,6 +6,8 @@ import '../../providers/deck_providers.dart';
 import '../../shared/widgets/mana_symbol.dart';
 import '../../shared/widgets/oracle_text.dart';
 import '../../shared/widgets/star_rating.dart';
+import '../../shared/models/trigger_style.dart';
+import '../../shared/models/trigger_type.dart';
 import 'card_effect_edit_screen.dart';
 import 'effect_tile.dart';
 
@@ -66,9 +68,9 @@ class _CardInfoSheet extends ConsumerWidget {
                               : definition.name,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        if (isDe && definition.printedName != null)
+                        if (definition.printedName != null)
                           Text(
-                            definition.name,
+                            isDe ? definition.name : definition.printedName!,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(
@@ -146,7 +148,13 @@ class _CardInfoSheet extends ConsumerWidget {
                         EffectTile(
                           effect: effect,
                           definition: definition,
-                          cardName: effect.trigger,
+                          cardName: triggerTypeLabel(
+                            TriggerType.values.firstWhere(
+                              (t) => t.name == effect.trigger,
+                              orElse: () => TriggerType.castSpell,
+                            ),
+                            isDe: isDe,
+                          ),
                           subtitleFirst: true,
                           contentPadding: EdgeInsets.zero,
                           onDelete: () => ref

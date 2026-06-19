@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/app_database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/deck_providers.dart';
+import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
 import 'effect_tile.dart';
 
@@ -111,6 +112,7 @@ class _CardEffectEditScreenState extends ConsumerState<CardEffectEditScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
+    final isDe = Localizations.localeOf(context).languageCode == 'de';
     final effects = ref.watch(effectsForCardDefinitionProvider(definition.id));
 
     return Scaffold(
@@ -135,8 +137,13 @@ class _CardEffectEditScreenState extends ConsumerState<CardEffectEditScreen> {
                     for (final effect in effects)
                       EffectTile(
                         effect: effect,
-                        definition: definition,
-                        cardName: effect.trigger,
+                        cardName: triggerTypeLabel(
+                          TriggerType.values.firstWhere(
+                            (t) => t.name == effect.trigger,
+                            orElse: () => TriggerType.castSpell,
+                          ),
+                          isDe: isDe,
+                        ),
                         subtitleFirst: true,
                         contentPadding: EdgeInsets.zero,
                         onDelete: () => ref

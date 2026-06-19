@@ -38,7 +38,8 @@
   "cardInfoTriggerDetailLabel": "Bedingung",
   "cardInfoSingleTargetLabel": "Nur bei Einzelziel",
   "effectConditionSingleTarget": "Nur bei Einzelziel",
-  "effectConditionDamageToOpponent": "Nur Schaden an Gegner",
+  "effectConditionSingleCreatureTarget": "Nur einzelne Kreatur als Ziel",
+  "effectConditionDamageToOpponent": "Schaden an Gegner",
   "cardInfoDamageAmountLabel": "Schaden",
   "cardInfoDamageMultiplierLabel": "Multiplikator (×)",
   "cardInfoDamageMinimumLabel": "Minimum",
@@ -93,5 +94,18 @@
   "cardRatingNone": "Nicht bewertet",
   "settingsTitle": "Einstellungen",
   "settingsLanguage": "Sprache",
-  "settingsLanguageSystem": "System"
+  "settingsLanguageSystem": "System",
+  "effectSuggestionTitle": "Erkannte Effekte",
+  "effectSuggestionHint": "Effekte aus dem Kartentext prüfen und speichern. Nicht passende einfach abwählen.",
+  "effectSuggestionSave": "Auswahl speichern ({count})",
+  "@effectSuggestionSave": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "effectSuggestionSelectAll": "Alle auswählen",
+  "effectSuggestionDeselectAll": "Alle abwählen",
+  "effectSuggestionNone": "Keine neuen Effekte erkannt."
 }

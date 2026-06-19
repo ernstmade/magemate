@@ -325,10 +325,16 @@ abstract class AppL10n {
   /// **'Single target only'**
   String get effectConditionSingleTarget;
 
+  /// No description provided for @effectConditionSingleCreatureTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Single creature target only'**
+  String get effectConditionSingleCreatureTarget;
+
   /// No description provided for @effectConditionDamageToOpponent.
   ///
   /// In en, this message translates to:
-  /// **'Damage to opponent only'**
+  /// **'Damage to opponent'**
   String get effectConditionDamageToOpponent;
 
   /// No description provided for @cardInfoDamageAmountLabel.
@@ -660,6 +666,42 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'System'**
   String get settingsLanguageSystem;
+
+  /// No description provided for @effectSuggestionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected effects'**
+  String get effectSuggestionTitle;
+
+  /// No description provided for @effectSuggestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Review the effects detected from card text. Deselect any that don\'t apply.'**
+  String get effectSuggestionHint;
+
+  /// No description provided for @effectSuggestionSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save selection ({count})'**
+  String effectSuggestionSave(int count);
+
+  /// No description provided for @effectSuggestionSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get effectSuggestionSelectAll;
+
+  /// No description provided for @effectSuggestionDeselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect all'**
+  String get effectSuggestionDeselectAll;
+
+  /// No description provided for @effectSuggestionNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No new effects detected.'**
+  String get effectSuggestionNone;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

@@ -52,7 +52,8 @@
   "cardInfoTriggerDetailLabel": "Condition",
   "cardInfoSingleTargetLabel": "Single target only",
   "effectConditionSingleTarget": "Single target only",
-  "effectConditionDamageToOpponent": "Damage to opponent only",
+  "effectConditionSingleCreatureTarget": "Single creature target only",
+  "effectConditionDamageToOpponent": "Damage to opponent",
   "cardInfoDamageAmountLabel": "Damage",
   "cardInfoDamageMultiplierLabel": "Multiplier (×)",
   "cardInfoDamageMinimumLabel": "Minimum",
@@ -121,5 +122,18 @@
   "cardRatingNone": "Not rated",
   "settingsTitle": "Settings",
   "settingsLanguage": "Language",
-  "settingsLanguageSystem": "System"
+  "settingsLanguageSystem": "System",
+  "effectSuggestionTitle": "Detected effects",
+  "effectSuggestionHint": "Review the effects detected from card text. Deselect any that don't apply.",
+  "effectSuggestionSave": "Save selection ({count})",
+  "@effectSuggestionSave": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "effectSuggestionSelectAll": "Select all",
+  "effectSuggestionDeselectAll": "Deselect all",
+  "effectSuggestionNone": "No new effects detected."
 }

@@ -128,7 +128,11 @@ class AppL10nEn extends AppL10n {
   String get effectConditionSingleTarget => 'Single target only';
 
   @override
-  String get effectConditionDamageToOpponent => 'Damage to opponent only';
+  String get effectConditionSingleCreatureTarget =>
+      'Single creature target only';
+
+  @override
+  String get effectConditionDamageToOpponent => 'Damage to opponent';
 
   @override
   String get cardInfoDamageAmountLabel => 'Damage';
@@ -309,4 +313,25 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get settingsLanguageSystem => 'System';
+
+  @override
+  String get effectSuggestionTitle => 'Detected effects';
+
+  @override
+  String get effectSuggestionHint =>
+      'Review the effects detected from card text. Deselect any that don\'t apply.';
+
+  @override
+  String effectSuggestionSave(int count) {
+    return 'Save selection ($count)';
+  }
+
+  @override
+  String get effectSuggestionSelectAll => 'Select all';
+
+  @override
+  String get effectSuggestionDeselectAll => 'Deselect all';
+
+  @override
+  String get effectSuggestionNone => 'No new effects detected.';
 }

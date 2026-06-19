@@ -56,6 +56,35 @@ class DeckCards extends Table {
   BoolColumn get inPlay => boolean().withDefault(const Constant(false))();
 }
 
+// ─── Gelernte Parser-Regeln ──────────────────────────────────────────────────
+
+// Speichert vom User bestätigte Orakeltext-Muster → Effekt-Zuordnungen.
+// Beim nächsten Parsen werden diese Regeln vor den eingebauten Regex-Regeln
+// geprüft, sodass die App aus Korrekturen lernt.
+//
+// `normalizedPattern`: Orakelzeile mit {self} statt Kartenname und {N} statt
+// Zahlen. Ist der Eindeutigkeitsschlüssel (UNIQUE NOT NULL).
+// `shortLabelTemplate` / `shortLabelEnTemplate`: Kurztext-Vorlage mit {N}
+// als Platzhalter für die extrahierte Zahl.
+// `hasDamageAmount`: Ob beim Anwenden der Regel {N} als damageAmount gilt.
+// `confidence`: Wird bei jeder Benutzerbestätigung um 1 erhöht.
+class LearnedRules extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get normalizedPattern => text().customConstraint('NOT NULL UNIQUE')();
+  TextColumn get trigger => text()();
+  TextColumn get triggerDetail => text().nullable()();
+  TextColumn get extraConditions => text().nullable()();
+  TextColumn get shortLabelTemplate => text()();
+  TextColumn get shortLabelEnTemplate => text()();
+  BoolColumn get hasDamageAmount => boolean().withDefault(const Constant(false))();
+  TextColumn get damageTarget => text().nullable()();
+  IntColumn get damageMultiplier => integer().nullable()();
+  IntColumn get damageMinimum => integer().nullable()();
+  TextColumn get replacementScope => text().nullable()();
+  BoolColumn get dynamicDamage => boolean().nullable()();
+  IntColumn get confidence => integer().withDefault(const Constant(1))();
+}
+
 // ─── Card-Effekt ─────────────────────────────────────────────────────────────
 
 // Ein Effekt einer Karten-Definition, ausgelöst durch einen TriggerType.

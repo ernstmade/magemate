@@ -2540,6 +2540,884 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
   }
 }
 
+class $LearnedRulesTable extends LearnedRules
+    with TableInfo<$LearnedRulesTable, LearnedRule> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LearnedRulesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _normalizedPatternMeta = const VerificationMeta(
+    'normalizedPattern',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedPattern =
+      GeneratedColumn<String>(
+        'normalized_pattern',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        $customConstraints: 'NOT NULL UNIQUE',
+      );
+  static const VerificationMeta _triggerMeta = const VerificationMeta(
+    'trigger',
+  );
+  @override
+  late final GeneratedColumn<String> trigger = GeneratedColumn<String>(
+    'trigger',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _triggerDetailMeta = const VerificationMeta(
+    'triggerDetail',
+  );
+  @override
+  late final GeneratedColumn<String> triggerDetail = GeneratedColumn<String>(
+    'trigger_detail',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _extraConditionsMeta = const VerificationMeta(
+    'extraConditions',
+  );
+  @override
+  late final GeneratedColumn<String> extraConditions = GeneratedColumn<String>(
+    'extra_conditions',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _shortLabelTemplateMeta =
+      const VerificationMeta('shortLabelTemplate');
+  @override
+  late final GeneratedColumn<String> shortLabelTemplate =
+      GeneratedColumn<String>(
+        'short_label_template',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _shortLabelEnTemplateMeta =
+      const VerificationMeta('shortLabelEnTemplate');
+  @override
+  late final GeneratedColumn<String> shortLabelEnTemplate =
+      GeneratedColumn<String>(
+        'short_label_en_template',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _hasDamageAmountMeta = const VerificationMeta(
+    'hasDamageAmount',
+  );
+  @override
+  late final GeneratedColumn<bool> hasDamageAmount = GeneratedColumn<bool>(
+    'has_damage_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("has_damage_amount" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _damageTargetMeta = const VerificationMeta(
+    'damageTarget',
+  );
+  @override
+  late final GeneratedColumn<String> damageTarget = GeneratedColumn<String>(
+    'damage_target',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _damageMultiplierMeta = const VerificationMeta(
+    'damageMultiplier',
+  );
+  @override
+  late final GeneratedColumn<int> damageMultiplier = GeneratedColumn<int>(
+    'damage_multiplier',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _damageMinimumMeta = const VerificationMeta(
+    'damageMinimum',
+  );
+  @override
+  late final GeneratedColumn<int> damageMinimum = GeneratedColumn<int>(
+    'damage_minimum',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _replacementScopeMeta = const VerificationMeta(
+    'replacementScope',
+  );
+  @override
+  late final GeneratedColumn<String> replacementScope = GeneratedColumn<String>(
+    'replacement_scope',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dynamicDamageMeta = const VerificationMeta(
+    'dynamicDamage',
+  );
+  @override
+  late final GeneratedColumn<bool> dynamicDamage = GeneratedColumn<bool>(
+    'dynamic_damage',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dynamic_damage" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _confidenceMeta = const VerificationMeta(
+    'confidence',
+  );
+  @override
+  late final GeneratedColumn<int> confidence = GeneratedColumn<int>(
+    'confidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    normalizedPattern,
+    trigger,
+    triggerDetail,
+    extraConditions,
+    shortLabelTemplate,
+    shortLabelEnTemplate,
+    hasDamageAmount,
+    damageTarget,
+    damageMultiplier,
+    damageMinimum,
+    replacementScope,
+    dynamicDamage,
+    confidence,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'learned_rules';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LearnedRule> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('normalized_pattern')) {
+      context.handle(
+        _normalizedPatternMeta,
+        normalizedPattern.isAcceptableOrUnknown(
+          data['normalized_pattern']!,
+          _normalizedPatternMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedPatternMeta);
+    }
+    if (data.containsKey('trigger')) {
+      context.handle(
+        _triggerMeta,
+        trigger.isAcceptableOrUnknown(data['trigger']!, _triggerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_triggerMeta);
+    }
+    if (data.containsKey('trigger_detail')) {
+      context.handle(
+        _triggerDetailMeta,
+        triggerDetail.isAcceptableOrUnknown(
+          data['trigger_detail']!,
+          _triggerDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('extra_conditions')) {
+      context.handle(
+        _extraConditionsMeta,
+        extraConditions.isAcceptableOrUnknown(
+          data['extra_conditions']!,
+          _extraConditionsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('short_label_template')) {
+      context.handle(
+        _shortLabelTemplateMeta,
+        shortLabelTemplate.isAcceptableOrUnknown(
+          data['short_label_template']!,
+          _shortLabelTemplateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_shortLabelTemplateMeta);
+    }
+    if (data.containsKey('short_label_en_template')) {
+      context.handle(
+        _shortLabelEnTemplateMeta,
+        shortLabelEnTemplate.isAcceptableOrUnknown(
+          data['short_label_en_template']!,
+          _shortLabelEnTemplateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_shortLabelEnTemplateMeta);
+    }
+    if (data.containsKey('has_damage_amount')) {
+      context.handle(
+        _hasDamageAmountMeta,
+        hasDamageAmount.isAcceptableOrUnknown(
+          data['has_damage_amount']!,
+          _hasDamageAmountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('damage_target')) {
+      context.handle(
+        _damageTargetMeta,
+        damageTarget.isAcceptableOrUnknown(
+          data['damage_target']!,
+          _damageTargetMeta,
+        ),
+      );
+    }
+    if (data.containsKey('damage_multiplier')) {
+      context.handle(
+        _damageMultiplierMeta,
+        damageMultiplier.isAcceptableOrUnknown(
+          data['damage_multiplier']!,
+          _damageMultiplierMeta,
+        ),
+      );
+    }
+    if (data.containsKey('damage_minimum')) {
+      context.handle(
+        _damageMinimumMeta,
+        damageMinimum.isAcceptableOrUnknown(
+          data['damage_minimum']!,
+          _damageMinimumMeta,
+        ),
+      );
+    }
+    if (data.containsKey('replacement_scope')) {
+      context.handle(
+        _replacementScopeMeta,
+        replacementScope.isAcceptableOrUnknown(
+          data['replacement_scope']!,
+          _replacementScopeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dynamic_damage')) {
+      context.handle(
+        _dynamicDamageMeta,
+        dynamicDamage.isAcceptableOrUnknown(
+          data['dynamic_damage']!,
+          _dynamicDamageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('confidence')) {
+      context.handle(
+        _confidenceMeta,
+        confidence.isAcceptableOrUnknown(data['confidence']!, _confidenceMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LearnedRule map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LearnedRule(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      normalizedPattern: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}normalized_pattern'],
+      )!,
+      trigger: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trigger'],
+      )!,
+      triggerDetail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trigger_detail'],
+      ),
+      extraConditions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}extra_conditions'],
+      ),
+      shortLabelTemplate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}short_label_template'],
+      )!,
+      shortLabelEnTemplate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}short_label_en_template'],
+      )!,
+      hasDamageAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}has_damage_amount'],
+      )!,
+      damageTarget: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}damage_target'],
+      ),
+      damageMultiplier: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}damage_multiplier'],
+      ),
+      damageMinimum: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}damage_minimum'],
+      ),
+      replacementScope: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}replacement_scope'],
+      ),
+      dynamicDamage: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dynamic_damage'],
+      ),
+      confidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}confidence'],
+      )!,
+    );
+  }
+
+  @override
+  $LearnedRulesTable createAlias(String alias) {
+    return $LearnedRulesTable(attachedDatabase, alias);
+  }
+}
+
+class LearnedRule extends DataClass implements Insertable<LearnedRule> {
+  final int id;
+  final String normalizedPattern;
+  final String trigger;
+  final String? triggerDetail;
+  final String? extraConditions;
+  final String shortLabelTemplate;
+  final String shortLabelEnTemplate;
+  final bool hasDamageAmount;
+  final String? damageTarget;
+  final int? damageMultiplier;
+  final int? damageMinimum;
+  final String? replacementScope;
+  final bool? dynamicDamage;
+  final int confidence;
+  const LearnedRule({
+    required this.id,
+    required this.normalizedPattern,
+    required this.trigger,
+    this.triggerDetail,
+    this.extraConditions,
+    required this.shortLabelTemplate,
+    required this.shortLabelEnTemplate,
+    required this.hasDamageAmount,
+    this.damageTarget,
+    this.damageMultiplier,
+    this.damageMinimum,
+    this.replacementScope,
+    this.dynamicDamage,
+    required this.confidence,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['normalized_pattern'] = Variable<String>(normalizedPattern);
+    map['trigger'] = Variable<String>(trigger);
+    if (!nullToAbsent || triggerDetail != null) {
+      map['trigger_detail'] = Variable<String>(triggerDetail);
+    }
+    if (!nullToAbsent || extraConditions != null) {
+      map['extra_conditions'] = Variable<String>(extraConditions);
+    }
+    map['short_label_template'] = Variable<String>(shortLabelTemplate);
+    map['short_label_en_template'] = Variable<String>(shortLabelEnTemplate);
+    map['has_damage_amount'] = Variable<bool>(hasDamageAmount);
+    if (!nullToAbsent || damageTarget != null) {
+      map['damage_target'] = Variable<String>(damageTarget);
+    }
+    if (!nullToAbsent || damageMultiplier != null) {
+      map['damage_multiplier'] = Variable<int>(damageMultiplier);
+    }
+    if (!nullToAbsent || damageMinimum != null) {
+      map['damage_minimum'] = Variable<int>(damageMinimum);
+    }
+    if (!nullToAbsent || replacementScope != null) {
+      map['replacement_scope'] = Variable<String>(replacementScope);
+    }
+    if (!nullToAbsent || dynamicDamage != null) {
+      map['dynamic_damage'] = Variable<bool>(dynamicDamage);
+    }
+    map['confidence'] = Variable<int>(confidence);
+    return map;
+  }
+
+  LearnedRulesCompanion toCompanion(bool nullToAbsent) {
+    return LearnedRulesCompanion(
+      id: Value(id),
+      normalizedPattern: Value(normalizedPattern),
+      trigger: Value(trigger),
+      triggerDetail: triggerDetail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(triggerDetail),
+      extraConditions: extraConditions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(extraConditions),
+      shortLabelTemplate: Value(shortLabelTemplate),
+      shortLabelEnTemplate: Value(shortLabelEnTemplate),
+      hasDamageAmount: Value(hasDamageAmount),
+      damageTarget: damageTarget == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageTarget),
+      damageMultiplier: damageMultiplier == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageMultiplier),
+      damageMinimum: damageMinimum == null && nullToAbsent
+          ? const Value.absent()
+          : Value(damageMinimum),
+      replacementScope: replacementScope == null && nullToAbsent
+          ? const Value.absent()
+          : Value(replacementScope),
+      dynamicDamage: dynamicDamage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dynamicDamage),
+      confidence: Value(confidence),
+    );
+  }
+
+  factory LearnedRule.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LearnedRule(
+      id: serializer.fromJson<int>(json['id']),
+      normalizedPattern: serializer.fromJson<String>(json['normalizedPattern']),
+      trigger: serializer.fromJson<String>(json['trigger']),
+      triggerDetail: serializer.fromJson<String?>(json['triggerDetail']),
+      extraConditions: serializer.fromJson<String?>(json['extraConditions']),
+      shortLabelTemplate: serializer.fromJson<String>(
+        json['shortLabelTemplate'],
+      ),
+      shortLabelEnTemplate: serializer.fromJson<String>(
+        json['shortLabelEnTemplate'],
+      ),
+      hasDamageAmount: serializer.fromJson<bool>(json['hasDamageAmount']),
+      damageTarget: serializer.fromJson<String?>(json['damageTarget']),
+      damageMultiplier: serializer.fromJson<int?>(json['damageMultiplier']),
+      damageMinimum: serializer.fromJson<int?>(json['damageMinimum']),
+      replacementScope: serializer.fromJson<String?>(json['replacementScope']),
+      dynamicDamage: serializer.fromJson<bool?>(json['dynamicDamage']),
+      confidence: serializer.fromJson<int>(json['confidence']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'normalizedPattern': serializer.toJson<String>(normalizedPattern),
+      'trigger': serializer.toJson<String>(trigger),
+      'triggerDetail': serializer.toJson<String?>(triggerDetail),
+      'extraConditions': serializer.toJson<String?>(extraConditions),
+      'shortLabelTemplate': serializer.toJson<String>(shortLabelTemplate),
+      'shortLabelEnTemplate': serializer.toJson<String>(shortLabelEnTemplate),
+      'hasDamageAmount': serializer.toJson<bool>(hasDamageAmount),
+      'damageTarget': serializer.toJson<String?>(damageTarget),
+      'damageMultiplier': serializer.toJson<int?>(damageMultiplier),
+      'damageMinimum': serializer.toJson<int?>(damageMinimum),
+      'replacementScope': serializer.toJson<String?>(replacementScope),
+      'dynamicDamage': serializer.toJson<bool?>(dynamicDamage),
+      'confidence': serializer.toJson<int>(confidence),
+    };
+  }
+
+  LearnedRule copyWith({
+    int? id,
+    String? normalizedPattern,
+    String? trigger,
+    Value<String?> triggerDetail = const Value.absent(),
+    Value<String?> extraConditions = const Value.absent(),
+    String? shortLabelTemplate,
+    String? shortLabelEnTemplate,
+    bool? hasDamageAmount,
+    Value<String?> damageTarget = const Value.absent(),
+    Value<int?> damageMultiplier = const Value.absent(),
+    Value<int?> damageMinimum = const Value.absent(),
+    Value<String?> replacementScope = const Value.absent(),
+    Value<bool?> dynamicDamage = const Value.absent(),
+    int? confidence,
+  }) => LearnedRule(
+    id: id ?? this.id,
+    normalizedPattern: normalizedPattern ?? this.normalizedPattern,
+    trigger: trigger ?? this.trigger,
+    triggerDetail: triggerDetail.present
+        ? triggerDetail.value
+        : this.triggerDetail,
+    extraConditions: extraConditions.present
+        ? extraConditions.value
+        : this.extraConditions,
+    shortLabelTemplate: shortLabelTemplate ?? this.shortLabelTemplate,
+    shortLabelEnTemplate: shortLabelEnTemplate ?? this.shortLabelEnTemplate,
+    hasDamageAmount: hasDamageAmount ?? this.hasDamageAmount,
+    damageTarget: damageTarget.present ? damageTarget.value : this.damageTarget,
+    damageMultiplier: damageMultiplier.present
+        ? damageMultiplier.value
+        : this.damageMultiplier,
+    damageMinimum: damageMinimum.present
+        ? damageMinimum.value
+        : this.damageMinimum,
+    replacementScope: replacementScope.present
+        ? replacementScope.value
+        : this.replacementScope,
+    dynamicDamage: dynamicDamage.present
+        ? dynamicDamage.value
+        : this.dynamicDamage,
+    confidence: confidence ?? this.confidence,
+  );
+  LearnedRule copyWithCompanion(LearnedRulesCompanion data) {
+    return LearnedRule(
+      id: data.id.present ? data.id.value : this.id,
+      normalizedPattern: data.normalizedPattern.present
+          ? data.normalizedPattern.value
+          : this.normalizedPattern,
+      trigger: data.trigger.present ? data.trigger.value : this.trigger,
+      triggerDetail: data.triggerDetail.present
+          ? data.triggerDetail.value
+          : this.triggerDetail,
+      extraConditions: data.extraConditions.present
+          ? data.extraConditions.value
+          : this.extraConditions,
+      shortLabelTemplate: data.shortLabelTemplate.present
+          ? data.shortLabelTemplate.value
+          : this.shortLabelTemplate,
+      shortLabelEnTemplate: data.shortLabelEnTemplate.present
+          ? data.shortLabelEnTemplate.value
+          : this.shortLabelEnTemplate,
+      hasDamageAmount: data.hasDamageAmount.present
+          ? data.hasDamageAmount.value
+          : this.hasDamageAmount,
+      damageTarget: data.damageTarget.present
+          ? data.damageTarget.value
+          : this.damageTarget,
+      damageMultiplier: data.damageMultiplier.present
+          ? data.damageMultiplier.value
+          : this.damageMultiplier,
+      damageMinimum: data.damageMinimum.present
+          ? data.damageMinimum.value
+          : this.damageMinimum,
+      replacementScope: data.replacementScope.present
+          ? data.replacementScope.value
+          : this.replacementScope,
+      dynamicDamage: data.dynamicDamage.present
+          ? data.dynamicDamage.value
+          : this.dynamicDamage,
+      confidence: data.confidence.present
+          ? data.confidence.value
+          : this.confidence,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LearnedRule(')
+          ..write('id: $id, ')
+          ..write('normalizedPattern: $normalizedPattern, ')
+          ..write('trigger: $trigger, ')
+          ..write('triggerDetail: $triggerDetail, ')
+          ..write('extraConditions: $extraConditions, ')
+          ..write('shortLabelTemplate: $shortLabelTemplate, ')
+          ..write('shortLabelEnTemplate: $shortLabelEnTemplate, ')
+          ..write('hasDamageAmount: $hasDamageAmount, ')
+          ..write('damageTarget: $damageTarget, ')
+          ..write('damageMultiplier: $damageMultiplier, ')
+          ..write('damageMinimum: $damageMinimum, ')
+          ..write('replacementScope: $replacementScope, ')
+          ..write('dynamicDamage: $dynamicDamage, ')
+          ..write('confidence: $confidence')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    normalizedPattern,
+    trigger,
+    triggerDetail,
+    extraConditions,
+    shortLabelTemplate,
+    shortLabelEnTemplate,
+    hasDamageAmount,
+    damageTarget,
+    damageMultiplier,
+    damageMinimum,
+    replacementScope,
+    dynamicDamage,
+    confidence,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LearnedRule &&
+          other.id == this.id &&
+          other.normalizedPattern == this.normalizedPattern &&
+          other.trigger == this.trigger &&
+          other.triggerDetail == this.triggerDetail &&
+          other.extraConditions == this.extraConditions &&
+          other.shortLabelTemplate == this.shortLabelTemplate &&
+          other.shortLabelEnTemplate == this.shortLabelEnTemplate &&
+          other.hasDamageAmount == this.hasDamageAmount &&
+          other.damageTarget == this.damageTarget &&
+          other.damageMultiplier == this.damageMultiplier &&
+          other.damageMinimum == this.damageMinimum &&
+          other.replacementScope == this.replacementScope &&
+          other.dynamicDamage == this.dynamicDamage &&
+          other.confidence == this.confidence);
+}
+
+class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
+  final Value<int> id;
+  final Value<String> normalizedPattern;
+  final Value<String> trigger;
+  final Value<String?> triggerDetail;
+  final Value<String?> extraConditions;
+  final Value<String> shortLabelTemplate;
+  final Value<String> shortLabelEnTemplate;
+  final Value<bool> hasDamageAmount;
+  final Value<String?> damageTarget;
+  final Value<int?> damageMultiplier;
+  final Value<int?> damageMinimum;
+  final Value<String?> replacementScope;
+  final Value<bool?> dynamicDamage;
+  final Value<int> confidence;
+  const LearnedRulesCompanion({
+    this.id = const Value.absent(),
+    this.normalizedPattern = const Value.absent(),
+    this.trigger = const Value.absent(),
+    this.triggerDetail = const Value.absent(),
+    this.extraConditions = const Value.absent(),
+    this.shortLabelTemplate = const Value.absent(),
+    this.shortLabelEnTemplate = const Value.absent(),
+    this.hasDamageAmount = const Value.absent(),
+    this.damageTarget = const Value.absent(),
+    this.damageMultiplier = const Value.absent(),
+    this.damageMinimum = const Value.absent(),
+    this.replacementScope = const Value.absent(),
+    this.dynamicDamage = const Value.absent(),
+    this.confidence = const Value.absent(),
+  });
+  LearnedRulesCompanion.insert({
+    this.id = const Value.absent(),
+    required String normalizedPattern,
+    required String trigger,
+    this.triggerDetail = const Value.absent(),
+    this.extraConditions = const Value.absent(),
+    required String shortLabelTemplate,
+    required String shortLabelEnTemplate,
+    this.hasDamageAmount = const Value.absent(),
+    this.damageTarget = const Value.absent(),
+    this.damageMultiplier = const Value.absent(),
+    this.damageMinimum = const Value.absent(),
+    this.replacementScope = const Value.absent(),
+    this.dynamicDamage = const Value.absent(),
+    this.confidence = const Value.absent(),
+  }) : normalizedPattern = Value(normalizedPattern),
+       trigger = Value(trigger),
+       shortLabelTemplate = Value(shortLabelTemplate),
+       shortLabelEnTemplate = Value(shortLabelEnTemplate);
+  static Insertable<LearnedRule> custom({
+    Expression<int>? id,
+    Expression<String>? normalizedPattern,
+    Expression<String>? trigger,
+    Expression<String>? triggerDetail,
+    Expression<String>? extraConditions,
+    Expression<String>? shortLabelTemplate,
+    Expression<String>? shortLabelEnTemplate,
+    Expression<bool>? hasDamageAmount,
+    Expression<String>? damageTarget,
+    Expression<int>? damageMultiplier,
+    Expression<int>? damageMinimum,
+    Expression<String>? replacementScope,
+    Expression<bool>? dynamicDamage,
+    Expression<int>? confidence,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (normalizedPattern != null) 'normalized_pattern': normalizedPattern,
+      if (trigger != null) 'trigger': trigger,
+      if (triggerDetail != null) 'trigger_detail': triggerDetail,
+      if (extraConditions != null) 'extra_conditions': extraConditions,
+      if (shortLabelTemplate != null)
+        'short_label_template': shortLabelTemplate,
+      if (shortLabelEnTemplate != null)
+        'short_label_en_template': shortLabelEnTemplate,
+      if (hasDamageAmount != null) 'has_damage_amount': hasDamageAmount,
+      if (damageTarget != null) 'damage_target': damageTarget,
+      if (damageMultiplier != null) 'damage_multiplier': damageMultiplier,
+      if (damageMinimum != null) 'damage_minimum': damageMinimum,
+      if (replacementScope != null) 'replacement_scope': replacementScope,
+      if (dynamicDamage != null) 'dynamic_damage': dynamicDamage,
+      if (confidence != null) 'confidence': confidence,
+    });
+  }
+
+  LearnedRulesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? normalizedPattern,
+    Value<String>? trigger,
+    Value<String?>? triggerDetail,
+    Value<String?>? extraConditions,
+    Value<String>? shortLabelTemplate,
+    Value<String>? shortLabelEnTemplate,
+    Value<bool>? hasDamageAmount,
+    Value<String?>? damageTarget,
+    Value<int?>? damageMultiplier,
+    Value<int?>? damageMinimum,
+    Value<String?>? replacementScope,
+    Value<bool?>? dynamicDamage,
+    Value<int>? confidence,
+  }) {
+    return LearnedRulesCompanion(
+      id: id ?? this.id,
+      normalizedPattern: normalizedPattern ?? this.normalizedPattern,
+      trigger: trigger ?? this.trigger,
+      triggerDetail: triggerDetail ?? this.triggerDetail,
+      extraConditions: extraConditions ?? this.extraConditions,
+      shortLabelTemplate: shortLabelTemplate ?? this.shortLabelTemplate,
+      shortLabelEnTemplate: shortLabelEnTemplate ?? this.shortLabelEnTemplate,
+      hasDamageAmount: hasDamageAmount ?? this.hasDamageAmount,
+      damageTarget: damageTarget ?? this.damageTarget,
+      damageMultiplier: damageMultiplier ?? this.damageMultiplier,
+      damageMinimum: damageMinimum ?? this.damageMinimum,
+      replacementScope: replacementScope ?? this.replacementScope,
+      dynamicDamage: dynamicDamage ?? this.dynamicDamage,
+      confidence: confidence ?? this.confidence,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (normalizedPattern.present) {
+      map['normalized_pattern'] = Variable<String>(normalizedPattern.value);
+    }
+    if (trigger.present) {
+      map['trigger'] = Variable<String>(trigger.value);
+    }
+    if (triggerDetail.present) {
+      map['trigger_detail'] = Variable<String>(triggerDetail.value);
+    }
+    if (extraConditions.present) {
+      map['extra_conditions'] = Variable<String>(extraConditions.value);
+    }
+    if (shortLabelTemplate.present) {
+      map['short_label_template'] = Variable<String>(shortLabelTemplate.value);
+    }
+    if (shortLabelEnTemplate.present) {
+      map['short_label_en_template'] = Variable<String>(
+        shortLabelEnTemplate.value,
+      );
+    }
+    if (hasDamageAmount.present) {
+      map['has_damage_amount'] = Variable<bool>(hasDamageAmount.value);
+    }
+    if (damageTarget.present) {
+      map['damage_target'] = Variable<String>(damageTarget.value);
+    }
+    if (damageMultiplier.present) {
+      map['damage_multiplier'] = Variable<int>(damageMultiplier.value);
+    }
+    if (damageMinimum.present) {
+      map['damage_minimum'] = Variable<int>(damageMinimum.value);
+    }
+    if (replacementScope.present) {
+      map['replacement_scope'] = Variable<String>(replacementScope.value);
+    }
+    if (dynamicDamage.present) {
+      map['dynamic_damage'] = Variable<bool>(dynamicDamage.value);
+    }
+    if (confidence.present) {
+      map['confidence'] = Variable<int>(confidence.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LearnedRulesCompanion(')
+          ..write('id: $id, ')
+          ..write('normalizedPattern: $normalizedPattern, ')
+          ..write('trigger: $trigger, ')
+          ..write('triggerDetail: $triggerDetail, ')
+          ..write('extraConditions: $extraConditions, ')
+          ..write('shortLabelTemplate: $shortLabelTemplate, ')
+          ..write('shortLabelEnTemplate: $shortLabelEnTemplate, ')
+          ..write('hasDamageAmount: $hasDamageAmount, ')
+          ..write('damageTarget: $damageTarget, ')
+          ..write('damageMultiplier: $damageMultiplier, ')
+          ..write('damageMinimum: $damageMinimum, ')
+          ..write('replacementScope: $replacementScope, ')
+          ..write('dynamicDamage: $dynamicDamage, ')
+          ..write('confidence: $confidence')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2549,6 +3427,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $DeckCardsTable deckCards = $DeckCardsTable(this);
   late final $CardEffectsTable cardEffects = $CardEffectsTable(this);
+  late final $LearnedRulesTable learnedRules = $LearnedRulesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2558,6 +3437,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cardDefinitions,
     deckCards,
     cardEffects,
+    learnedRules,
   ];
 }
 
@@ -3769,6 +4649,395 @@ typedef $$CardEffectsTableProcessedTableManager =
       CardEffect,
       PrefetchHooks Function()
     >;
+typedef $$LearnedRulesTableCreateCompanionBuilder =
+    LearnedRulesCompanion Function({
+      Value<int> id,
+      required String normalizedPattern,
+      required String trigger,
+      Value<String?> triggerDetail,
+      Value<String?> extraConditions,
+      required String shortLabelTemplate,
+      required String shortLabelEnTemplate,
+      Value<bool> hasDamageAmount,
+      Value<String?> damageTarget,
+      Value<int?> damageMultiplier,
+      Value<int?> damageMinimum,
+      Value<String?> replacementScope,
+      Value<bool?> dynamicDamage,
+      Value<int> confidence,
+    });
+typedef $$LearnedRulesTableUpdateCompanionBuilder =
+    LearnedRulesCompanion Function({
+      Value<int> id,
+      Value<String> normalizedPattern,
+      Value<String> trigger,
+      Value<String?> triggerDetail,
+      Value<String?> extraConditions,
+      Value<String> shortLabelTemplate,
+      Value<String> shortLabelEnTemplate,
+      Value<bool> hasDamageAmount,
+      Value<String?> damageTarget,
+      Value<int?> damageMultiplier,
+      Value<int?> damageMinimum,
+      Value<String?> replacementScope,
+      Value<bool?> dynamicDamage,
+      Value<int> confidence,
+    });
+
+class $$LearnedRulesTableFilterComposer
+    extends Composer<_$AppDatabase, $LearnedRulesTable> {
+  $$LearnedRulesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedPattern => $composableBuilder(
+    column: $table.normalizedPattern,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get trigger => $composableBuilder(
+    column: $table.trigger,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get triggerDetail => $composableBuilder(
+    column: $table.triggerDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get extraConditions => $composableBuilder(
+    column: $table.extraConditions,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shortLabelTemplate => $composableBuilder(
+    column: $table.shortLabelTemplate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shortLabelEnTemplate => $composableBuilder(
+    column: $table.shortLabelEnTemplate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hasDamageAmount => $composableBuilder(
+    column: $table.hasDamageAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get damageTarget => $composableBuilder(
+    column: $table.damageTarget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get damageMultiplier => $composableBuilder(
+    column: $table.damageMultiplier,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get damageMinimum => $composableBuilder(
+    column: $table.damageMinimum,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get replacementScope => $composableBuilder(
+    column: $table.replacementScope,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dynamicDamage => $composableBuilder(
+    column: $table.dynamicDamage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LearnedRulesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LearnedRulesTable> {
+  $$LearnedRulesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedPattern => $composableBuilder(
+    column: $table.normalizedPattern,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get trigger => $composableBuilder(
+    column: $table.trigger,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get triggerDetail => $composableBuilder(
+    column: $table.triggerDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get extraConditions => $composableBuilder(
+    column: $table.extraConditions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shortLabelTemplate => $composableBuilder(
+    column: $table.shortLabelTemplate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shortLabelEnTemplate => $composableBuilder(
+    column: $table.shortLabelEnTemplate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hasDamageAmount => $composableBuilder(
+    column: $table.hasDamageAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get damageTarget => $composableBuilder(
+    column: $table.damageTarget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get damageMultiplier => $composableBuilder(
+    column: $table.damageMultiplier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get damageMinimum => $composableBuilder(
+    column: $table.damageMinimum,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get replacementScope => $composableBuilder(
+    column: $table.replacementScope,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get dynamicDamage => $composableBuilder(
+    column: $table.dynamicDamage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LearnedRulesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LearnedRulesTable> {
+  $$LearnedRulesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get normalizedPattern => $composableBuilder(
+    column: $table.normalizedPattern,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get trigger =>
+      $composableBuilder(column: $table.trigger, builder: (column) => column);
+
+  GeneratedColumn<String> get triggerDetail => $composableBuilder(
+    column: $table.triggerDetail,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get extraConditions => $composableBuilder(
+    column: $table.extraConditions,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get shortLabelTemplate => $composableBuilder(
+    column: $table.shortLabelTemplate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get shortLabelEnTemplate => $composableBuilder(
+    column: $table.shortLabelEnTemplate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get hasDamageAmount => $composableBuilder(
+    column: $table.hasDamageAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get damageTarget => $composableBuilder(
+    column: $table.damageTarget,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get damageMultiplier => $composableBuilder(
+    column: $table.damageMultiplier,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get damageMinimum => $composableBuilder(
+    column: $table.damageMinimum,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get replacementScope => $composableBuilder(
+    column: $table.replacementScope,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get dynamicDamage => $composableBuilder(
+    column: $table.dynamicDamage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => column,
+  );
+}
+
+class $$LearnedRulesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LearnedRulesTable,
+          LearnedRule,
+          $$LearnedRulesTableFilterComposer,
+          $$LearnedRulesTableOrderingComposer,
+          $$LearnedRulesTableAnnotationComposer,
+          $$LearnedRulesTableCreateCompanionBuilder,
+          $$LearnedRulesTableUpdateCompanionBuilder,
+          (
+            LearnedRule,
+            BaseReferences<_$AppDatabase, $LearnedRulesTable, LearnedRule>,
+          ),
+          LearnedRule,
+          PrefetchHooks Function()
+        > {
+  $$LearnedRulesTableTableManager(_$AppDatabase db, $LearnedRulesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LearnedRulesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LearnedRulesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LearnedRulesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> normalizedPattern = const Value.absent(),
+                Value<String> trigger = const Value.absent(),
+                Value<String?> triggerDetail = const Value.absent(),
+                Value<String?> extraConditions = const Value.absent(),
+                Value<String> shortLabelTemplate = const Value.absent(),
+                Value<String> shortLabelEnTemplate = const Value.absent(),
+                Value<bool> hasDamageAmount = const Value.absent(),
+                Value<String?> damageTarget = const Value.absent(),
+                Value<int?> damageMultiplier = const Value.absent(),
+                Value<int?> damageMinimum = const Value.absent(),
+                Value<String?> replacementScope = const Value.absent(),
+                Value<bool?> dynamicDamage = const Value.absent(),
+                Value<int> confidence = const Value.absent(),
+              }) => LearnedRulesCompanion(
+                id: id,
+                normalizedPattern: normalizedPattern,
+                trigger: trigger,
+                triggerDetail: triggerDetail,
+                extraConditions: extraConditions,
+                shortLabelTemplate: shortLabelTemplate,
+                shortLabelEnTemplate: shortLabelEnTemplate,
+                hasDamageAmount: hasDamageAmount,
+                damageTarget: damageTarget,
+                damageMultiplier: damageMultiplier,
+                damageMinimum: damageMinimum,
+                replacementScope: replacementScope,
+                dynamicDamage: dynamicDamage,
+                confidence: confidence,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String normalizedPattern,
+                required String trigger,
+                Value<String?> triggerDetail = const Value.absent(),
+                Value<String?> extraConditions = const Value.absent(),
+                required String shortLabelTemplate,
+                required String shortLabelEnTemplate,
+                Value<bool> hasDamageAmount = const Value.absent(),
+                Value<String?> damageTarget = const Value.absent(),
+                Value<int?> damageMultiplier = const Value.absent(),
+                Value<int?> damageMinimum = const Value.absent(),
+                Value<String?> replacementScope = const Value.absent(),
+                Value<bool?> dynamicDamage = const Value.absent(),
+                Value<int> confidence = const Value.absent(),
+              }) => LearnedRulesCompanion.insert(
+                id: id,
+                normalizedPattern: normalizedPattern,
+                trigger: trigger,
+                triggerDetail: triggerDetail,
+                extraConditions: extraConditions,
+                shortLabelTemplate: shortLabelTemplate,
+                shortLabelEnTemplate: shortLabelEnTemplate,
+                hasDamageAmount: hasDamageAmount,
+                damageTarget: damageTarget,
+                damageMultiplier: damageMultiplier,
+                damageMinimum: damageMinimum,
+                replacementScope: replacementScope,
+                dynamicDamage: dynamicDamage,
+                confidence: confidence,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LearnedRulesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LearnedRulesTable,
+      LearnedRule,
+      $$LearnedRulesTableFilterComposer,
+      $$LearnedRulesTableOrderingComposer,
+      $$LearnedRulesTableAnnotationComposer,
+      $$LearnedRulesTableCreateCompanionBuilder,
+      $$LearnedRulesTableUpdateCompanionBuilder,
+      (
+        LearnedRule,
+        BaseReferences<_$AppDatabase, $LearnedRulesTable, LearnedRule>,
+      ),
+      LearnedRule,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3781,4 +5050,6 @@ class $AppDatabaseManager {
       $$DeckCardsTableTableManager(_db, _db.deckCards);
   $$CardEffectsTableTableManager get cardEffects =>
       $$CardEffectsTableTableManager(_db, _db.cardEffects);
+  $$LearnedRulesTableTableManager get learnedRules =>
+      $$LearnedRulesTableTableManager(_db, _db.learnedRules);
 }

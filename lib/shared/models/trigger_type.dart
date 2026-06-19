@@ -177,9 +177,12 @@ bool isOpponentTarget(DamageTarget target) {
 /// kann bei Bedarf erweitert werden, ohne dass eine neue Spalte/Migration
 /// nötig ist.
 enum EffectCondition {
-  // Effekt greift nur, wenn der auslösende Spruch/Fähigkeit genau ein
-  // einziges Ziel hatte (z.B. Imodane, Spinerock Tyrant).
+  // Effekt greift nur, wenn der auslösende Spruch/Fähigkeit genau einen
+  // einzigen Spieler/Gegner als Ziel hatte (z.B. Spinerock Tyrant).
   singleTarget,
+  // Effekt greift nur, wenn der auslösende Spruch/Fähigkeit genau eine
+  // einzige Kreatur als Ziel hatte (z.B. Imodane the Pyrohammer).
+  singleCreatureTarget,
   // Effekt greift nur, wenn der Schaden an einen Gegner (Spieler) geht,
   // nicht an Kreaturen (z.B. Chandra's Incinerator).
   damageToOpponent,
