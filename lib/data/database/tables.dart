@@ -40,6 +40,8 @@ class CardDefinitions extends Table {
   TextColumn get printedTypeLine => text().nullable()();
   // Persönliche Bewertung der Karte: 0–5,5 in 0,25-Schritten. Null = nicht bewertet.
   RealColumn get rating => real().nullable()();
+  // Schlüsselwörter von Scryfall, kommagetrennt, z.B. "Flying,Trample".
+  TextColumn get keywords => text().nullable()();
 }
 
 // ─── Deck-Karte (konkretes Exemplar im Deck) ────────────────────────────────
@@ -82,6 +84,9 @@ class LearnedRules extends Table {
   IntColumn get damageMinimum => integer().nullable()();
   TextColumn get replacementScope => text().nullable()();
   BoolColumn get dynamicDamage => boolean().nullable()();
+  TextColumn get triggerConditionText => text().nullable()();
+  TextColumn get effectDetail => text().nullable()();
+  TextColumn get effectExtraConditions => text().nullable()();
   IntColumn get confidence => integer().withDefault(const Constant(1))();
 }
 
@@ -101,7 +106,7 @@ class CardEffects extends Table {
   //   (redSource / anySource)
   // Spaltenname bleibt aus Migrationsgründen "spell_category".
   TextColumn get triggerDetail => text().nullable().named('spell_category')();
-  // Kommagetrennte Liste von EffectCondition-Enum-Namen, z.B. "singleTarget".
+  // Kommagetrennte Liste von TriggerCondition-Enum-Namen, z.B. "singleTarget".
   // Orthogonale Zusatzbedingungen, erweiterbar ohne neue Migration.
   TextColumn get extraConditions => text().nullable()();
   // Kurzschreibweise für die schnelle Übersicht (primäre Sprache, i.d.R. DE).
@@ -136,8 +141,50 @@ class CardEffects extends Table {
   // Für optimalen Schaden: zuerst floor anwenden, dann addieren, dann
   // multiplizieren.
   IntColumn get damageMinimum => integer().nullable()();
+  // Freitext-Bedingung die zusätzlich zum Trigger erfüllt sein muss, bevor der
+  // Effekt eintritt (z.B. "if you control a creature with power 7 or greater").
+  // Wird aus dem Oracle-Text extrahiert und kompakt normalisiert gespeichert.
+  TextColumn get triggerConditionText => text().nullable()();
   // Optionaler Bezug auf einen anderen Effekt, der durch diesen Effekt
   // beeinflusst/ausgelöst wird (für Effekt-Verkettungen).
   IntColumn get triggersEffectId =>
       integer().nullable().references(CardEffects, #id)();
+  // Grobe Kategorisierung des Effekts (unabhängig vom Trigger):
+  // damage | drawCards | createToken | destroyPermanent | exilePermanent |
+  // searchLibrary | attachEquipment | grantKeyword | modifyStat |
+  // extraCombat | gainLife | loseLife | returnCard | counter | other
+  // null = noch nicht kategorisiert.
+  TextColumn get effectType => text().nullable()();
+
+  // CE-Scope: beschreibt, auf wen ein continuousEffect wirkt.
+  // self       → Karte modifiziert sich selbst dauerhaft
+  // oneTarget  → Equipment/Aura: wirkt auf genau eine angelegt Karte
+  // global     → wirkt auf alle eigenen Karten (ggf. mit Typbedingung)
+  // conditional → wirkt auf Karten, die triggerConditionText erfüllen
+  TextColumn get ceScope => text().nullable()();
+
+  // Strukturiertes Effekt-Detail: schränkt ein, worauf der EFFEKT (nicht der
+  // Trigger) wirkt oder unter welcher Bedingung er eintritt. Freitext analog
+  // zu triggerConditionText, aber auf Effekt-Seite (z.B. "only flying creatures",
+  // "only opponents").
+  TextColumn get effectDetail => text().nullable()();
+  // Kommagetrennte Liste von EffectCondition-Enum-Namen (z.B. "onlyIfYourTurn").
+  // Orthogonale Effekt-Einschränkungen, erweiterbar ohne neue Migration.
+  TextColumn get effectExtraConditions => text().nullable()();
+}
+
+/// Zuordnung Equipment/Aura → Zielkarte (je Deck, eine Zeile pro Equipment).
+/// Wird gelöscht, wenn Equipment aus dem Spiel entfernt wird.
+class CardAttachments extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get deckId => integer().references(Decks, #id)();
+  IntColumn get equipmentDefinitionId =>
+      integer().references(CardDefinitions, #id)();
+  IntColumn get targetDefinitionId =>
+      integer().references(CardDefinitions, #id)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {deckId, equipmentDefinitionId},
+  ];
 }

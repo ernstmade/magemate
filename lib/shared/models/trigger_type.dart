@@ -8,6 +8,7 @@ enum TriggerType {
   upkeep,
   draw,
   endStep,
+  beginningOfCombat,
 
   // Zaubersprüche / Stack
   //
@@ -42,6 +43,11 @@ enum TriggerType {
   // Statische, dauerhaft aktive Modifikatoren (kein Einzel-Event, aber
   // relevant zu wissen, wenn man auf Schaden o.ä. schaut)
   staticDamageModifier,
+
+  // Dauerhafter Effekt, der anderen Karten Eigenschaften verleiht, z.B.
+  // "Creatures you control have trample" oder "Dragons get +1/+1".
+  // Wird nur im Status-Tab angezeigt, nicht im Trigger-Screen.
+  continuousEffect,
 }
 
 /// Lvl3-Detail für `TriggerType.castSpell` / `TriggerType.spellDealsDamage`:
@@ -85,7 +91,7 @@ TriggerDetailKind triggerDetailKind(TriggerType trigger) {
 }
 
 /// Ob für [trigger] die Zusatzbedingung "nur bei Einzelziel" (s.
-/// [EffectCondition.singleTarget]) sinnvoll angeboten werden soll.
+/// [TriggerCondition.singleTarget]) sinnvoll angeboten werden soll.
 bool supportsSingleTargetCondition(TriggerType trigger) {
   switch (trigger) {
     case TriggerType.castSpell:
@@ -101,7 +107,7 @@ bool supportsSingleTargetCondition(TriggerType trigger) {
 /// Ziel eines festen Schadenswerts ([CardEffects.damageAmount]). Wird genutzt,
 /// um beim "Gespielt"-Sheet Summen pro Zielgruppe zu bilden.
 enum DamageTarget {
-  // Ein einzelner Gegner (z.B. Lightning Bolt, Brash Taunter)
+  // Ein einzelner Gegner (z.B. Boltwave, Guttersnipe)
   singleOpponent,
   // Jeder Gegner (z.B. Boltwave, Guttersnipe)
   eachOpponent,
@@ -109,8 +115,10 @@ enum DamageTarget {
   singleCreature,
   // Jede Kreatur (z.B. Fiery Confluence Modus 1)
   eachCreature,
-  // Die Kreaturen jedes Gegners (z.B. Tectonic Hazard)
+  // Die Kreaturen jedes Gegners
   eachOpponentCreatures,
+  // Beliebiges Ziel: Kreatur, Spieler oder Planeswalker (z.B. Lightning Bolt)
+  anyTarget,
 }
 
 /// Prüft, ob das gespeicherte `triggerDetail` eines Effekts zur gerade
@@ -164,6 +172,7 @@ bool isOpponentTarget(DamageTarget target) {
   switch (target) {
     case DamageTarget.singleOpponent:
     case DamageTarget.eachOpponent:
+    case DamageTarget.anyTarget:
       return true;
     case DamageTarget.singleCreature:
     case DamageTarget.eachCreature:
@@ -172,11 +181,11 @@ bool isOpponentTarget(DamageTarget target) {
   }
 }
 
-/// Orthogonale, optionale Zusatzbedingungen für einen Effekt. Mehrere Werte
-/// werden kommagetrennt in `CardEffects.extraConditions` gespeichert. Liste
-/// kann bei Bedarf erweitert werden, ohne dass eine neue Spalte/Migration
+/// Orthogonale, optionale Bedingungen, unter denen ein Trigger feuert. Mehrere
+/// Werte werden kommagetrennt in `CardEffects.extraConditions` gespeichert.
+/// Liste kann bei Bedarf erweitert werden, ohne dass eine neue Spalte/Migration
 /// nötig ist.
-enum EffectCondition {
+enum TriggerCondition {
   // Effekt greift nur, wenn der auslösende Spruch/Fähigkeit genau einen
   // einzigen Spieler/Gegner als Ziel hatte (z.B. Spinerock Tyrant).
   singleTarget,
@@ -187,3 +196,26 @@ enum EffectCondition {
   // nicht an Kreaturen (z.B. Chandra's Incinerator).
   damageToOpponent,
 }
+
+/// Orthogonale, optionale Einschränkungen, unter denen ein EFFEKT eintritt
+/// (unabhängig vom Trigger). Mehrere Werte werden kommagetrennt in
+/// `CardEffects.effectExtraConditions` gespeichert.
+enum EffectCondition {
+  // Effekt gilt nur in deinem Zug.
+  onlyIfYourTurn,
+  // Effekt gilt nur im Zug eines Gegners.
+  onlyIfOpponentsTurn,
+  // Effekt greift nur beim ersten Mal pro Zug ("the first time each turn").
+  onlyFirstTimePerTurn,
+  // Effekt gilt nur, solange diese Kreatur angreift.
+  onlyWhileAttacking,
+}
+
+/// Lokalisierter Anzeigename für einen [EffectCondition]-Wert.
+String effectConditionLabel(EffectCondition c, {required bool isDe}) =>
+    switch (c) {
+      EffectCondition.onlyIfYourTurn       => isDe ? 'Nur dein Zug'     : 'Only your turn',
+      EffectCondition.onlyIfOpponentsTurn  => isDe ? 'Nur Gegner-Zug'   : "Only opp's turn",
+      EffectCondition.onlyFirstTimePerTurn => isDe ? 'Nur erstes Mal'   : 'Only first time',
+      EffectCondition.onlyWhileAttacking   => isDe ? 'Nur beim Angriff' : 'Only while attacking',
+    };

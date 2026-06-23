@@ -127,6 +127,36 @@ abstract class AppL10n {
   /// **'Settings'**
   String get navSettings;
 
+  /// No description provided for @navStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get navStatus;
+
+  /// No description provided for @statusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get statusTitle;
+
+  /// No description provided for @statusEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No cards in play with continuous effects or keywords.'**
+  String get statusEmpty;
+
+  /// No description provided for @statusContinuousEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Continuous Effects'**
+  String get statusContinuousEffects;
+
+  /// No description provided for @statusKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'Keywords'**
+  String get statusKeywords;
+
   /// No description provided for @noActiveDeck.
   ///
   /// In en, this message translates to:
@@ -415,6 +445,12 @@ abstract class AppL10n {
   /// **'Total damage to each opponent\'s creatures'**
   String get castSpellDamageSummaryEachOpponentCreatures;
 
+  /// No description provided for @castSpellDamageSummaryAnyTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Total damage to any target'**
+  String get castSpellDamageSummaryAnyTarget;
+
   /// No description provided for @cardInfoShortLabelLabel.
   ///
   /// In en, this message translates to:
@@ -702,6 +738,210 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'No new effects detected.'**
   String get effectSuggestionNone;
+
+  /// No description provided for @newDeckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New deck'**
+  String get newDeckTitle;
+
+  /// No description provided for @newDeckNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Deck name'**
+  String get newDeckNameHint;
+
+  /// No description provided for @newDeckImportFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from file'**
+  String get newDeckImportFile;
+
+  /// No description provided for @newDeckFileSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'File: {name}'**
+  String newDeckFileSelected(String name);
+
+  /// No description provided for @analysisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysing deck'**
+  String get analysisTitle;
+
+  /// No description provided for @analysisFetchingCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading card data ({done}/{total})'**
+  String analysisFetchingCard(int done, int total);
+
+  /// No description provided for @analysisParsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysing effects…'**
+  String get analysisParsing;
+
+  /// No description provided for @analysisDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import complete'**
+  String get analysisDoneTitle;
+
+  /// No description provided for @analysisSummaryCards.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} cards'**
+  String analysisSummaryCards(int count);
+
+  /// No description provided for @analysisSummaryTriggers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} trigger effects detected'**
+  String analysisSummaryTriggers(int count);
+
+  /// No description provided for @analysisSummaryContinuous.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} continuous effects detected'**
+  String analysisSummaryContinuous(int count);
+
+  /// No description provided for @analysisSummaryKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} cards with keywords'**
+  String analysisSummaryKeywords(int count);
+
+  /// No description provided for @analysisReviewButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Review effects ({count})'**
+  String analysisReviewButton(int count);
+
+  /// No description provided for @analysisDoneButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get analysisDoneButton;
+
+  /// No description provided for @boardMain.
+  ///
+  /// In en, this message translates to:
+  /// **'Mainboard'**
+  String get boardMain;
+
+  /// No description provided for @boardSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Sideboard'**
+  String get boardSide;
+
+  /// No description provided for @manageDeck.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage deck'**
+  String get manageDeck;
+
+  /// No description provided for @scryfallSyncButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Scryfall data'**
+  String get scryfallSyncButton;
+
+  /// No description provided for @scryfallSyncTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch missing Scryfall data for this deck'**
+  String get scryfallSyncTooltip;
+
+  /// No description provided for @scryfallSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Scryfall data available'**
+  String get scryfallSynced;
+
+  /// No description provided for @scryfallMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Scryfall data missing'**
+  String get scryfallMissing;
+
+  /// No description provided for @scryfallNoSetInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'No set code – manually added'**
+  String get scryfallNoSetInfo;
+
+  /// No description provided for @analyseEffectsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyse and record effects'**
+  String get analyseEffectsTooltip;
+
+  /// No description provided for @effectsNotParsed.
+  ///
+  /// In en, this message translates to:
+  /// **'No effects recorded yet'**
+  String get effectsNotParsed;
+
+  /// No description provided for @effectsParsed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} effect(s) recorded'**
+  String effectsParsed(int count);
+
+  /// No description provided for @equipmentPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Equip to...'**
+  String get equipmentPickerTitle;
+
+  /// No description provided for @equipmentAttachedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Attached to: {name}'**
+  String equipmentAttachedTo(String name);
+
+  /// No description provided for @equipmentNotAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Not equipped'**
+  String get equipmentNotAttached;
+
+  /// No description provided for @equipmentDetach.
+  ///
+  /// In en, this message translates to:
+  /// **'Detach'**
+  String get equipmentDetach;
+
+  /// No description provided for @equipmentReattach.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-equip'**
+  String get equipmentReattach;
+
+  /// No description provided for @ceScopeSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Self'**
+  String get ceScopeSelf;
+
+  /// No description provided for @ceScopeOneTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment / Aura'**
+  String get ceScopeOneTarget;
+
+  /// No description provided for @ceScopeGlobal.
+  ///
+  /// In en, this message translates to:
+  /// **'All owned'**
+  String get ceScopeGlobal;
+
+  /// No description provided for @ceScopeConditional.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditional'**
+  String get ceScopeConditional;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

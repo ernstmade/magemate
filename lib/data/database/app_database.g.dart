@@ -485,6 +485,17 @@ class $CardDefinitionsTable extends CardDefinitions
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _keywordsMeta = const VerificationMeta(
+    'keywords',
+  );
+  @override
+  late final GeneratedColumn<String> keywords = GeneratedColumn<String>(
+    'keywords',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -504,6 +515,7 @@ class $CardDefinitionsTable extends CardDefinitions
     printedText,
     printedTypeLine,
     rating,
+    keywords,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -630,6 +642,12 @@ class $CardDefinitionsTable extends CardDefinitions
         rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
       );
     }
+    if (data.containsKey('keywords')) {
+      context.handle(
+        _keywordsMeta,
+        keywords.isAcceptableOrUnknown(data['keywords']!, _keywordsMeta),
+      );
+    }
     return context;
   }
 
@@ -707,6 +725,10 @@ class $CardDefinitionsTable extends CardDefinitions
         DriftSqlType.double,
         data['${effectivePrefix}rating'],
       ),
+      keywords: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}keywords'],
+      ),
     );
   }
 
@@ -734,6 +756,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
   final String? printedText;
   final String? printedTypeLine;
   final double? rating;
+  final String? keywords;
   const CardDefinition({
     required this.id,
     required this.name,
@@ -752,6 +775,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     this.printedText,
     this.printedTypeLine,
     this.rating,
+    this.keywords,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -803,6 +827,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     if (!nullToAbsent || rating != null) {
       map['rating'] = Variable<double>(rating);
     }
+    if (!nullToAbsent || keywords != null) {
+      map['keywords'] = Variable<String>(keywords);
+    }
     return map;
   }
 
@@ -853,6 +880,9 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       rating: rating == null && nullToAbsent
           ? const Value.absent()
           : Value(rating),
+      keywords: keywords == null && nullToAbsent
+          ? const Value.absent()
+          : Value(keywords),
     );
   }
 
@@ -879,6 +909,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       printedText: serializer.fromJson<String?>(json['printedText']),
       printedTypeLine: serializer.fromJson<String?>(json['printedTypeLine']),
       rating: serializer.fromJson<double?>(json['rating']),
+      keywords: serializer.fromJson<String?>(json['keywords']),
     );
   }
   @override
@@ -902,6 +933,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
       'printedText': serializer.toJson<String?>(printedText),
       'printedTypeLine': serializer.toJson<String?>(printedTypeLine),
       'rating': serializer.toJson<double?>(rating),
+      'keywords': serializer.toJson<String?>(keywords),
     };
   }
 
@@ -923,6 +955,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     Value<String?> printedText = const Value.absent(),
     Value<String?> printedTypeLine = const Value.absent(),
     Value<double?> rating = const Value.absent(),
+    Value<String?> keywords = const Value.absent(),
   }) => CardDefinition(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -945,6 +978,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
         ? printedTypeLine.value
         : this.printedTypeLine,
     rating: rating.present ? rating.value : this.rating,
+    keywords: keywords.present ? keywords.value : this.keywords,
   );
   CardDefinition copyWithCompanion(CardDefinitionsCompanion data) {
     return CardDefinition(
@@ -977,6 +1011,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           ? data.printedTypeLine.value
           : this.printedTypeLine,
       rating: data.rating.present ? data.rating.value : this.rating,
+      keywords: data.keywords.present ? data.keywords.value : this.keywords,
     );
   }
 
@@ -999,7 +1034,8 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           ..write('printedName: $printedName, ')
           ..write('printedText: $printedText, ')
           ..write('printedTypeLine: $printedTypeLine, ')
-          ..write('rating: $rating')
+          ..write('rating: $rating, ')
+          ..write('keywords: $keywords')
           ..write(')'))
         .toString();
   }
@@ -1023,6 +1059,7 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
     printedText,
     printedTypeLine,
     rating,
+    keywords,
   );
   @override
   bool operator ==(Object other) =>
@@ -1044,7 +1081,8 @@ class CardDefinition extends DataClass implements Insertable<CardDefinition> {
           other.printedName == this.printedName &&
           other.printedText == this.printedText &&
           other.printedTypeLine == this.printedTypeLine &&
-          other.rating == this.rating);
+          other.rating == this.rating &&
+          other.keywords == this.keywords);
 }
 
 class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
@@ -1065,6 +1103,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
   final Value<String?> printedText;
   final Value<String?> printedTypeLine;
   final Value<double?> rating;
+  final Value<String?> keywords;
   const CardDefinitionsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1083,6 +1122,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     this.printedText = const Value.absent(),
     this.printedTypeLine = const Value.absent(),
     this.rating = const Value.absent(),
+    this.keywords = const Value.absent(),
   });
   CardDefinitionsCompanion.insert({
     this.id = const Value.absent(),
@@ -1102,6 +1142,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     this.printedText = const Value.absent(),
     this.printedTypeLine = const Value.absent(),
     this.rating = const Value.absent(),
+    this.keywords = const Value.absent(),
   }) : name = Value(name);
   static Insertable<CardDefinition> custom({
     Expression<int>? id,
@@ -1121,6 +1162,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     Expression<String>? printedText,
     Expression<String>? printedTypeLine,
     Expression<double>? rating,
+    Expression<String>? keywords,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1140,6 +1182,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
       if (printedText != null) 'printed_text': printedText,
       if (printedTypeLine != null) 'printed_type_line': printedTypeLine,
       if (rating != null) 'rating': rating,
+      if (keywords != null) 'keywords': keywords,
     });
   }
 
@@ -1161,6 +1204,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     Value<String?>? printedText,
     Value<String?>? printedTypeLine,
     Value<double?>? rating,
+    Value<String?>? keywords,
   }) {
     return CardDefinitionsCompanion(
       id: id ?? this.id,
@@ -1180,6 +1224,7 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
       printedText: printedText ?? this.printedText,
       printedTypeLine: printedTypeLine ?? this.printedTypeLine,
       rating: rating ?? this.rating,
+      keywords: keywords ?? this.keywords,
     );
   }
 
@@ -1237,6 +1282,9 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
     if (rating.present) {
       map['rating'] = Variable<double>(rating.value);
     }
+    if (keywords.present) {
+      map['keywords'] = Variable<String>(keywords.value);
+    }
     return map;
   }
 
@@ -1259,7 +1307,8 @@ class CardDefinitionsCompanion extends UpdateCompanion<CardDefinition> {
           ..write('printedName: $printedName, ')
           ..write('printedText: $printedText, ')
           ..write('printedTypeLine: $printedTypeLine, ')
-          ..write('rating: $rating')
+          ..write('rating: $rating, ')
+          ..write('keywords: $keywords')
           ..write(')'))
         .toString();
   }
@@ -1781,6 +1830,17 @@ class $CardEffectsTable extends CardEffects
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _triggerConditionTextMeta =
+      const VerificationMeta('triggerConditionText');
+  @override
+  late final GeneratedColumn<String> triggerConditionText =
+      GeneratedColumn<String>(
+        'trigger_condition_text',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _triggersEffectIdMeta = const VerificationMeta(
     'triggersEffectId',
   );
@@ -1792,6 +1852,50 @@ class $CardEffectsTable extends CardEffects
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _effectTypeMeta = const VerificationMeta(
+    'effectType',
+  );
+  @override
+  late final GeneratedColumn<String> effectType = GeneratedColumn<String>(
+    'effect_type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ceScopeMeta = const VerificationMeta(
+    'ceScope',
+  );
+  @override
+  late final GeneratedColumn<String> ceScope = GeneratedColumn<String>(
+    'ce_scope',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _effectDetailMeta = const VerificationMeta(
+    'effectDetail',
+  );
+  @override
+  late final GeneratedColumn<String> effectDetail = GeneratedColumn<String>(
+    'effect_detail',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _effectExtraConditionsMeta =
+      const VerificationMeta('effectExtraConditions');
+  @override
+  late final GeneratedColumn<String> effectExtraConditions =
+      GeneratedColumn<String>(
+        'effect_extra_conditions',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1808,7 +1912,12 @@ class $CardEffectsTable extends CardEffects
     dynamicDamage,
     damageMultiplier,
     damageMinimum,
+    triggerConditionText,
     triggersEffectId,
+    effectType,
+    ceScope,
+    effectDetail,
+    effectExtraConditions,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1942,12 +2051,51 @@ class $CardEffectsTable extends CardEffects
         ),
       );
     }
+    if (data.containsKey('trigger_condition_text')) {
+      context.handle(
+        _triggerConditionTextMeta,
+        triggerConditionText.isAcceptableOrUnknown(
+          data['trigger_condition_text']!,
+          _triggerConditionTextMeta,
+        ),
+      );
+    }
     if (data.containsKey('triggers_effect_id')) {
       context.handle(
         _triggersEffectIdMeta,
         triggersEffectId.isAcceptableOrUnknown(
           data['triggers_effect_id']!,
           _triggersEffectIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('effect_type')) {
+      context.handle(
+        _effectTypeMeta,
+        effectType.isAcceptableOrUnknown(data['effect_type']!, _effectTypeMeta),
+      );
+    }
+    if (data.containsKey('ce_scope')) {
+      context.handle(
+        _ceScopeMeta,
+        ceScope.isAcceptableOrUnknown(data['ce_scope']!, _ceScopeMeta),
+      );
+    }
+    if (data.containsKey('effect_detail')) {
+      context.handle(
+        _effectDetailMeta,
+        effectDetail.isAcceptableOrUnknown(
+          data['effect_detail']!,
+          _effectDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('effect_extra_conditions')) {
+      context.handle(
+        _effectExtraConditionsMeta,
+        effectExtraConditions.isAcceptableOrUnknown(
+          data['effect_extra_conditions']!,
+          _effectExtraConditionsMeta,
         ),
       );
     }
@@ -2016,9 +2164,29 @@ class $CardEffectsTable extends CardEffects
         DriftSqlType.int,
         data['${effectivePrefix}damage_minimum'],
       ),
+      triggerConditionText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trigger_condition_text'],
+      ),
       triggersEffectId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}triggers_effect_id'],
+      ),
+      effectType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effect_type'],
+      ),
+      ceScope: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ce_scope'],
+      ),
+      effectDetail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effect_detail'],
+      ),
+      effectExtraConditions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effect_extra_conditions'],
       ),
     );
   }
@@ -2044,7 +2212,12 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
   final bool? dynamicDamage;
   final int? damageMultiplier;
   final int? damageMinimum;
+  final String? triggerConditionText;
   final int? triggersEffectId;
+  final String? effectType;
+  final String? ceScope;
+  final String? effectDetail;
+  final String? effectExtraConditions;
   const CardEffect({
     required this.id,
     required this.cardDefinitionId,
@@ -2060,7 +2233,12 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     this.dynamicDamage,
     this.damageMultiplier,
     this.damageMinimum,
+    this.triggerConditionText,
     this.triggersEffectId,
+    this.effectType,
+    this.ceScope,
+    this.effectDetail,
+    this.effectExtraConditions,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2097,8 +2275,23 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     if (!nullToAbsent || damageMinimum != null) {
       map['damage_minimum'] = Variable<int>(damageMinimum);
     }
+    if (!nullToAbsent || triggerConditionText != null) {
+      map['trigger_condition_text'] = Variable<String>(triggerConditionText);
+    }
     if (!nullToAbsent || triggersEffectId != null) {
       map['triggers_effect_id'] = Variable<int>(triggersEffectId);
+    }
+    if (!nullToAbsent || effectType != null) {
+      map['effect_type'] = Variable<String>(effectType);
+    }
+    if (!nullToAbsent || ceScope != null) {
+      map['ce_scope'] = Variable<String>(ceScope);
+    }
+    if (!nullToAbsent || effectDetail != null) {
+      map['effect_detail'] = Variable<String>(effectDetail);
+    }
+    if (!nullToAbsent || effectExtraConditions != null) {
+      map['effect_extra_conditions'] = Variable<String>(effectExtraConditions);
     }
     return map;
   }
@@ -2137,9 +2330,24 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       damageMinimum: damageMinimum == null && nullToAbsent
           ? const Value.absent()
           : Value(damageMinimum),
+      triggerConditionText: triggerConditionText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(triggerConditionText),
       triggersEffectId: triggersEffectId == null && nullToAbsent
           ? const Value.absent()
           : Value(triggersEffectId),
+      effectType: effectType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effectType),
+      ceScope: ceScope == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ceScope),
+      effectDetail: effectDetail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effectDetail),
+      effectExtraConditions: effectExtraConditions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effectExtraConditions),
     );
   }
 
@@ -2163,7 +2371,16 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       dynamicDamage: serializer.fromJson<bool?>(json['dynamicDamage']),
       damageMultiplier: serializer.fromJson<int?>(json['damageMultiplier']),
       damageMinimum: serializer.fromJson<int?>(json['damageMinimum']),
+      triggerConditionText: serializer.fromJson<String?>(
+        json['triggerConditionText'],
+      ),
       triggersEffectId: serializer.fromJson<int?>(json['triggersEffectId']),
+      effectType: serializer.fromJson<String?>(json['effectType']),
+      ceScope: serializer.fromJson<String?>(json['ceScope']),
+      effectDetail: serializer.fromJson<String?>(json['effectDetail']),
+      effectExtraConditions: serializer.fromJson<String?>(
+        json['effectExtraConditions'],
+      ),
     );
   }
   @override
@@ -2184,7 +2401,14 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       'dynamicDamage': serializer.toJson<bool?>(dynamicDamage),
       'damageMultiplier': serializer.toJson<int?>(damageMultiplier),
       'damageMinimum': serializer.toJson<int?>(damageMinimum),
+      'triggerConditionText': serializer.toJson<String?>(triggerConditionText),
       'triggersEffectId': serializer.toJson<int?>(triggersEffectId),
+      'effectType': serializer.toJson<String?>(effectType),
+      'ceScope': serializer.toJson<String?>(ceScope),
+      'effectDetail': serializer.toJson<String?>(effectDetail),
+      'effectExtraConditions': serializer.toJson<String?>(
+        effectExtraConditions,
+      ),
     };
   }
 
@@ -2203,7 +2427,12 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     Value<bool?> dynamicDamage = const Value.absent(),
     Value<int?> damageMultiplier = const Value.absent(),
     Value<int?> damageMinimum = const Value.absent(),
+    Value<String?> triggerConditionText = const Value.absent(),
     Value<int?> triggersEffectId = const Value.absent(),
+    Value<String?> effectType = const Value.absent(),
+    Value<String?> ceScope = const Value.absent(),
+    Value<String?> effectDetail = const Value.absent(),
+    Value<String?> effectExtraConditions = const Value.absent(),
   }) => CardEffect(
     id: id ?? this.id,
     cardDefinitionId: cardDefinitionId ?? this.cardDefinitionId,
@@ -2231,9 +2460,18 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     damageMinimum: damageMinimum.present
         ? damageMinimum.value
         : this.damageMinimum,
+    triggerConditionText: triggerConditionText.present
+        ? triggerConditionText.value
+        : this.triggerConditionText,
     triggersEffectId: triggersEffectId.present
         ? triggersEffectId.value
         : this.triggersEffectId,
+    effectType: effectType.present ? effectType.value : this.effectType,
+    ceScope: ceScope.present ? ceScope.value : this.ceScope,
+    effectDetail: effectDetail.present ? effectDetail.value : this.effectDetail,
+    effectExtraConditions: effectExtraConditions.present
+        ? effectExtraConditions.value
+        : this.effectExtraConditions,
   );
   CardEffect copyWithCompanion(CardEffectsCompanion data) {
     return CardEffect(
@@ -2275,9 +2513,22 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
       damageMinimum: data.damageMinimum.present
           ? data.damageMinimum.value
           : this.damageMinimum,
+      triggerConditionText: data.triggerConditionText.present
+          ? data.triggerConditionText.value
+          : this.triggerConditionText,
       triggersEffectId: data.triggersEffectId.present
           ? data.triggersEffectId.value
           : this.triggersEffectId,
+      effectType: data.effectType.present
+          ? data.effectType.value
+          : this.effectType,
+      ceScope: data.ceScope.present ? data.ceScope.value : this.ceScope,
+      effectDetail: data.effectDetail.present
+          ? data.effectDetail.value
+          : this.effectDetail,
+      effectExtraConditions: data.effectExtraConditions.present
+          ? data.effectExtraConditions.value
+          : this.effectExtraConditions,
     );
   }
 
@@ -2298,7 +2549,12 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
           ..write('dynamicDamage: $dynamicDamage, ')
           ..write('damageMultiplier: $damageMultiplier, ')
           ..write('damageMinimum: $damageMinimum, ')
-          ..write('triggersEffectId: $triggersEffectId')
+          ..write('triggerConditionText: $triggerConditionText, ')
+          ..write('triggersEffectId: $triggersEffectId, ')
+          ..write('effectType: $effectType, ')
+          ..write('ceScope: $ceScope, ')
+          ..write('effectDetail: $effectDetail, ')
+          ..write('effectExtraConditions: $effectExtraConditions')
           ..write(')'))
         .toString();
   }
@@ -2319,7 +2575,12 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
     dynamicDamage,
     damageMultiplier,
     damageMinimum,
+    triggerConditionText,
     triggersEffectId,
+    effectType,
+    ceScope,
+    effectDetail,
+    effectExtraConditions,
   );
   @override
   bool operator ==(Object other) =>
@@ -2339,7 +2600,12 @@ class CardEffect extends DataClass implements Insertable<CardEffect> {
           other.dynamicDamage == this.dynamicDamage &&
           other.damageMultiplier == this.damageMultiplier &&
           other.damageMinimum == this.damageMinimum &&
-          other.triggersEffectId == this.triggersEffectId);
+          other.triggerConditionText == this.triggerConditionText &&
+          other.triggersEffectId == this.triggersEffectId &&
+          other.effectType == this.effectType &&
+          other.ceScope == this.ceScope &&
+          other.effectDetail == this.effectDetail &&
+          other.effectExtraConditions == this.effectExtraConditions);
 }
 
 class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
@@ -2357,7 +2623,12 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
   final Value<bool?> dynamicDamage;
   final Value<int?> damageMultiplier;
   final Value<int?> damageMinimum;
+  final Value<String?> triggerConditionText;
   final Value<int?> triggersEffectId;
+  final Value<String?> effectType;
+  final Value<String?> ceScope;
+  final Value<String?> effectDetail;
+  final Value<String?> effectExtraConditions;
   const CardEffectsCompanion({
     this.id = const Value.absent(),
     this.cardDefinitionId = const Value.absent(),
@@ -2373,7 +2644,12 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     this.dynamicDamage = const Value.absent(),
     this.damageMultiplier = const Value.absent(),
     this.damageMinimum = const Value.absent(),
+    this.triggerConditionText = const Value.absent(),
     this.triggersEffectId = const Value.absent(),
+    this.effectType = const Value.absent(),
+    this.ceScope = const Value.absent(),
+    this.effectDetail = const Value.absent(),
+    this.effectExtraConditions = const Value.absent(),
   });
   CardEffectsCompanion.insert({
     this.id = const Value.absent(),
@@ -2390,7 +2666,12 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     this.dynamicDamage = const Value.absent(),
     this.damageMultiplier = const Value.absent(),
     this.damageMinimum = const Value.absent(),
+    this.triggerConditionText = const Value.absent(),
     this.triggersEffectId = const Value.absent(),
+    this.effectType = const Value.absent(),
+    this.ceScope = const Value.absent(),
+    this.effectDetail = const Value.absent(),
+    this.effectExtraConditions = const Value.absent(),
   }) : cardDefinitionId = Value(cardDefinitionId),
        trigger = Value(trigger),
        description = Value(description);
@@ -2409,7 +2690,12 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     Expression<bool>? dynamicDamage,
     Expression<int>? damageMultiplier,
     Expression<int>? damageMinimum,
+    Expression<String>? triggerConditionText,
     Expression<int>? triggersEffectId,
+    Expression<String>? effectType,
+    Expression<String>? ceScope,
+    Expression<String>? effectDetail,
+    Expression<String>? effectExtraConditions,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2426,7 +2712,14 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
       if (dynamicDamage != null) 'dynamic_damage': dynamicDamage,
       if (damageMultiplier != null) 'damage_multiplier': damageMultiplier,
       if (damageMinimum != null) 'damage_minimum': damageMinimum,
+      if (triggerConditionText != null)
+        'trigger_condition_text': triggerConditionText,
       if (triggersEffectId != null) 'triggers_effect_id': triggersEffectId,
+      if (effectType != null) 'effect_type': effectType,
+      if (ceScope != null) 'ce_scope': ceScope,
+      if (effectDetail != null) 'effect_detail': effectDetail,
+      if (effectExtraConditions != null)
+        'effect_extra_conditions': effectExtraConditions,
     });
   }
 
@@ -2445,7 +2738,12 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     Value<bool?>? dynamicDamage,
     Value<int?>? damageMultiplier,
     Value<int?>? damageMinimum,
+    Value<String?>? triggerConditionText,
     Value<int?>? triggersEffectId,
+    Value<String?>? effectType,
+    Value<String?>? ceScope,
+    Value<String?>? effectDetail,
+    Value<String?>? effectExtraConditions,
   }) {
     return CardEffectsCompanion(
       id: id ?? this.id,
@@ -2462,7 +2760,13 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
       dynamicDamage: dynamicDamage ?? this.dynamicDamage,
       damageMultiplier: damageMultiplier ?? this.damageMultiplier,
       damageMinimum: damageMinimum ?? this.damageMinimum,
+      triggerConditionText: triggerConditionText ?? this.triggerConditionText,
       triggersEffectId: triggersEffectId ?? this.triggersEffectId,
+      effectType: effectType ?? this.effectType,
+      ceScope: ceScope ?? this.ceScope,
+      effectDetail: effectDetail ?? this.effectDetail,
+      effectExtraConditions:
+          effectExtraConditions ?? this.effectExtraConditions,
     );
   }
 
@@ -2511,8 +2815,27 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
     if (damageMinimum.present) {
       map['damage_minimum'] = Variable<int>(damageMinimum.value);
     }
+    if (triggerConditionText.present) {
+      map['trigger_condition_text'] = Variable<String>(
+        triggerConditionText.value,
+      );
+    }
     if (triggersEffectId.present) {
       map['triggers_effect_id'] = Variable<int>(triggersEffectId.value);
+    }
+    if (effectType.present) {
+      map['effect_type'] = Variable<String>(effectType.value);
+    }
+    if (ceScope.present) {
+      map['ce_scope'] = Variable<String>(ceScope.value);
+    }
+    if (effectDetail.present) {
+      map['effect_detail'] = Variable<String>(effectDetail.value);
+    }
+    if (effectExtraConditions.present) {
+      map['effect_extra_conditions'] = Variable<String>(
+        effectExtraConditions.value,
+      );
     }
     return map;
   }
@@ -2534,7 +2857,12 @@ class CardEffectsCompanion extends UpdateCompanion<CardEffect> {
           ..write('dynamicDamage: $dynamicDamage, ')
           ..write('damageMultiplier: $damageMultiplier, ')
           ..write('damageMinimum: $damageMinimum, ')
-          ..write('triggersEffectId: $triggersEffectId')
+          ..write('triggerConditionText: $triggerConditionText, ')
+          ..write('triggersEffectId: $triggersEffectId, ')
+          ..write('effectType: $effectType, ')
+          ..write('ceScope: $ceScope, ')
+          ..write('effectDetail: $effectDetail, ')
+          ..write('effectExtraConditions: $effectExtraConditions')
           ..write(')'))
         .toString();
   }
@@ -2700,6 +3028,39 @@ class $LearnedRulesTable extends LearnedRules
       'CHECK ("dynamic_damage" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _triggerConditionTextMeta =
+      const VerificationMeta('triggerConditionText');
+  @override
+  late final GeneratedColumn<String> triggerConditionText =
+      GeneratedColumn<String>(
+        'trigger_condition_text',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _effectDetailMeta = const VerificationMeta(
+    'effectDetail',
+  );
+  @override
+  late final GeneratedColumn<String> effectDetail = GeneratedColumn<String>(
+    'effect_detail',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _effectExtraConditionsMeta =
+      const VerificationMeta('effectExtraConditions');
+  @override
+  late final GeneratedColumn<String> effectExtraConditions =
+      GeneratedColumn<String>(
+        'effect_extra_conditions',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _confidenceMeta = const VerificationMeta(
     'confidence',
   );
@@ -2727,6 +3088,9 @@ class $LearnedRulesTable extends LearnedRules
     damageMinimum,
     replacementScope,
     dynamicDamage,
+    triggerConditionText,
+    effectDetail,
+    effectExtraConditions,
     confidence,
   ];
   @override
@@ -2857,6 +3221,33 @@ class $LearnedRulesTable extends LearnedRules
         ),
       );
     }
+    if (data.containsKey('trigger_condition_text')) {
+      context.handle(
+        _triggerConditionTextMeta,
+        triggerConditionText.isAcceptableOrUnknown(
+          data['trigger_condition_text']!,
+          _triggerConditionTextMeta,
+        ),
+      );
+    }
+    if (data.containsKey('effect_detail')) {
+      context.handle(
+        _effectDetailMeta,
+        effectDetail.isAcceptableOrUnknown(
+          data['effect_detail']!,
+          _effectDetailMeta,
+        ),
+      );
+    }
+    if (data.containsKey('effect_extra_conditions')) {
+      context.handle(
+        _effectExtraConditionsMeta,
+        effectExtraConditions.isAcceptableOrUnknown(
+          data['effect_extra_conditions']!,
+          _effectExtraConditionsMeta,
+        ),
+      );
+    }
     if (data.containsKey('confidence')) {
       context.handle(
         _confidenceMeta,
@@ -2924,6 +3315,18 @@ class $LearnedRulesTable extends LearnedRules
         DriftSqlType.bool,
         data['${effectivePrefix}dynamic_damage'],
       ),
+      triggerConditionText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}trigger_condition_text'],
+      ),
+      effectDetail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effect_detail'],
+      ),
+      effectExtraConditions: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effect_extra_conditions'],
+      ),
       confidence: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}confidence'],
@@ -2951,6 +3354,9 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
   final int? damageMinimum;
   final String? replacementScope;
   final bool? dynamicDamage;
+  final String? triggerConditionText;
+  final String? effectDetail;
+  final String? effectExtraConditions;
   final int confidence;
   const LearnedRule({
     required this.id,
@@ -2966,6 +3372,9 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
     this.damageMinimum,
     this.replacementScope,
     this.dynamicDamage,
+    this.triggerConditionText,
+    this.effectDetail,
+    this.effectExtraConditions,
     required this.confidence,
   });
   @override
@@ -2997,6 +3406,15 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
     }
     if (!nullToAbsent || dynamicDamage != null) {
       map['dynamic_damage'] = Variable<bool>(dynamicDamage);
+    }
+    if (!nullToAbsent || triggerConditionText != null) {
+      map['trigger_condition_text'] = Variable<String>(triggerConditionText);
+    }
+    if (!nullToAbsent || effectDetail != null) {
+      map['effect_detail'] = Variable<String>(effectDetail);
+    }
+    if (!nullToAbsent || effectExtraConditions != null) {
+      map['effect_extra_conditions'] = Variable<String>(effectExtraConditions);
     }
     map['confidence'] = Variable<int>(confidence);
     return map;
@@ -3031,6 +3449,15 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
       dynamicDamage: dynamicDamage == null && nullToAbsent
           ? const Value.absent()
           : Value(dynamicDamage),
+      triggerConditionText: triggerConditionText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(triggerConditionText),
+      effectDetail: effectDetail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effectDetail),
+      effectExtraConditions: effectExtraConditions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effectExtraConditions),
       confidence: Value(confidence),
     );
   }
@@ -3058,6 +3485,13 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
       damageMinimum: serializer.fromJson<int?>(json['damageMinimum']),
       replacementScope: serializer.fromJson<String?>(json['replacementScope']),
       dynamicDamage: serializer.fromJson<bool?>(json['dynamicDamage']),
+      triggerConditionText: serializer.fromJson<String?>(
+        json['triggerConditionText'],
+      ),
+      effectDetail: serializer.fromJson<String?>(json['effectDetail']),
+      effectExtraConditions: serializer.fromJson<String?>(
+        json['effectExtraConditions'],
+      ),
       confidence: serializer.fromJson<int>(json['confidence']),
     );
   }
@@ -3078,6 +3512,11 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
       'damageMinimum': serializer.toJson<int?>(damageMinimum),
       'replacementScope': serializer.toJson<String?>(replacementScope),
       'dynamicDamage': serializer.toJson<bool?>(dynamicDamage),
+      'triggerConditionText': serializer.toJson<String?>(triggerConditionText),
+      'effectDetail': serializer.toJson<String?>(effectDetail),
+      'effectExtraConditions': serializer.toJson<String?>(
+        effectExtraConditions,
+      ),
       'confidence': serializer.toJson<int>(confidence),
     };
   }
@@ -3096,6 +3535,9 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
     Value<int?> damageMinimum = const Value.absent(),
     Value<String?> replacementScope = const Value.absent(),
     Value<bool?> dynamicDamage = const Value.absent(),
+    Value<String?> triggerConditionText = const Value.absent(),
+    Value<String?> effectDetail = const Value.absent(),
+    Value<String?> effectExtraConditions = const Value.absent(),
     int? confidence,
   }) => LearnedRule(
     id: id ?? this.id,
@@ -3123,6 +3565,13 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
     dynamicDamage: dynamicDamage.present
         ? dynamicDamage.value
         : this.dynamicDamage,
+    triggerConditionText: triggerConditionText.present
+        ? triggerConditionText.value
+        : this.triggerConditionText,
+    effectDetail: effectDetail.present ? effectDetail.value : this.effectDetail,
+    effectExtraConditions: effectExtraConditions.present
+        ? effectExtraConditions.value
+        : this.effectExtraConditions,
     confidence: confidence ?? this.confidence,
   );
   LearnedRule copyWithCompanion(LearnedRulesCompanion data) {
@@ -3162,6 +3611,15 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
       dynamicDamage: data.dynamicDamage.present
           ? data.dynamicDamage.value
           : this.dynamicDamage,
+      triggerConditionText: data.triggerConditionText.present
+          ? data.triggerConditionText.value
+          : this.triggerConditionText,
+      effectDetail: data.effectDetail.present
+          ? data.effectDetail.value
+          : this.effectDetail,
+      effectExtraConditions: data.effectExtraConditions.present
+          ? data.effectExtraConditions.value
+          : this.effectExtraConditions,
       confidence: data.confidence.present
           ? data.confidence.value
           : this.confidence,
@@ -3184,6 +3642,9 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
           ..write('damageMinimum: $damageMinimum, ')
           ..write('replacementScope: $replacementScope, ')
           ..write('dynamicDamage: $dynamicDamage, ')
+          ..write('triggerConditionText: $triggerConditionText, ')
+          ..write('effectDetail: $effectDetail, ')
+          ..write('effectExtraConditions: $effectExtraConditions, ')
           ..write('confidence: $confidence')
           ..write(')'))
         .toString();
@@ -3204,6 +3665,9 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
     damageMinimum,
     replacementScope,
     dynamicDamage,
+    triggerConditionText,
+    effectDetail,
+    effectExtraConditions,
     confidence,
   );
   @override
@@ -3223,6 +3687,9 @@ class LearnedRule extends DataClass implements Insertable<LearnedRule> {
           other.damageMinimum == this.damageMinimum &&
           other.replacementScope == this.replacementScope &&
           other.dynamicDamage == this.dynamicDamage &&
+          other.triggerConditionText == this.triggerConditionText &&
+          other.effectDetail == this.effectDetail &&
+          other.effectExtraConditions == this.effectExtraConditions &&
           other.confidence == this.confidence);
 }
 
@@ -3240,6 +3707,9 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
   final Value<int?> damageMinimum;
   final Value<String?> replacementScope;
   final Value<bool?> dynamicDamage;
+  final Value<String?> triggerConditionText;
+  final Value<String?> effectDetail;
+  final Value<String?> effectExtraConditions;
   final Value<int> confidence;
   const LearnedRulesCompanion({
     this.id = const Value.absent(),
@@ -3255,6 +3725,9 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
     this.damageMinimum = const Value.absent(),
     this.replacementScope = const Value.absent(),
     this.dynamicDamage = const Value.absent(),
+    this.triggerConditionText = const Value.absent(),
+    this.effectDetail = const Value.absent(),
+    this.effectExtraConditions = const Value.absent(),
     this.confidence = const Value.absent(),
   });
   LearnedRulesCompanion.insert({
@@ -3271,6 +3744,9 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
     this.damageMinimum = const Value.absent(),
     this.replacementScope = const Value.absent(),
     this.dynamicDamage = const Value.absent(),
+    this.triggerConditionText = const Value.absent(),
+    this.effectDetail = const Value.absent(),
+    this.effectExtraConditions = const Value.absent(),
     this.confidence = const Value.absent(),
   }) : normalizedPattern = Value(normalizedPattern),
        trigger = Value(trigger),
@@ -3290,6 +3766,9 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
     Expression<int>? damageMinimum,
     Expression<String>? replacementScope,
     Expression<bool>? dynamicDamage,
+    Expression<String>? triggerConditionText,
+    Expression<String>? effectDetail,
+    Expression<String>? effectExtraConditions,
     Expression<int>? confidence,
   }) {
     return RawValuesInsertable({
@@ -3308,6 +3787,11 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
       if (damageMinimum != null) 'damage_minimum': damageMinimum,
       if (replacementScope != null) 'replacement_scope': replacementScope,
       if (dynamicDamage != null) 'dynamic_damage': dynamicDamage,
+      if (triggerConditionText != null)
+        'trigger_condition_text': triggerConditionText,
+      if (effectDetail != null) 'effect_detail': effectDetail,
+      if (effectExtraConditions != null)
+        'effect_extra_conditions': effectExtraConditions,
       if (confidence != null) 'confidence': confidence,
     });
   }
@@ -3326,6 +3810,9 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
     Value<int?>? damageMinimum,
     Value<String?>? replacementScope,
     Value<bool?>? dynamicDamage,
+    Value<String?>? triggerConditionText,
+    Value<String?>? effectDetail,
+    Value<String?>? effectExtraConditions,
     Value<int>? confidence,
   }) {
     return LearnedRulesCompanion(
@@ -3342,6 +3829,10 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
       damageMinimum: damageMinimum ?? this.damageMinimum,
       replacementScope: replacementScope ?? this.replacementScope,
       dynamicDamage: dynamicDamage ?? this.dynamicDamage,
+      triggerConditionText: triggerConditionText ?? this.triggerConditionText,
+      effectDetail: effectDetail ?? this.effectDetail,
+      effectExtraConditions:
+          effectExtraConditions ?? this.effectExtraConditions,
       confidence: confidence ?? this.confidence,
     );
   }
@@ -3390,6 +3881,19 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
     if (dynamicDamage.present) {
       map['dynamic_damage'] = Variable<bool>(dynamicDamage.value);
     }
+    if (triggerConditionText.present) {
+      map['trigger_condition_text'] = Variable<String>(
+        triggerConditionText.value,
+      );
+    }
+    if (effectDetail.present) {
+      map['effect_detail'] = Variable<String>(effectDetail.value);
+    }
+    if (effectExtraConditions.present) {
+      map['effect_extra_conditions'] = Variable<String>(
+        effectExtraConditions.value,
+      );
+    }
     if (confidence.present) {
       map['confidence'] = Variable<int>(confidence.value);
     }
@@ -3412,7 +3916,333 @@ class LearnedRulesCompanion extends UpdateCompanion<LearnedRule> {
           ..write('damageMinimum: $damageMinimum, ')
           ..write('replacementScope: $replacementScope, ')
           ..write('dynamicDamage: $dynamicDamage, ')
+          ..write('triggerConditionText: $triggerConditionText, ')
+          ..write('effectDetail: $effectDetail, ')
+          ..write('effectExtraConditions: $effectExtraConditions, ')
           ..write('confidence: $confidence')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CardAttachmentsTable extends CardAttachments
+    with TableInfo<$CardAttachmentsTable, CardAttachment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardAttachmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _deckIdMeta = const VerificationMeta('deckId');
+  @override
+  late final GeneratedColumn<int> deckId = GeneratedColumn<int>(
+    'deck_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _equipmentDefinitionIdMeta =
+      const VerificationMeta('equipmentDefinitionId');
+  @override
+  late final GeneratedColumn<int> equipmentDefinitionId = GeneratedColumn<int>(
+    'equipment_definition_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetDefinitionIdMeta =
+      const VerificationMeta('targetDefinitionId');
+  @override
+  late final GeneratedColumn<int> targetDefinitionId = GeneratedColumn<int>(
+    'target_definition_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    deckId,
+    equipmentDefinitionId,
+    targetDefinitionId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'card_attachments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CardAttachment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('deck_id')) {
+      context.handle(
+        _deckIdMeta,
+        deckId.isAcceptableOrUnknown(data['deck_id']!, _deckIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deckIdMeta);
+    }
+    if (data.containsKey('equipment_definition_id')) {
+      context.handle(
+        _equipmentDefinitionIdMeta,
+        equipmentDefinitionId.isAcceptableOrUnknown(
+          data['equipment_definition_id']!,
+          _equipmentDefinitionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_equipmentDefinitionIdMeta);
+    }
+    if (data.containsKey('target_definition_id')) {
+      context.handle(
+        _targetDefinitionIdMeta,
+        targetDefinitionId.isAcceptableOrUnknown(
+          data['target_definition_id']!,
+          _targetDefinitionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetDefinitionIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {deckId, equipmentDefinitionId},
+  ];
+  @override
+  CardAttachment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CardAttachment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      deckId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deck_id'],
+      )!,
+      equipmentDefinitionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}equipment_definition_id'],
+      )!,
+      targetDefinitionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_definition_id'],
+      )!,
+    );
+  }
+
+  @override
+  $CardAttachmentsTable createAlias(String alias) {
+    return $CardAttachmentsTable(attachedDatabase, alias);
+  }
+}
+
+class CardAttachment extends DataClass implements Insertable<CardAttachment> {
+  final int id;
+  final int deckId;
+  final int equipmentDefinitionId;
+  final int targetDefinitionId;
+  const CardAttachment({
+    required this.id,
+    required this.deckId,
+    required this.equipmentDefinitionId,
+    required this.targetDefinitionId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['deck_id'] = Variable<int>(deckId);
+    map['equipment_definition_id'] = Variable<int>(equipmentDefinitionId);
+    map['target_definition_id'] = Variable<int>(targetDefinitionId);
+    return map;
+  }
+
+  CardAttachmentsCompanion toCompanion(bool nullToAbsent) {
+    return CardAttachmentsCompanion(
+      id: Value(id),
+      deckId: Value(deckId),
+      equipmentDefinitionId: Value(equipmentDefinitionId),
+      targetDefinitionId: Value(targetDefinitionId),
+    );
+  }
+
+  factory CardAttachment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CardAttachment(
+      id: serializer.fromJson<int>(json['id']),
+      deckId: serializer.fromJson<int>(json['deckId']),
+      equipmentDefinitionId: serializer.fromJson<int>(
+        json['equipmentDefinitionId'],
+      ),
+      targetDefinitionId: serializer.fromJson<int>(json['targetDefinitionId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'deckId': serializer.toJson<int>(deckId),
+      'equipmentDefinitionId': serializer.toJson<int>(equipmentDefinitionId),
+      'targetDefinitionId': serializer.toJson<int>(targetDefinitionId),
+    };
+  }
+
+  CardAttachment copyWith({
+    int? id,
+    int? deckId,
+    int? equipmentDefinitionId,
+    int? targetDefinitionId,
+  }) => CardAttachment(
+    id: id ?? this.id,
+    deckId: deckId ?? this.deckId,
+    equipmentDefinitionId: equipmentDefinitionId ?? this.equipmentDefinitionId,
+    targetDefinitionId: targetDefinitionId ?? this.targetDefinitionId,
+  );
+  CardAttachment copyWithCompanion(CardAttachmentsCompanion data) {
+    return CardAttachment(
+      id: data.id.present ? data.id.value : this.id,
+      deckId: data.deckId.present ? data.deckId.value : this.deckId,
+      equipmentDefinitionId: data.equipmentDefinitionId.present
+          ? data.equipmentDefinitionId.value
+          : this.equipmentDefinitionId,
+      targetDefinitionId: data.targetDefinitionId.present
+          ? data.targetDefinitionId.value
+          : this.targetDefinitionId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardAttachment(')
+          ..write('id: $id, ')
+          ..write('deckId: $deckId, ')
+          ..write('equipmentDefinitionId: $equipmentDefinitionId, ')
+          ..write('targetDefinitionId: $targetDefinitionId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, deckId, equipmentDefinitionId, targetDefinitionId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CardAttachment &&
+          other.id == this.id &&
+          other.deckId == this.deckId &&
+          other.equipmentDefinitionId == this.equipmentDefinitionId &&
+          other.targetDefinitionId == this.targetDefinitionId);
+}
+
+class CardAttachmentsCompanion extends UpdateCompanion<CardAttachment> {
+  final Value<int> id;
+  final Value<int> deckId;
+  final Value<int> equipmentDefinitionId;
+  final Value<int> targetDefinitionId;
+  const CardAttachmentsCompanion({
+    this.id = const Value.absent(),
+    this.deckId = const Value.absent(),
+    this.equipmentDefinitionId = const Value.absent(),
+    this.targetDefinitionId = const Value.absent(),
+  });
+  CardAttachmentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int deckId,
+    required int equipmentDefinitionId,
+    required int targetDefinitionId,
+  }) : deckId = Value(deckId),
+       equipmentDefinitionId = Value(equipmentDefinitionId),
+       targetDefinitionId = Value(targetDefinitionId);
+  static Insertable<CardAttachment> custom({
+    Expression<int>? id,
+    Expression<int>? deckId,
+    Expression<int>? equipmentDefinitionId,
+    Expression<int>? targetDefinitionId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (deckId != null) 'deck_id': deckId,
+      if (equipmentDefinitionId != null)
+        'equipment_definition_id': equipmentDefinitionId,
+      if (targetDefinitionId != null)
+        'target_definition_id': targetDefinitionId,
+    });
+  }
+
+  CardAttachmentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? deckId,
+    Value<int>? equipmentDefinitionId,
+    Value<int>? targetDefinitionId,
+  }) {
+    return CardAttachmentsCompanion(
+      id: id ?? this.id,
+      deckId: deckId ?? this.deckId,
+      equipmentDefinitionId:
+          equipmentDefinitionId ?? this.equipmentDefinitionId,
+      targetDefinitionId: targetDefinitionId ?? this.targetDefinitionId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (deckId.present) {
+      map['deck_id'] = Variable<int>(deckId.value);
+    }
+    if (equipmentDefinitionId.present) {
+      map['equipment_definition_id'] = Variable<int>(
+        equipmentDefinitionId.value,
+      );
+    }
+    if (targetDefinitionId.present) {
+      map['target_definition_id'] = Variable<int>(targetDefinitionId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardAttachmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('deckId: $deckId, ')
+          ..write('equipmentDefinitionId: $equipmentDefinitionId, ')
+          ..write('targetDefinitionId: $targetDefinitionId')
           ..write(')'))
         .toString();
   }
@@ -3428,6 +4258,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DeckCardsTable deckCards = $DeckCardsTable(this);
   late final $CardEffectsTable cardEffects = $CardEffectsTable(this);
   late final $LearnedRulesTable learnedRules = $LearnedRulesTable(this);
+  late final $CardAttachmentsTable cardAttachments = $CardAttachmentsTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3438,6 +4271,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     deckCards,
     cardEffects,
     learnedRules,
+    cardAttachments,
   ];
 }
 
@@ -3628,6 +4462,7 @@ typedef $$CardDefinitionsTableCreateCompanionBuilder =
       Value<String?> printedText,
       Value<String?> printedTypeLine,
       Value<double?> rating,
+      Value<String?> keywords,
     });
 typedef $$CardDefinitionsTableUpdateCompanionBuilder =
     CardDefinitionsCompanion Function({
@@ -3648,6 +4483,7 @@ typedef $$CardDefinitionsTableUpdateCompanionBuilder =
       Value<String?> printedText,
       Value<String?> printedTypeLine,
       Value<double?> rating,
+      Value<String?> keywords,
     });
 
 class $$CardDefinitionsTableFilterComposer
@@ -3741,6 +4577,11 @@ class $$CardDefinitionsTableFilterComposer
 
   ColumnFilters<double> get rating => $composableBuilder(
     column: $table.rating,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get keywords => $composableBuilder(
+    column: $table.keywords,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3838,6 +4679,11 @@ class $$CardDefinitionsTableOrderingComposer
     column: $table.rating,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get keywords => $composableBuilder(
+    column: $table.keywords,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CardDefinitionsTableAnnotationComposer
@@ -3911,6 +4757,9 @@ class $$CardDefinitionsTableAnnotationComposer
 
   GeneratedColumn<double> get rating =>
       $composableBuilder(column: $table.rating, builder: (column) => column);
+
+  GeneratedColumn<String> get keywords =>
+      $composableBuilder(column: $table.keywords, builder: (column) => column);
 }
 
 class $$CardDefinitionsTableTableManager
@@ -3967,6 +4816,7 @@ class $$CardDefinitionsTableTableManager
                 Value<String?> printedText = const Value.absent(),
                 Value<String?> printedTypeLine = const Value.absent(),
                 Value<double?> rating = const Value.absent(),
+                Value<String?> keywords = const Value.absent(),
               }) => CardDefinitionsCompanion(
                 id: id,
                 name: name,
@@ -3985,6 +4835,7 @@ class $$CardDefinitionsTableTableManager
                 printedText: printedText,
                 printedTypeLine: printedTypeLine,
                 rating: rating,
+                keywords: keywords,
               ),
           createCompanionCallback:
               ({
@@ -4005,6 +4856,7 @@ class $$CardDefinitionsTableTableManager
                 Value<String?> printedText = const Value.absent(),
                 Value<String?> printedTypeLine = const Value.absent(),
                 Value<double?> rating = const Value.absent(),
+                Value<String?> keywords = const Value.absent(),
               }) => CardDefinitionsCompanion.insert(
                 id: id,
                 name: name,
@@ -4023,6 +4875,7 @@ class $$CardDefinitionsTableTableManager
                 printedText: printedText,
                 printedTypeLine: printedTypeLine,
                 rating: rating,
+                keywords: keywords,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -4255,7 +5108,12 @@ typedef $$CardEffectsTableCreateCompanionBuilder =
       Value<bool?> dynamicDamage,
       Value<int?> damageMultiplier,
       Value<int?> damageMinimum,
+      Value<String?> triggerConditionText,
       Value<int?> triggersEffectId,
+      Value<String?> effectType,
+      Value<String?> ceScope,
+      Value<String?> effectDetail,
+      Value<String?> effectExtraConditions,
     });
 typedef $$CardEffectsTableUpdateCompanionBuilder =
     CardEffectsCompanion Function({
@@ -4273,7 +5131,12 @@ typedef $$CardEffectsTableUpdateCompanionBuilder =
       Value<bool?> dynamicDamage,
       Value<int?> damageMultiplier,
       Value<int?> damageMinimum,
+      Value<String?> triggerConditionText,
       Value<int?> triggersEffectId,
+      Value<String?> effectType,
+      Value<String?> ceScope,
+      Value<String?> effectDetail,
+      Value<String?> effectExtraConditions,
     });
 
 class $$CardEffectsTableFilterComposer
@@ -4355,8 +5218,33 @@ class $$CardEffectsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get triggerConditionText => $composableBuilder(
+    column: $table.triggerConditionText,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get triggersEffectId => $composableBuilder(
     column: $table.triggersEffectId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectType => $composableBuilder(
+    column: $table.effectType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ceScope => $composableBuilder(
+    column: $table.ceScope,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectDetail => $composableBuilder(
+    column: $table.effectDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectExtraConditions => $composableBuilder(
+    column: $table.effectExtraConditions,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -4440,8 +5328,33 @@ class $$CardEffectsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get triggerConditionText => $composableBuilder(
+    column: $table.triggerConditionText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get triggersEffectId => $composableBuilder(
     column: $table.triggersEffectId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectType => $composableBuilder(
+    column: $table.effectType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ceScope => $composableBuilder(
+    column: $table.ceScope,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectDetail => $composableBuilder(
+    column: $table.effectDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectExtraConditions => $composableBuilder(
+    column: $table.effectExtraConditions,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -4521,8 +5434,31 @@ class $$CardEffectsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get triggerConditionText => $composableBuilder(
+    column: $table.triggerConditionText,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get triggersEffectId => $composableBuilder(
     column: $table.triggersEffectId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get effectType => $composableBuilder(
+    column: $table.effectType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ceScope =>
+      $composableBuilder(column: $table.ceScope, builder: (column) => column);
+
+  GeneratedColumn<String> get effectDetail => $composableBuilder(
+    column: $table.effectDetail,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get effectExtraConditions => $composableBuilder(
+    column: $table.effectExtraConditions,
     builder: (column) => column,
   );
 }
@@ -4572,7 +5508,12 @@ class $$CardEffectsTableTableManager
                 Value<bool?> dynamicDamage = const Value.absent(),
                 Value<int?> damageMultiplier = const Value.absent(),
                 Value<int?> damageMinimum = const Value.absent(),
+                Value<String?> triggerConditionText = const Value.absent(),
                 Value<int?> triggersEffectId = const Value.absent(),
+                Value<String?> effectType = const Value.absent(),
+                Value<String?> ceScope = const Value.absent(),
+                Value<String?> effectDetail = const Value.absent(),
+                Value<String?> effectExtraConditions = const Value.absent(),
               }) => CardEffectsCompanion(
                 id: id,
                 cardDefinitionId: cardDefinitionId,
@@ -4588,7 +5529,12 @@ class $$CardEffectsTableTableManager
                 dynamicDamage: dynamicDamage,
                 damageMultiplier: damageMultiplier,
                 damageMinimum: damageMinimum,
+                triggerConditionText: triggerConditionText,
                 triggersEffectId: triggersEffectId,
+                effectType: effectType,
+                ceScope: ceScope,
+                effectDetail: effectDetail,
+                effectExtraConditions: effectExtraConditions,
               ),
           createCompanionCallback:
               ({
@@ -4606,7 +5552,12 @@ class $$CardEffectsTableTableManager
                 Value<bool?> dynamicDamage = const Value.absent(),
                 Value<int?> damageMultiplier = const Value.absent(),
                 Value<int?> damageMinimum = const Value.absent(),
+                Value<String?> triggerConditionText = const Value.absent(),
                 Value<int?> triggersEffectId = const Value.absent(),
+                Value<String?> effectType = const Value.absent(),
+                Value<String?> ceScope = const Value.absent(),
+                Value<String?> effectDetail = const Value.absent(),
+                Value<String?> effectExtraConditions = const Value.absent(),
               }) => CardEffectsCompanion.insert(
                 id: id,
                 cardDefinitionId: cardDefinitionId,
@@ -4622,7 +5573,12 @@ class $$CardEffectsTableTableManager
                 dynamicDamage: dynamicDamage,
                 damageMultiplier: damageMultiplier,
                 damageMinimum: damageMinimum,
+                triggerConditionText: triggerConditionText,
                 triggersEffectId: triggersEffectId,
+                effectType: effectType,
+                ceScope: ceScope,
+                effectDetail: effectDetail,
+                effectExtraConditions: effectExtraConditions,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -4664,6 +5620,9 @@ typedef $$LearnedRulesTableCreateCompanionBuilder =
       Value<int?> damageMinimum,
       Value<String?> replacementScope,
       Value<bool?> dynamicDamage,
+      Value<String?> triggerConditionText,
+      Value<String?> effectDetail,
+      Value<String?> effectExtraConditions,
       Value<int> confidence,
     });
 typedef $$LearnedRulesTableUpdateCompanionBuilder =
@@ -4681,6 +5640,9 @@ typedef $$LearnedRulesTableUpdateCompanionBuilder =
       Value<int?> damageMinimum,
       Value<String?> replacementScope,
       Value<bool?> dynamicDamage,
+      Value<String?> triggerConditionText,
+      Value<String?> effectDetail,
+      Value<String?> effectExtraConditions,
       Value<int> confidence,
     });
 
@@ -4755,6 +5717,21 @@ class $$LearnedRulesTableFilterComposer
 
   ColumnFilters<bool> get dynamicDamage => $composableBuilder(
     column: $table.dynamicDamage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get triggerConditionText => $composableBuilder(
+    column: $table.triggerConditionText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectDetail => $composableBuilder(
+    column: $table.effectDetail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectExtraConditions => $composableBuilder(
+    column: $table.effectExtraConditions,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4838,6 +5815,21 @@ class $$LearnedRulesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get triggerConditionText => $composableBuilder(
+    column: $table.triggerConditionText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectDetail => $composableBuilder(
+    column: $table.effectDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectExtraConditions => $composableBuilder(
+    column: $table.effectExtraConditions,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get confidence => $composableBuilder(
     column: $table.confidence,
     builder: (column) => ColumnOrderings(column),
@@ -4914,6 +5906,21 @@ class $$LearnedRulesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get triggerConditionText => $composableBuilder(
+    column: $table.triggerConditionText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get effectDetail => $composableBuilder(
+    column: $table.effectDetail,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get effectExtraConditions => $composableBuilder(
+    column: $table.effectExtraConditions,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get confidence => $composableBuilder(
     column: $table.confidence,
     builder: (column) => column,
@@ -4964,6 +5971,9 @@ class $$LearnedRulesTableTableManager
                 Value<int?> damageMinimum = const Value.absent(),
                 Value<String?> replacementScope = const Value.absent(),
                 Value<bool?> dynamicDamage = const Value.absent(),
+                Value<String?> triggerConditionText = const Value.absent(),
+                Value<String?> effectDetail = const Value.absent(),
+                Value<String?> effectExtraConditions = const Value.absent(),
                 Value<int> confidence = const Value.absent(),
               }) => LearnedRulesCompanion(
                 id: id,
@@ -4979,6 +5989,9 @@ class $$LearnedRulesTableTableManager
                 damageMinimum: damageMinimum,
                 replacementScope: replacementScope,
                 dynamicDamage: dynamicDamage,
+                triggerConditionText: triggerConditionText,
+                effectDetail: effectDetail,
+                effectExtraConditions: effectExtraConditions,
                 confidence: confidence,
               ),
           createCompanionCallback:
@@ -4996,6 +6009,9 @@ class $$LearnedRulesTableTableManager
                 Value<int?> damageMinimum = const Value.absent(),
                 Value<String?> replacementScope = const Value.absent(),
                 Value<bool?> dynamicDamage = const Value.absent(),
+                Value<String?> triggerConditionText = const Value.absent(),
+                Value<String?> effectDetail = const Value.absent(),
+                Value<String?> effectExtraConditions = const Value.absent(),
                 Value<int> confidence = const Value.absent(),
               }) => LearnedRulesCompanion.insert(
                 id: id,
@@ -5011,6 +6027,9 @@ class $$LearnedRulesTableTableManager
                 damageMinimum: damageMinimum,
                 replacementScope: replacementScope,
                 dynamicDamage: dynamicDamage,
+                triggerConditionText: triggerConditionText,
+                effectDetail: effectDetail,
+                effectExtraConditions: effectExtraConditions,
                 confidence: confidence,
               ),
           withReferenceMapper: (p0) => p0
@@ -5038,6 +6057,191 @@ typedef $$LearnedRulesTableProcessedTableManager =
       LearnedRule,
       PrefetchHooks Function()
     >;
+typedef $$CardAttachmentsTableCreateCompanionBuilder =
+    CardAttachmentsCompanion Function({
+      Value<int> id,
+      required int deckId,
+      required int equipmentDefinitionId,
+      required int targetDefinitionId,
+    });
+typedef $$CardAttachmentsTableUpdateCompanionBuilder =
+    CardAttachmentsCompanion Function({
+      Value<int> id,
+      Value<int> deckId,
+      Value<int> equipmentDefinitionId,
+      Value<int> targetDefinitionId,
+    });
+
+class $$CardAttachmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $CardAttachmentsTable> {
+  $$CardAttachmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get equipmentDefinitionId => $composableBuilder(
+    column: $table.equipmentDefinitionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetDefinitionId => $composableBuilder(
+    column: $table.targetDefinitionId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CardAttachmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardAttachmentsTable> {
+  $$CardAttachmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get equipmentDefinitionId => $composableBuilder(
+    column: $table.equipmentDefinitionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetDefinitionId => $composableBuilder(
+    column: $table.targetDefinitionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CardAttachmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardAttachmentsTable> {
+  $$CardAttachmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get deckId =>
+      $composableBuilder(column: $table.deckId, builder: (column) => column);
+
+  GeneratedColumn<int> get equipmentDefinitionId => $composableBuilder(
+    column: $table.equipmentDefinitionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetDefinitionId => $composableBuilder(
+    column: $table.targetDefinitionId,
+    builder: (column) => column,
+  );
+}
+
+class $$CardAttachmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardAttachmentsTable,
+          CardAttachment,
+          $$CardAttachmentsTableFilterComposer,
+          $$CardAttachmentsTableOrderingComposer,
+          $$CardAttachmentsTableAnnotationComposer,
+          $$CardAttachmentsTableCreateCompanionBuilder,
+          $$CardAttachmentsTableUpdateCompanionBuilder,
+          (
+            CardAttachment,
+            BaseReferences<
+              _$AppDatabase,
+              $CardAttachmentsTable,
+              CardAttachment
+            >,
+          ),
+          CardAttachment,
+          PrefetchHooks Function()
+        > {
+  $$CardAttachmentsTableTableManager(
+    _$AppDatabase db,
+    $CardAttachmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CardAttachmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CardAttachmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CardAttachmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> deckId = const Value.absent(),
+                Value<int> equipmentDefinitionId = const Value.absent(),
+                Value<int> targetDefinitionId = const Value.absent(),
+              }) => CardAttachmentsCompanion(
+                id: id,
+                deckId: deckId,
+                equipmentDefinitionId: equipmentDefinitionId,
+                targetDefinitionId: targetDefinitionId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int deckId,
+                required int equipmentDefinitionId,
+                required int targetDefinitionId,
+              }) => CardAttachmentsCompanion.insert(
+                id: id,
+                deckId: deckId,
+                equipmentDefinitionId: equipmentDefinitionId,
+                targetDefinitionId: targetDefinitionId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CardAttachmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardAttachmentsTable,
+      CardAttachment,
+      $$CardAttachmentsTableFilterComposer,
+      $$CardAttachmentsTableOrderingComposer,
+      $$CardAttachmentsTableAnnotationComposer,
+      $$CardAttachmentsTableCreateCompanionBuilder,
+      $$CardAttachmentsTableUpdateCompanionBuilder,
+      (
+        CardAttachment,
+        BaseReferences<_$AppDatabase, $CardAttachmentsTable, CardAttachment>,
+      ),
+      CardAttachment,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5052,4 +6256,6 @@ class $AppDatabaseManager {
       $$CardEffectsTableTableManager(_db, _db.cardEffects);
   $$LearnedRulesTableTableManager get learnedRules =>
       $$LearnedRulesTableTableManager(_db, _db.learnedRules);
+  $$CardAttachmentsTableTableManager get cardAttachments =>
+      $$CardAttachmentsTableTableManager(_db, _db.cardAttachments);
 }

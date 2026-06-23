@@ -41,7 +41,7 @@ class TriggerGroupDef {
 /// als auch die Abschnitt-Reihenfolge in der Liste.
 ///
 ///   0  Replacement   – statische Schadensmodifikatoren (orange)
-///   1  Rundenbasiert – Upkeep, Draw, End Step (grau)
+///   1  Rundenbasiert – Upkeep, Draw, End Step, Kampfbeginn (grau)
 ///   2  Spruchbasiert – Cast, Resolve, Spell Damage, Noncombat, Landfall (lila)
 ///   3  Kampfbasiert  – Angriff, Block, Kampfschaden, Sterben, Abgang (rot)
 ///   4  Ressourcen    – Leben, Karten, Hand (grün)
@@ -55,8 +55,8 @@ const triggerGroupDefs = <TriggerGroupDef>[
   TriggerGroupDef(
     label: 'Rundenbasiert',
     icon: Icons.schedule,
-    color: Colors.grey,
-    triggers: [TriggerType.upkeep, TriggerType.draw, TriggerType.endStep],
+    color: Colors.teal,
+    triggers: [TriggerType.upkeep, TriggerType.draw, TriggerType.endStep, TriggerType.beginningOfCombat],
   ),
   TriggerGroupDef(
     label: 'Spruchbasiert',
@@ -110,6 +110,7 @@ String triggerTypeLabel(TriggerType trigger, {required bool isDe}) {
       TriggerType.enterBattlefield    => 'Kommt ins Spiel',
       TriggerType.leaveBattlefield    => 'Verlässt Spiel',
       TriggerType.dies                => 'Stirbt',
+      TriggerType.beginningOfCombat   => 'Kampfbeginn',
       TriggerType.attacks             => 'Greift an',
       TriggerType.blocks              => 'Blockt',
       TriggerType.dealsCombatDamage   => 'Kampfschaden',
@@ -122,6 +123,7 @@ String triggerTypeLabel(TriggerType trigger, {required bool isDe}) {
       TriggerType.cardDrawn           => 'Karte gezogen',
       TriggerType.discard             => 'Abwerfen',
       TriggerType.staticDamageModifier => 'Ersetzungseffekt',
+      TriggerType.continuousEffect    => 'Dauereffekt',
     };
   } else {
     return switch (trigger) {
@@ -133,6 +135,7 @@ String triggerTypeLabel(TriggerType trigger, {required bool isDe}) {
       TriggerType.enterBattlefield    => 'Enters',
       TriggerType.leaveBattlefield    => 'Leaves battlefield',
       TriggerType.dies                => 'Dies',
+      TriggerType.beginningOfCombat   => 'Beginning of combat',
       TriggerType.attacks             => 'Attacks',
       TriggerType.blocks              => 'Blocks',
       TriggerType.dealsCombatDamage   => 'Combat damage',
@@ -145,6 +148,7 @@ String triggerTypeLabel(TriggerType trigger, {required bool isDe}) {
       TriggerType.cardDrawn           => 'Card drawn',
       TriggerType.discard             => 'Discard',
       TriggerType.staticDamageModifier => 'Replacement effect',
+      TriggerType.continuousEffect    => 'Continuous effect',
     };
   }
 }
@@ -173,7 +177,8 @@ TriggerStyle triggerStyle(TriggerType trigger) {
     case TriggerType.upkeep:
     case TriggerType.draw:
     case TriggerType.endStep:
-      return const TriggerStyle(Icons.schedule, Colors.grey);
+    case TriggerType.beginningOfCombat:
+      return const TriggerStyle(Icons.schedule, Colors.teal);
 
     // Spruchbasiert
     case TriggerType.castSpell:
@@ -219,6 +224,9 @@ TriggerStyle triggerStyle(TriggerType trigger) {
 
     // enterBattlefield: kein aktiver Scope im Trigger-Screen, bleibt grün
     case TriggerType.enterBattlefield:
-      return const TriggerStyle(Icons.arrow_circle_right, Colors.green);
+      return const TriggerStyle(Icons.arrow_circle_right, Colors.amber);
+
+    case TriggerType.continuousEffect:
+      return const TriggerStyle(Icons.all_inclusive, Colors.amber);
   }
 }

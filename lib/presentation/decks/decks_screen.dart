@@ -1,11 +1,11 @@
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/import/deck_list_parser.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/active_deck_provider.dart';
 import '../../providers/deck_providers.dart';
+import 'deck_analysis_screen.dart';
+import 'deck_manage_screen.dart';
+import 'new_deck_dialog.dart';
 
 class DecksScreen extends ConsumerWidget {
   const DecksScreen({super.key});
@@ -17,15 +17,11 @@ class DecksScreen extends ConsumerWidget {
     final activeDeckId = ref.watch(activeDeckProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.decksTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.file_upload_outlined),
-            tooltip: l10n.importDeck,
-            onPressed: () => _importDeck(context, ref),
-          ),
-        ],
+      appBar: AppBar(title: Text(l10n.decksTitle)),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _newDeck(context, ref),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.newDeckTitle),
       ),
       body: decks.when(
         data: (decks) {
@@ -34,6 +30,8 @@ class DecksScreen extends ConsumerWidget {
           }
           return ListView.builder(
             itemCount: decks.length,
+            // Genug Platz für den FAB
+            padding: const EdgeInsets.only(bottom: 88),
             itemBuilder: (context, index) {
               final deck = decks[index];
               final isActive = deck.id == activeDeckId;
@@ -43,10 +41,27 @@ class DecksScreen extends ConsumerWidget {
                 ),
                 title: Text(deck.name),
                 subtitle: isActive ? Text(l10n.activeDeck) : null,
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () =>
-                      ref.read(deckRepositoryProvider).deleteDeck(deck.id),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.tune),
+                      tooltip: l10n.manageDeck,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => DeckManageScreen(
+                            deckId: deck.id,
+                            deckName: deck.name,
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () =>
+                          ref.read(deckRepositoryProvider).deleteDeck(deck.id),
+                    ),
+                  ],
                 ),
                 onTap: () =>
                     ref.read(activeDeckProvider.notifier).state = deck.id,
@@ -60,40 +75,32 @@ class DecksScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _importDeck(BuildContext context, WidgetRef ref) async {
-    final l10n = AppL10n.of(context);
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['txt'],
-        withData: true,
-      );
-      if (result == null || result.files.isEmpty) return;
+  Future<void> _newDeck(BuildContext context, WidgetRef ref) async {
+    final result = await showDialog<NewDeckResult>(
+      context: context,
+      builder: (_) => const NewDeckDialog(),
+    );
+    if (result == null || !context.mounted) return;
 
-      final file = result.files.single;
-      final content = file.bytes != null
-          ? String.fromCharCodes(file.bytes!)
-          : await File(file.path!).readAsString();
+    final repo = ref.read(deckRepositoryProvider);
 
-      final cards = parseDeckList(content);
-      if (cards.isEmpty) {
-        throw Exception(l10n.importEmptyError);
-      }
-
-      final deckName = file.name.replaceAll(RegExp(r'\.txt$'), '');
-      final deckId = await ref
-          .read(deckRepositoryProvider)
-          .importDeckList(deckName, cards);
+    if (result.cards == null) {
+      // Manueller Pfad: leeres Deck erstellen
+      final deckId = await repo.createDeck(result.name);
       ref.read(activeDeckProvider.notifier).state = deckId;
-
+    } else {
+      // Import-Pfad: Deck importieren, dann zur Analyse navigieren
+      final deckId = await repo.importDeckList(result.name, result.cards!);
+      ref.read(activeDeckProvider.notifier).state = deckId;
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.importSuccess(cards.length))),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.importFailed(e.toString()))),
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => DeckAnalysisScreen(
+            deckId: deckId,
+            deckName: result.name,
+            importedCards: result.cards!,
+          ),
+        ),
       );
     }
   }

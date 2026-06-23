@@ -17,6 +17,7 @@ class EffectTile extends StatelessWidget {
     this.contentPadding,
     this.subtitleFirst = false,
     this.showLeadingIcon = true,
+    this.showInfoTitle = false,
     this.extraInfo,
   });
 
@@ -27,6 +28,12 @@ class EffectTile extends StatelessWidget {
   final CardDefinition? definition;
 
   final String? cardName;
+
+  /// Zeigt [cardName] als Titel im Info-Dialog. Standardmäßig false (z.B.
+  /// Card Info Sheet, wo der Kartenname bereits als Sheet-Titel sichtbar ist).
+  /// Auf dem Trigger-Screen true setzen, da mehrere Karten gleichzeitig
+  /// angezeigt werden.
+  final bool showInfoTitle;
   final VoidCallback? onDelete;
   final EdgeInsetsGeometry? contentPadding;
 
@@ -69,19 +76,35 @@ class EffectTile extends StatelessWidget {
         .map((c) => c.trim())
         .where((c) => c.isNotEmpty)
         .toList();
-    final hasSingleTarget = conditions.contains(EffectCondition.singleTarget.name);
-    final hasSingleCreatureTarget = conditions.contains(EffectCondition.singleCreatureTarget.name);
-    final hasDamageToOpponent = conditions.contains(EffectCondition.damageToOpponent.name);
+    final hasSingleTarget = conditions.contains(TriggerCondition.singleTarget.name);
+    final hasSingleCreatureTarget = conditions.contains(TriggerCondition.singleCreatureTarget.name);
+    final hasDamageToOpponent = conditions.contains(TriggerCondition.damageToOpponent.name);
     final detailLabel = triggerDetailLabel(effect.triggerDetail, isDe: isDe);
     final conditionLabel = [
       if (hasSingleTarget) l10n.effectConditionSingleTarget,
       if (hasSingleCreatureTarget) l10n.effectConditionSingleCreatureTarget,
       if (hasDamageToOpponent) l10n.effectConditionDamageToOpponent,
     ].join(', ');
+
+    final effectConds = (effect.effectExtraConditions ?? '')
+        .split(',')
+        .map((c) => c.trim())
+        .where((c) => c.isNotEmpty)
+        .map((name) {
+          try { return EffectCondition.values.byName(name); } catch (_) { return null; }
+        })
+        .whereType<EffectCondition>()
+        .toList();
+    final effectRestrictionLabel = [
+      for (final c in effectConds) effectConditionLabel(c, isDe: isDe),
+      if ((effect.effectDetail ?? '').isNotEmpty) effect.effectDetail!,
+    ].join(' · ');
+
     final lvl23Line = [
       ?cardName,
       ?detailLabel,
       if (conditionLabel.isNotEmpty) conditionLabel,
+      if (effectRestrictionLabel.isNotEmpty) effectRestrictionLabel,
     ].join(' · ');
 
     final theme = Theme.of(context);
@@ -100,8 +123,7 @@ class EffectTile extends StatelessWidget {
       infoText = effect.description;
     }
 
-    // Im Karten-Info-Kontext (definition vorhanden) reicht das Zitat ohne Titel.
-    final String? dialogTitle = def != null ? null : (cardName ?? title);
+    final String? dialogTitle = showInfoTitle ? (cardName ?? title) : null;
 
     return ListTile(
       contentPadding: contentPadding,
@@ -129,6 +151,32 @@ class EffectTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     OracleText(infoText),
+                    if (effect.triggerConditionText != null) ...[
+                      const SizedBox(height: 8),
+                      Builder(builder: (ctx) {
+                        final isDe = Localizations.localeOf(ctx).languageCode == 'de';
+                        return Text(
+                          '${isDe ? 'Bedingung' : 'Condition'}: ${effect.triggerConditionText}',
+                          style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        );
+                      }),
+                    ],
+                    if (effectRestrictionLabel.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Builder(builder: (ctx) {
+                        final isDe = Localizations.localeOf(ctx).languageCode == 'de';
+                        return Text(
+                          '${isDe ? 'Effekt-Einschränkung' : 'Effect restriction'}: $effectRestrictionLabel',
+                          style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        );
+                      }),
+                    ],
                     if (extraInfo != null) ...[
                       const SizedBox(height: 12),
                       Text(
@@ -198,4 +246,6 @@ List<String> _triggerKeywords(TriggerType trigger) => switch (trigger) {
   TriggerType.cardDrawn           => ['whenever you draw a card', 'whenever a player draws', 'immer wenn du eine karte ziehst'],
   TriggerType.discard             => ['whenever you discard', 'immer wenn du eine karte abwirfst'],
   TriggerType.staticDamageModifier => ['if a source would deal', 'damage that would be dealt', 'wenn eine quelle', 'schaden, der'],
+  TriggerType.beginningOfCombat   => ['at the beginning of combat on your turn', 'beginning of combat', 'at the beginning of each combat', 'zu beginn des kampfes', 'kampfbeginn'],
+  TriggerType.continuousEffect    => ['creatures you control have', 'creatures you control get', 'permanents you control have', 'kreaturen unter deiner kontrolle haben', 'kreaturen, die du kontrollierst'],
 };

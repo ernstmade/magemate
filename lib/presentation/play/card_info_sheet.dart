@@ -10,25 +10,29 @@ import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
 import 'card_effect_edit_screen.dart';
 import 'effect_tile.dart';
+import 'play_screen.dart' show isEquipmentOrAura, showEquipmentPicker;
 
 Future<void> showCardInfoSheet(
   BuildContext context,
-  CardDefinition definition,
-) {
+  CardDefinition definition, {
+  int? deckId,
+}) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     constraints: BoxConstraints(
       maxHeight: MediaQuery.of(context).size.height * 0.8,
     ),
-    builder: (context) => _CardInfoSheet(definition: definition),
+    builder: (context) =>
+        _CardInfoSheet(definition: definition, deckId: deckId),
   );
 }
 
 class _CardInfoSheet extends ConsumerWidget {
-  const _CardInfoSheet({required this.definition});
+  const _CardInfoSheet({required this.definition, this.deckId});
 
   final CardDefinition definition;
+  final int? deckId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -129,6 +133,12 @@ class _CardInfoSheet extends ConsumerWidget {
                       ? (definition.printedText ?? definition.oracleText!)
                       : (definition.oracleText ?? definition.printedText!),
                 ),
+              ],
+
+              // ── Equipment-Zuordnung ───────────────────────────────────────
+              if (deckId != null && isEquipmentOrAura(definition)) ...[
+                const Divider(),
+                _EquipmentAttachSection(deckId: deckId!, definition: definition),
               ],
 
               // ── Effektliste ───────────────────────────────────────────────
@@ -261,6 +271,82 @@ class _RatingDialog extends StatefulWidget {
 
   @override
   State<_RatingDialog> createState() => _RatingDialogState();
+}
+
+class _EquipmentAttachSection extends ConsumerWidget {
+  const _EquipmentAttachSection({
+    required this.deckId,
+    required this.definition,
+  });
+
+  final int deckId;
+  final CardDefinition definition;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppL10n.of(context);
+    final isDe = Localizations.localeOf(context).languageCode == 'de';
+    final attachments = ref.watch(attachmentsWithDefsProvider(deckId));
+
+    return attachments.when(
+      loading: () => const SizedBox.shrink(),
+      error: (e, _) => const SizedBox.shrink(),
+      data: (map) {
+        final targetDef = map[definition.id];
+        final targetName = targetDef == null
+            ? null
+            : (isDe
+                ? (targetDef.printedName ?? targetDef.name)
+                : targetDef.name);
+
+        return Row(
+          children: [
+            const Icon(Icons.link, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                targetName != null
+                    ? l10n.equipmentAttachedTo(targetName)
+                    : l10n.equipmentNotAttached,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: targetName != null
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outlineVariant,
+                  fontStyle: targetName == null ? FontStyle.italic : null,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final repo = ref.read(deckRepositoryProvider);
+                // Check if equipment is in play first
+                final groups =
+                    ref.read(groupedCardsForDeckProvider(deckId)).valueOrNull;
+                final group = groups
+                    ?.where((g) => g.definition.id == definition.id)
+                    .firstOrNull;
+                if (group == null || group.inPlayCount == 0) return;
+
+                final target = await showEquipmentPicker(
+                    context, deckId, definition, ref);
+                if (!context.mounted) return;
+                if (target != null) {
+                  await repo.attachEquipment(deckId, definition.id, target.id);
+                } else if (targetDef != null) {
+                  await repo.detachEquipment(deckId, definition.id);
+                }
+              },
+              child: Text(
+                targetName != null
+                    ? l10n.equipmentReattach
+                    : l10n.equipmentPickerTitle,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _RatingDialogState extends State<_RatingDialog> {

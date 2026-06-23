@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/app_database.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/active_deck_provider.dart';
 import '../../providers/deck_providers.dart';
 import '../../shared/models/trigger_style.dart';
 import '../../shared/models/trigger_type.dart';
@@ -14,7 +15,7 @@ class TriggersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppL10n.of(context);
-    final activeEffects = ref.watch(activeTriggerEffectsProvider);
+    final activeDeckId = ref.watch(activeDeckProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -29,22 +30,24 @@ class TriggersScreen extends ConsumerWidget {
             Text(l10n.triggersHint),
             const SizedBox(height: 8),
             Expanded(
-              child: activeEffects.when(
-                data: (effectsByTrigger) {
-                  final activeTriggers = TriggerType.values
-                      .where((t) => effectsByTrigger[t]?.isNotEmpty ?? false)
-                      .toList();
-                  if (activeTriggers.isEmpty) {
-                    return Center(child: Text(l10n.noActiveTriggers));
-                  }
-                  return _TriggerSections(
-                    activeTriggers: activeTriggers,
-                    effectsByTrigger: effectsByTrigger,
-                  );
-                },
-                error: (e, _) => Center(child: Text('Error: $e')),
-                loading: () => const Center(child: CircularProgressIndicator()),
-              ),
+              child: activeDeckId == null
+                  ? Center(child: Text(l10n.noActiveTriggers))
+                  : ref.watch(activeTriggerEffectsProvider(activeDeckId)).when(
+                      data: (effectsByTrigger) {
+                        final activeTriggers = TriggerType.values
+                            .where((t) => effectsByTrigger[t]?.isNotEmpty ?? false)
+                            .toList();
+                        if (activeTriggers.isEmpty) {
+                          return Center(child: Text(l10n.noActiveTriggers));
+                        }
+                        return _TriggerSections(
+                          activeTriggers: activeTriggers,
+                          effectsByTrigger: effectsByTrigger,
+                        );
+                      },
+                      error: (e, _) => Center(child: Text('Error: $e')),
+                      loading: () => const Center(child: CircularProgressIndicator()),
+                    ),
             ),
           ],
         ),
@@ -150,7 +153,7 @@ class _TriggerSectionsState extends State<_TriggerSections> {
                   for (final trigger
                       in activeGroups[i].triggers.where(activeSet.contains))
                     TriggerEffectSection(
-                      title: trigger.name,
+                      title: triggerTypeLabel(trigger, isDe: Localizations.localeOf(context).languageCode == 'de'),
                       trigger: trigger,
                       entries: widget.effectsByTrigger[trigger] ?? const [],
                       highlighted: trigger == TriggerType.staticDamageModifier,

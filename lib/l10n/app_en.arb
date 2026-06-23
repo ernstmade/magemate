@@ -5,6 +5,11 @@
   "navDecks": "Decks",
   "navTriggers": "Triggers",
   "navSettings": "Settings",
+  "navStatus": "Status",
+  "statusTitle": "Status",
+  "statusEmpty": "No cards in play with continuous effects or keywords.",
+  "statusContinuousEffects": "Continuous Effects",
+  "statusKeywords": "Keywords",
   "noActiveDeck": "No active deck selected.",
   "selectDeckHint": "Pick a deck below to use it as your active deck.",
   "activeDeck": "Active deck",
@@ -67,6 +72,7 @@
   "castSpellDamageSummarySingleCreature": "Total damage to a creature/permanent",
   "castSpellDamageSummaryEachCreature": "Total damage to each creature",
   "castSpellDamageSummaryEachOpponentCreatures": "Total damage to each opponent's creatures",
+  "castSpellDamageSummaryAnyTarget": "Total damage to any target",
   "cardInfoShortLabelLabel": "Short label (DE)",
   "cardInfoShortLabelEnLabel": "Short label (EN)",
   "cardInfoEffectDescriptionLabel": "Effect description",
@@ -135,5 +141,65 @@
   },
   "effectSuggestionSelectAll": "Select all",
   "effectSuggestionDeselectAll": "Deselect all",
-  "effectSuggestionNone": "No new effects detected."
+  "effectSuggestionNone": "No new effects detected.",
+  "newDeckTitle": "New deck",
+  "newDeckNameHint": "Deck name",
+  "newDeckImportFile": "Import from file",
+  "newDeckFileSelected": "File: {name}",
+  "@newDeckFileSelected": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "analysisTitle": "Analysing deck",
+  "analysisFetchingCard": "Loading card data ({done}/{total})",
+  "@analysisFetchingCard": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "analysisParsing": "Analysing effects…",
+  "analysisDoneTitle": "Import complete",
+  "analysisSummaryCards": "{count} cards",
+  "@analysisSummaryCards": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisSummaryTriggers": "{count} trigger effects detected",
+  "@analysisSummaryTriggers": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisSummaryContinuous": "{count} continuous effects detected",
+  "@analysisSummaryContinuous": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisSummaryKeywords": "{count} cards with keywords",
+  "@analysisSummaryKeywords": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisReviewButton": "Review effects ({count})",
+  "@analysisReviewButton": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisDoneButton": "Done",
+  "boardMain": "Mainboard",
+  "boardSide": "Sideboard",
+  "manageDeck": "Manage deck",
+  "scryfallSyncButton": "Fetch Scryfall data",
+  "scryfallSyncTooltip": "Fetch missing Scryfall data for this deck",
+  "scryfallSynced": "Scryfall data available",
+  "scryfallMissing": "Scryfall data missing",
+  "scryfallNoSetInfo": "No set code – manually added",
+  "analyseEffectsTooltip": "Analyse and record effects",
+  "effectsNotParsed": "No effects recorded yet",
+  "effectsParsed": "{count} effect(s) recorded",
+  "@effectsParsed": { "placeholders": { "count": { "type": "int" } } },
+  "equipmentPickerTitle": "Equip to...",
+  "equipmentAttachedTo": "Attached to: {name}",
+  "@equipmentAttachedTo": { "placeholders": { "name": { "type": "String" } } },
+  "equipmentNotAttached": "Not equipped",
+  "equipmentDetach": "Detach",
+  "equipmentReattach": "Re-equip",
+  "ceScopeSelf": "Self",
+  "ceScopeOneTarget": "Equipment / Aura",
+  "ceScopeGlobal": "All owned",
+  "ceScopeConditional": "Conditional"
 }

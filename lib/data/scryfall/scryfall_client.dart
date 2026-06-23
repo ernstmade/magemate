@@ -15,6 +15,7 @@ class ScryfallCard {
     this.power,
     this.toughness,
     this.imageUri,
+    this.keywords,
     this.printedName,
     this.printedText,
     this.printedTypeLine,
@@ -31,6 +32,8 @@ class ScryfallCard {
   final String? power;
   final String? toughness;
   final String? imageUri;
+  /// Schlüsselwörter kommagetrennt, z.B. "Flying,Trample". Null wenn leer.
+  final String? keywords;
   /// Lokalisierter Kartenname (z.B. Deutsch), null wenn nicht verfügbar.
   final String? printedName;
   /// Lokalisierter Regeltext (z.B. Deutsch), null wenn nicht verfügbar.
@@ -50,6 +53,7 @@ class ScryfallCard {
     final colors = (json['colors'] ?? firstFace?['colors']) as List<dynamic>?;
     final imageUris = (json['image_uris'] ?? firstFace?['image_uris'])
         as Map<String, dynamic>?;
+    final keywords = json['keywords'] as List<dynamic>?;
 
     return ScryfallCard(
       setCode: (json['set'] as String).toUpperCase(),
@@ -63,6 +67,9 @@ class ScryfallCard {
       power: str('power'),
       toughness: str('toughness'),
       imageUri: imageUris?['normal'] as String?,
+      keywords: (keywords != null && keywords.isNotEmpty)
+          ? keywords.map((k) => k.toString()).join(',')
+          : null,
       // printed_* nur bei lokalisierten Einzelabrufen vorhanden
       printedName: str('printed_name'),
       printedText: str('printed_text'),
@@ -84,6 +91,7 @@ class ScryfallCard {
       power: power,
       toughness: toughness,
       imageUri: imageUri,
+      keywords: keywords,
       printedName: localized.printedName,
       printedText: localized.printedText,
       printedTypeLine: localized.printedTypeLine,
@@ -107,6 +115,7 @@ class ScryfallClient {
   Future<List<ScryfallCard>> fetchCards(
     List<(String setCode, String collectorNumber)> identifiers, {
     String localeLang = 'de',
+    void Function(int done, int total, String cardName)? onProgress,
   }) async {
     // Schritt 1: Englische Basisdaten per Batch laden
     final baseCards = <ScryfallCard>[];
@@ -118,13 +127,16 @@ class ScryfallClient {
 
     // Schritt 2: Deutsche Texte per Einzelabruf nachladen
     final results = <ScryfallCard>[];
-    for (final card in baseCards) {
+    for (var i = 0; i < baseCards.length; i++) {
+      final card = baseCards[i];
       final localized = await _fetchLocalized(
         card.setCode,
         card.collectorNumber,
         localeLang,
       );
-      results.add(localized != null ? card.withLocalized(localized) : card);
+      final result = localized != null ? card.withLocalized(localized) : card;
+      results.add(result);
+      onProgress?.call(i + 1, baseCards.length, result.printedName ?? result.scryfallId);
       // Scryfall erlaubt ~10 Anfragen/Sekunde
       await Future<void>.delayed(const Duration(milliseconds: 120));
     }

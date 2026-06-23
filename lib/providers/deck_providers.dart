@@ -136,11 +136,12 @@ final effectsForTriggerProvider =
       });
     });
 
-/// Effekte aller im Spiel befindlichen Karten, gruppiert nach Trigger-Typ.
-/// Liefert nur Trigger, für die mind. ein Effekt existiert.
+/// Effekte aller im Spiel befindlichen Karten des aktiven Decks, gruppiert
+/// nach Trigger-Typ. Liefert nur Trigger, für die mind. ein Effekt existiert.
 final activeTriggerEffectsProvider =
-    StreamProvider<Map<TriggerType, List<(CardDefinition, CardEffect)>>>((
+    StreamProvider.family<Map<TriggerType, List<(CardDefinition, CardEffect)>>, int>((
       ref,
+      deckId,
     ) {
       final db = ref.watch(databaseProvider);
       final query = db.select(db.deckCards).join([
@@ -152,7 +153,10 @@ final activeTriggerEffectsProvider =
           db.cardEffects,
           db.cardEffects.cardDefinitionId.equalsExp(db.cardDefinitions.id),
         ),
-      ])..where(db.deckCards.inPlay.equals(true));
+      ])
+        ..where(db.deckCards.inPlay.equals(true))
+        ..where(db.deckCards.deckId.equals(deckId))
+        ..where(db.deckCards.board.equals('main'));
 
       return query.watch().map((rows) {
         final map = <TriggerType, List<(CardDefinition, CardEffect)>>{};
@@ -160,6 +164,8 @@ final activeTriggerEffectsProvider =
           final definition = row.readTable(db.cardDefinitions);
           final effect = row.readTable(db.cardEffects);
           for (final trigger in TriggerType.values) {
+            // continuousEffect gehört nur in den Status-Tab, nicht hierher
+            if (trigger == TriggerType.continuousEffect) break;
             if (trigger.name == effect.trigger) {
               map.putIfAbsent(trigger, () => []).add((definition, effect));
               break;
@@ -167,6 +173,65 @@ final activeTriggerEffectsProvider =
           }
         }
         return map;
+      });
+    });
+
+/// Dauereffekte aller im Spiel befindlichen Karten des aktiven Decks
+/// (trigger = continuousEffect).
+final activeContinuousEffectsProvider =
+    StreamProvider.family<List<(CardDefinition, CardEffect)>, int>((ref, deckId) {
+      final db = ref.watch(databaseProvider);
+      final query = db.select(db.deckCards).join([
+        drift.innerJoin(
+          db.cardDefinitions,
+          db.cardDefinitions.id.equalsExp(db.deckCards.cardDefinitionId),
+        ),
+        drift.innerJoin(
+          db.cardEffects,
+          db.cardEffects.cardDefinitionId.equalsExp(db.cardDefinitions.id),
+        ),
+      ])
+        ..where(db.deckCards.inPlay.equals(true))
+        ..where(db.deckCards.deckId.equals(deckId))
+        ..where(db.deckCards.board.equals('main'))
+        ..where(db.cardEffects.trigger.equals(TriggerType.continuousEffect.name));
+
+      return query.watch().map(
+        (rows) => rows
+            .map((r) => (r.readTable(db.cardDefinitions), r.readTable(db.cardEffects)))
+            .toList(),
+      );
+    });
+
+/// Keywords aller im Spiel befindlichen Karten des aktiven Decks, die
+/// mindestens ein Scryfall-Keyword haben. Dedupliziert nach CardDefinition.
+final activeCardKeywordsProvider =
+    StreamProvider.family<List<(CardDefinition, List<String>)>, int>((ref, deckId) {
+      final db = ref.watch(databaseProvider);
+      final query = db.select(db.deckCards).join([
+        drift.innerJoin(
+          db.cardDefinitions,
+          db.cardDefinitions.id.equalsExp(db.deckCards.cardDefinitionId),
+        ),
+      ])
+        ..where(db.deckCards.inPlay.equals(true))
+        ..where(db.deckCards.deckId.equals(deckId))
+        ..where(db.deckCards.board.equals('main'))
+        ..groupBy([db.cardDefinitions.id]);
+
+      return query.watch().map((rows) {
+        final result = <(CardDefinition, List<String>)>[];
+        for (final row in rows) {
+          final def = row.readTable(db.cardDefinitions);
+          final kws = def.keywords
+                  ?.split(',')
+                  .map((k) => k.trim())
+                  .where((k) => k.isNotEmpty)
+                  .toList() ??
+              [];
+          if (kws.isNotEmpty) result.add((def, kws));
+        }
+        return result;
       });
     });
 
@@ -311,13 +376,18 @@ class DeckRepository {
     String shortLabelEn,
     String description, {
     String? triggerDetail,
-    Set<EffectCondition> extraConditions = const {},
+    String? triggerConditionText,
+    String? effectType,
+    String? ceScope,
+    Set<TriggerCondition> extraConditions = const {},
     int? damageAmount,
     DamageTarget? damageTarget,
     int? damageMultiplier,
     int? damageMinimum,
     ReplacementScope? replacementScope,
     bool dynamicDamage = false,
+    String? effectDetail,
+    Set<EffectCondition> effectExtraConditions = const {},
   }) {
     return _db
         .into(_db.cardEffects)
@@ -326,6 +396,9 @@ class DeckRepository {
             cardDefinitionId: cardDefinitionId,
             trigger: trigger.name,
             triggerDetail: drift.Value(triggerDetail),
+            triggerConditionText: drift.Value(triggerConditionText),
+            effectType: drift.Value(effectType),
+            ceScope: drift.Value(ceScope),
             extraConditions: drift.Value(
               extraConditions.isEmpty
                   ? null
@@ -340,14 +413,82 @@ class DeckRepository {
             damageMinimum: drift.Value(damageMinimum),
             replacementScope: drift.Value(replacementScope?.name),
             dynamicDamage: drift.Value(dynamicDamage ? true : null),
+            effectDetail: drift.Value(effectDetail),
+            effectExtraConditions: drift.Value(
+              effectExtraConditions.isEmpty
+                  ? null
+                  : effectExtraConditions.map((c) => c.name).join(','),
+            ),
           ),
         );
   }
 
+  /// Verschiebt alle Exemplare einer Kartengruppe in ein anderes Board-Segment.
+  Future<void> moveGroupToBoard(DeckCardGroup group, String board) {
+    return _db.transaction(() async {
+      for (final card in group.deckCards) {
+        await (_db.update(_db.deckCards)..where((c) => c.id.equals(card.id)))
+            .write(DeckCardsCompanion(board: drift.Value(board)));
+      }
+    });
+  }
+
+  Future<void> attachEquipment(
+    int deckId,
+    int equipmentDefinitionId,
+    int targetDefinitionId,
+  ) async {
+    await (_db.delete(_db.cardAttachments)
+          ..where(
+            (a) =>
+                a.deckId.equals(deckId) &
+                a.equipmentDefinitionId.equals(equipmentDefinitionId),
+          ))
+        .go();
+    await _db.into(_db.cardAttachments).insert(
+      CardAttachmentsCompanion.insert(
+        deckId: deckId,
+        equipmentDefinitionId: equipmentDefinitionId,
+        targetDefinitionId: targetDefinitionId,
+      ),
+    );
+  }
+
+  Future<void> detachEquipment(int deckId, int equipmentDefinitionId) {
+    return (_db.delete(_db.cardAttachments)
+          ..where(
+            (a) =>
+                a.deckId.equals(deckId) &
+                a.equipmentDefinitionId.equals(equipmentDefinitionId),
+          ))
+        .go();
+  }
+
+  /// Löscht alle Attachment-Einträge für ein Deck (z.B. beim Runden-Reset).
+  Future<void> clearAttachments(int deckId) {
+    return (_db.delete(_db.cardAttachments)
+          ..where((a) => a.deckId.equals(deckId)))
+        .go();
+  }
+
+  /// Löscht alle erfassten Effekte für alle Karten eines Decks.
+  Future<void> clearEffectsForDeck(int deckId) async {
+    final defIds = await (_db.selectOnly(_db.deckCards)
+          ..addColumns([_db.deckCards.cardDefinitionId])
+          ..where(_db.deckCards.deckId.equals(deckId)))
+        .map((r) => r.read(_db.deckCards.cardDefinitionId)!)
+        .get();
+    if (defIds.isEmpty) return;
+    await (_db.delete(_db.cardEffects)
+          ..where((e) => e.cardDefinitionId.isIn(defIds)))
+        .go();
+  }
+
   /// Setzt alle Karten eines Decks auf "nicht im Spiel" (Rundenreset).
-  Future<void> resetAllInPlay(int deckId) {
-    return (_db.update(_db.deckCards)..where((c) => c.deckId.equals(deckId)))
+  Future<void> resetAllInPlay(int deckId) async {
+    await (_db.update(_db.deckCards)..where((c) => c.deckId.equals(deckId)))
         .write(const DeckCardsCompanion(inPlay: drift.Value(false)));
+    await clearAttachments(deckId);
   }
 
   Future<void> updateRating(int cardDefinitionId, double? rating) {
@@ -391,12 +532,15 @@ class DeckRepository {
     required String shortLabelEnTemplate,
     required bool hasDamageAmount,
     String? triggerDetail,
+    String? triggerConditionText,
     String? extraConditions,
     String? damageTarget,
     int? damageMultiplier,
     int? damageMinimum,
     String? replacementScope,
     bool? dynamicDamage,
+    String? effectDetail,
+    String? effectExtraConditions,
   }) {
     return _db.customStatement(
       '''
@@ -404,8 +548,9 @@ class DeckRepository {
         normalized_pattern, trigger, trigger_detail, extra_conditions,
         short_label_template, short_label_en_template, has_damage_amount,
         damage_target, damage_multiplier, damage_minimum,
-        replacement_scope, dynamic_damage, confidence
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        replacement_scope, dynamic_damage, trigger_condition_text,
+        effect_detail, effect_extra_conditions, confidence
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
       ON CONFLICT(normalized_pattern) DO UPDATE SET
         confidence      = confidence + 1,
         trigger         = excluded.trigger,
@@ -418,7 +563,10 @@ class DeckRepository {
         damage_multiplier= excluded.damage_multiplier,
         damage_minimum  = excluded.damage_minimum,
         replacement_scope= excluded.replacement_scope,
-        dynamic_damage  = excluded.dynamic_damage
+        dynamic_damage  = excluded.dynamic_damage,
+        trigger_condition_text = excluded.trigger_condition_text,
+        effect_detail          = excluded.effect_detail,
+        effect_extra_conditions= excluded.effect_extra_conditions
       ''',
       [
         pattern,
@@ -433,6 +581,9 @@ class DeckRepository {
         damageMinimum,
         replacementScope,
         dynamicDamage == true ? 1 : 0,
+        triggerConditionText,
+        effectDetail,
+        effectExtraConditions,
       ],
     );
   }
@@ -459,12 +610,32 @@ class DeckRepository {
     return list.isNotEmpty;
   }
 
+  /// Gibt true zurück, wenn für [cardDefinitionId] bereits ein
+  /// continuousEffect-Eintrag mit exakt dieser [description] existiert.
+  Future<bool> hasContinuousEffectForDescription(
+    int cardDefinitionId,
+    String description,
+  ) async {
+    final list = await (_db.select(_db.cardEffects)
+          ..where(
+            (e) =>
+                e.cardDefinitionId.equals(cardDefinitionId) &
+                e.trigger.equals(TriggerType.continuousEffect.name) &
+                e.description.equals(description),
+          ))
+        .get();
+    return list.isNotEmpty;
+  }
+
   /// Lädt für alle Karten-Definitionen eines Decks mit Set + Sammelnummer
   /// die fehlenden Werte (Manakosten, Typ, Text, ...) von Scryfall nach.
+  /// Mit [onlyMissing] = true werden nur Karten ohne `scryfallId` abgerufen.
   /// Gibt die Anzahl der aktualisierten Karten-Definitionen zurück.
   Future<int> enrichDeckFromScryfall(
     int deckId, {
+    bool onlyMissing = false,
     ScryfallClient? client,
+    void Function(int done, int total, String cardName)? onProgress,
   }) async {
     final definitions =
         await (_db.select(_db.cardDefinitions).join([
@@ -481,14 +652,18 @@ class DeckRepository {
             .get();
 
     final toFetch = definitions.where(
-      (d) => d.setCode != null && d.collectorNumber != null,
+      (d) =>
+          d.setCode != null &&
+          d.collectorNumber != null &&
+          (!onlyMissing || d.scryfallId == null),
     ).toList();
     if (toFetch.isEmpty) return 0;
 
     final scryfall = client ?? ScryfallClient();
-    final cards = await scryfall.fetchCards([
-      for (final d in toFetch) (d.setCode!, d.collectorNumber!),
-    ]);
+    final cards = await scryfall.fetchCards(
+      [for (final d in toFetch) (d.setCode!, d.collectorNumber!)],
+      onProgress: onProgress,
+    );
 
     final byKey = {
       for (final c in cards) '${c.setCode}_${c.collectorNumber}': c,
@@ -514,6 +689,7 @@ class DeckRepository {
                 printedName: drift.Value(card.printedName),
                 printedText: drift.Value(card.printedText),
                 printedTypeLine: drift.Value(card.printedTypeLine),
+                keywords: drift.Value(card.keywords),
               ),
             );
         updated++;
@@ -522,6 +698,39 @@ class DeckRepository {
     return updated;
   }
 }
+
+/// Alle Equipment-Zuordnungen für ein Deck: equipmentDefinitionId → targetDefinitionId.
+final attachmentsForDeckProvider =
+    StreamProvider.family<Map<int, int>, int>((ref, deckId) {
+  final db = ref.watch(databaseProvider);
+  return (db.select(db.cardAttachments)
+        ..where((a) => a.deckId.equals(deckId)))
+      .watch()
+      .map((rows) => {
+            for (final r in rows)
+              r.equipmentDefinitionId: r.targetDefinitionId,
+          });
+});
+
+/// Wie [attachmentsForDeckProvider], aber mit aufgelösten CardDefinitions:
+/// equipmentDefinitionId → CardDefinition der Zielkarte.
+final attachmentsWithDefsProvider =
+    StreamProvider.family<Map<int, CardDefinition>, int>((ref, deckId) {
+  final db = ref.watch(databaseProvider);
+  final target = db.alias(db.cardDefinitions, 'target');
+  final query = db.select(db.cardAttachments).join([
+    drift.innerJoin(
+      target,
+      target.id.equalsExp(db.cardAttachments.targetDefinitionId),
+    ),
+  ])..where(db.cardAttachments.deckId.equals(deckId));
+
+  return query.watch().map((rows) => {
+        for (final row in rows)
+          row.readTable(db.cardAttachments).equipmentDefinitionId:
+              row.readTable(target),
+      });
+});
 
 final deckRepositoryProvider = Provider<DeckRepository>((ref) {
   return DeckRepository(ref.watch(databaseProvider));

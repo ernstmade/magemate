@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/play/play_screen.dart';
 import 'presentation/decks/decks_screen.dart';
+import 'presentation/status/status_screen.dart';
 import 'presentation/triggers/triggers_screen.dart';
 import 'presentation/settings/settings_screen.dart';
 
@@ -27,6 +28,14 @@ final router = GoRouter(
             GoRoute(
               path: '/triggers',
               builder: (context, state) => const TriggersScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/status',
+              builder: (context, state) => const StatusScreen(),
             ),
           ],
         ),
@@ -77,6 +86,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
             icon: const Icon(Icons.flash_on_outlined),
             selectedIcon: const Icon(Icons.flash_on),
             label: l10n.navTriggers,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.info_outline),
+            selectedIcon: const Icon(Icons.info),
+            label: l10n.navStatus,
           ),
           NavigationDestination(
             icon: const Icon(Icons.style_outlined),

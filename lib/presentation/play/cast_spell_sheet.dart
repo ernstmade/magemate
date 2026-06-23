@@ -1,11 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/database/app_database.dart';
+import '../../data/parser/card_text_parser.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/deck_providers.dart';
 import '../../shared/models/trigger_type.dart';
 import '../../shared/widgets/trigger_effect_section.dart';
 import 'effect_tile.dart';
+
+/// Parst den eigenen Schadenseffekt einer Karte direkt aus dem Oracle-Text,
+/// ohne auf DB-Einträge angewiesen zu sein. Der spellResolved-Trigger wird
+/// nicht persistiert — die Karte IST der Effekt, kein externer Trigger.
+List<ParsedEffect> _ownSpellParsedEffects(CardDefinition definition) {
+  if (definition.oracleText == null) return [];
+  return CardTextParser.parse(definition.oracleText!, cardName: definition.name)
+      .where((e) => e.trigger == TriggerType.spellResolved)
+      .toList();
+}
+
+CardEffect _parsedToCardEffect(ParsedEffect e, CardDefinition definition) =>
+    CardEffect(
+      id: -1,
+      cardDefinitionId: definition.id,
+      trigger: e.trigger.name,
+      triggerDetail: e.triggerDetail,
+      extraConditions: e.extraConditions.isEmpty
+          ? null
+          : e.extraConditions.map((c) => c.name).join(','),
+      shortLabel: e.shortLabel,
+      shortLabelEn: e.shortLabelEn,
+      description: e.description,
+      damageAmount: e.damageAmount,
+      damageTarget: e.damageTarget?.name,
+      replacementScope: e.replacementScope?.name,
+      dynamicDamage: e.dynamicDamage,
+      damageMultiplier: e.damageMultiplier,
+      damageMinimum: e.damageMinimum,
+      triggerConditionText: e.triggerConditionText,
+      triggersEffectId: null,
+      effectType: null,
+      ceScope: null,
+    );
 
 /// Zeigt in einem Modal alle Effekte, die ausgelöst werden, wenn ein
 /// Instant/Sorcery gespielt wird – inklusive der Folge-Trigger, die durch
@@ -31,13 +66,57 @@ Future<void> showCastSpellEffectsSheet(
   );
 }
 
-class _CastSpellEffectsSheet extends ConsumerWidget {
+class _CastSpellEffectsSheet extends ConsumerStatefulWidget {
   const _CastSpellEffectsSheet({required this.definition});
 
   final CardDefinition definition;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_CastSpellEffectsSheet> createState() =>
+      _CastSpellEffectsSheetState();
+}
+
+class _CastSpellEffectsSheetState
+    extends ConsumerState<_CastSpellEffectsSheet> {
+  late final List<ParsedEffect> _parsedEffects;
+  // groupId → index des gewählten Modus in dieser Gruppe
+  final Map<int, int> _selectedModes = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _parsedEffects = _ownSpellParsedEffects(widget.definition);
+    for (final e in _parsedEffects) {
+      if (e.modeGroupId != null) {
+        _selectedModes.putIfAbsent(e.modeGroupId!, () => 0);
+      }
+    }
+  }
+
+  /// Liefert nur die aktiven spellResolved-Effekte unter Berücksichtigung der
+  /// gewählten Modi (bei "Choose one"-Karten immer genau einer pro Gruppe).
+  List<CardEffect> get _activeOwnEffects {
+    final result = <CardEffect>[];
+    // Pro Gruppe: welche ParsedEffects sind in ihr, welcher ist ausgewählt?
+    final grouped = <int, List<ParsedEffect>>{};
+    for (final e in _parsedEffects) {
+      if (e.modeGroupId == null) {
+        result.add(_parsedToCardEffect(e, widget.definition));
+      } else {
+        grouped.putIfAbsent(e.modeGroupId!, () => []).add(e);
+      }
+    }
+    for (final entry in grouped.entries) {
+      final idx = _selectedModes[entry.key] ?? 0;
+      if (idx < entry.value.length) {
+        result.add(_parsedToCardEffect(entry.value[idx], widget.definition));
+      }
+    }
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
 
     return SafeArea(
@@ -53,17 +132,26 @@ class _CastSpellEffectsSheet extends ConsumerWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
-              _DamageSummary(definition: definition),
+              _DamageSummary(
+                definition: widget.definition,
+                ownEffects: _activeOwnEffects,
+              ),
               const SizedBox(height: 8),
-              _ReplacementEffectsBox(definition: definition),
-              _OwnEffectSection(definition: definition),
+              _ReplacementEffectsBox(definition: widget.definition),
+              _OwnEffectSection(
+                definition: widget.definition,
+                parsedEffects: _parsedEffects,
+                selectedModes: _selectedModes,
+                onModeSelected: (groupId, idx) =>
+                    setState(() => _selectedModes[groupId] = idx),
+              ),
               _FilteredSection(
                 title: l10n.castSpellSectionCast,
                 hint: l10n.castSpellSectionCastHint,
                 trigger: TriggerType.castSpell,
-                castDefinition: definition,
+                castDefinition: widget.definition,
               ),
-              _FollowUpSection(definition: definition),
+              _FollowUpSection(definition: widget.definition),
             ],
           ),
         ),
@@ -75,9 +163,11 @@ class _CastSpellEffectsSheet extends ConsumerWidget {
 /// Zeigt die Summe des fixen Schadens aller relevanten Effekte, gruppiert
 /// nach [DamageTarget]. Per Tap aufklappbar für die Detailrechnung.
 class _DamageSummary extends ConsumerStatefulWidget {
-  const _DamageSummary({required this.definition});
+  const _DamageSummary({required this.definition, required this.ownEffects});
 
   final CardDefinition definition;
+  /// Bereits gefilterter spellResolved-Effekte (berücksichtigt "Choose one"-Auswahl).
+  final List<CardEffect> ownEffects;
 
   @override
   ConsumerState<_DamageSummary> createState() => _DamageSummaryState();
@@ -90,11 +180,6 @@ class _DamageSummaryState extends ConsumerState<_DamageSummary> {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final isDe = Localizations.localeOf(context).languageCode == 'de';
-    final definition = widget.definition;
-
-    final ownEffects =
-        ref.watch(effectsForCardDefinitionProvider(definition.id)).valueOrNull ??
-        const [];
     final castSpellEffects =
         ref.watch(effectsForTriggerProvider(TriggerType.castSpell)).valueOrNull ??
         const [];
@@ -114,11 +199,10 @@ class _DamageSummaryState extends ConsumerState<_DamageSummary> {
             .valueOrNull ??
         const [];
 
+    final definition = widget.definition;
     // (Kartenname, Effekt) – für Formelbeschriftung
     final relevant = <(String, CardEffect)>[
-      for (final e in ownEffects.where(
-        (e) => e.trigger == TriggerType.spellResolved.name,
-      ))
+      for (final e in widget.ownEffects)
         (definition.name, e),
       for (final (cardDef, effect) in [
         ...castSpellEffects,
@@ -237,6 +321,7 @@ class _DamageSummaryState extends ConsumerState<_DamageSummary> {
           DamageTarget.eachCreature => l10n.castSpellDamageSummaryEachCreature,
           DamageTarget.eachOpponentCreatures =>
             l10n.castSpellDamageSummaryEachOpponentCreatures,
+          DamageTarget.anyTarget => l10n.castSpellDamageSummaryAnyTarget,
         };
 
     // Replacement-Zeilen in Rechenreihenfolge: 1. Minimum, 2. Additiv, 3. Multiplikativ.
@@ -407,31 +492,113 @@ class _ReplacementEffectsBox extends ConsumerWidget {
 }
 
 /// Der eigene Effekt der gespielten Karte (`spellResolved`).
-class _OwnEffectSection extends ConsumerWidget {
-  const _OwnEffectSection({required this.definition});
+/// Unterstützt "Choose one"-Karten mit Mode-Auswahl per ChoiceChip.
+class _OwnEffectSection extends StatelessWidget {
+  const _OwnEffectSection({
+    required this.definition,
+    required this.parsedEffects,
+    required this.selectedModes,
+    required this.onModeSelected,
+  });
 
   final CardDefinition definition;
+  final List<ParsedEffect> parsedEffects;
+  final Map<int, int> selectedModes;
+  final void Function(int groupId, int index) onModeSelected;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
-    final ownEffects = ref.watch(
-      effectsForCardDefinitionProvider(definition.id),
-    );
+    final isDe = Localizations.localeOf(context).languageCode == 'de';
 
-    return ownEffects.when(
-      data: (effects) {
-        final resolveEffects = effects
-            .where((e) => e.trigger == TriggerType.spellResolved.name)
-            .toList();
-        return TriggerEffectSection(
-          title: l10n.castSpellSectionOwnEffect,
-          entries: resolveEffects.map((e) => (definition, e)).toList(),
-          showDividerAbove: true,
-        );
-      },
-      error: (e, _) => Text('Error: $e'),
-      loading: () => const SizedBox.shrink(),
+    if (parsedEffects.isEmpty) return const SizedBox.shrink();
+
+    // Effekte in ungrupierte und grupierte aufteilen
+    final ungrouped = <ParsedEffect>[];
+    final grouped = <int, List<ParsedEffect>>{};
+    for (final e in parsedEffects) {
+      if (e.modeGroupId == null) {
+        ungrouped.add(e);
+      } else {
+        grouped.putIfAbsent(e.modeGroupId!, () => []).add(e);
+      }
+    }
+
+    // Ungrupierte → normale Tile-Liste, grupierte → Mode-Auswahl.
+    // Gruppen mit nur einem erkannten Effekt (andere Mode hat keinen Schaden)
+    // werden ebenfalls als normal behandelt, da kein Auswahlbedarf besteht.
+    final ungroupedCardEffects =
+        ungrouped.map((e) => (definition, _parsedToCardEffect(e, definition))).toList();
+    for (final entry in grouped.entries.where((e) => e.value.length < 2).toList()) {
+      if (entry.value.isNotEmpty) {
+        ungroupedCardEffects.add((definition, _parsedToCardEffect(entry.value.first, definition)));
+      }
+      grouped.remove(entry.key);
+    }
+
+    final theme = Theme.of(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (ungroupedCardEffects.isNotEmpty)
+          TriggerEffectSection(
+            title: l10n.castSpellSectionOwnEffect,
+            entries: ungroupedCardEffects,
+            showDividerAbove: true,
+          ),
+        for (final entry in grouped.entries) ...[
+          const Divider(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.castSpellSectionOwnEffect,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                // Chip-Auswahl für Modi
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (int i = 0; i < entry.value.length; i++)
+                      ChoiceChip(
+                        label: Text(
+                          isDe
+                              ? entry.value[i].shortLabel
+                              : entry.value[i].shortLabelEn.isNotEmpty
+                                  ? entry.value[i].shortLabelEn
+                                  : entry.value[i].shortLabel,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        selected: (selectedModes[entry.key] ?? 0) == i,
+                        onSelected: (_) => onModeSelected(entry.key, i),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Ausgewählter Modus als EffectTile
+                () {
+                  final idx = selectedModes[entry.key] ?? 0;
+                  final effect = _parsedToCardEffect(entry.value[idx], definition);
+                  return EffectTile(
+                    effect: effect,
+                    definition: definition,
+                    cardName: definition.name,
+                    contentPadding: EdgeInsets.zero,
+                    subtitleFirst: true,
+                    showInfoTitle: true,
+                  );
+                }(),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -505,6 +672,7 @@ class _FollowUpSection extends ConsumerWidget {
               cardName: cardDefinition.name,
               contentPadding: EdgeInsets.zero,
               subtitleFirst: true,
+              showInfoTitle: true,
               extraInfo: hint,
             ),
         ],

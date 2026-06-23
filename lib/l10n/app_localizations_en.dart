@@ -24,6 +24,22 @@ class AppL10nEn extends AppL10n {
   String get navSettings => 'Settings';
 
   @override
+  String get navStatus => 'Status';
+
+  @override
+  String get statusTitle => 'Status';
+
+  @override
+  String get statusEmpty =>
+      'No cards in play with continuous effects or keywords.';
+
+  @override
+  String get statusContinuousEffects => 'Continuous Effects';
+
+  @override
+  String get statusKeywords => 'Keywords';
+
+  @override
   String get noActiveDeck => 'No active deck selected.';
 
   @override
@@ -180,6 +196,9 @@ class AppL10nEn extends AppL10n {
       'Total damage to each opponent\'s creatures';
 
   @override
+  String get castSpellDamageSummaryAnyTarget => 'Total damage to any target';
+
+  @override
   String get cardInfoShortLabelLabel => 'Short label (DE)';
 
   @override
@@ -334,4 +353,124 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get effectSuggestionNone => 'No new effects detected.';
+
+  @override
+  String get newDeckTitle => 'New deck';
+
+  @override
+  String get newDeckNameHint => 'Deck name';
+
+  @override
+  String get newDeckImportFile => 'Import from file';
+
+  @override
+  String newDeckFileSelected(String name) {
+    return 'File: $name';
+  }
+
+  @override
+  String get analysisTitle => 'Analysing deck';
+
+  @override
+  String analysisFetchingCard(int done, int total) {
+    return 'Loading card data ($done/$total)';
+  }
+
+  @override
+  String get analysisParsing => 'Analysing effects…';
+
+  @override
+  String get analysisDoneTitle => 'Import complete';
+
+  @override
+  String analysisSummaryCards(int count) {
+    return '$count cards';
+  }
+
+  @override
+  String analysisSummaryTriggers(int count) {
+    return '$count trigger effects detected';
+  }
+
+  @override
+  String analysisSummaryContinuous(int count) {
+    return '$count continuous effects detected';
+  }
+
+  @override
+  String analysisSummaryKeywords(int count) {
+    return '$count cards with keywords';
+  }
+
+  @override
+  String analysisReviewButton(int count) {
+    return 'Review effects ($count)';
+  }
+
+  @override
+  String get analysisDoneButton => 'Done';
+
+  @override
+  String get boardMain => 'Mainboard';
+
+  @override
+  String get boardSide => 'Sideboard';
+
+  @override
+  String get manageDeck => 'Manage deck';
+
+  @override
+  String get scryfallSyncButton => 'Fetch Scryfall data';
+
+  @override
+  String get scryfallSyncTooltip => 'Fetch missing Scryfall data for this deck';
+
+  @override
+  String get scryfallSynced => 'Scryfall data available';
+
+  @override
+  String get scryfallMissing => 'Scryfall data missing';
+
+  @override
+  String get scryfallNoSetInfo => 'No set code – manually added';
+
+  @override
+  String get analyseEffectsTooltip => 'Analyse and record effects';
+
+  @override
+  String get effectsNotParsed => 'No effects recorded yet';
+
+  @override
+  String effectsParsed(int count) {
+    return '$count effect(s) recorded';
+  }
+
+  @override
+  String get equipmentPickerTitle => 'Equip to...';
+
+  @override
+  String equipmentAttachedTo(String name) {
+    return 'Attached to: $name';
+  }
+
+  @override
+  String get equipmentNotAttached => 'Not equipped';
+
+  @override
+  String get equipmentDetach => 'Detach';
+
+  @override
+  String get equipmentReattach => 'Re-equip';
+
+  @override
+  String get ceScopeSelf => 'Self';
+
+  @override
+  String get ceScopeOneTarget => 'Equipment / Aura';
+
+  @override
+  String get ceScopeGlobal => 'All owned';
+
+  @override
+  String get ceScopeConditional => 'Conditional';
 }

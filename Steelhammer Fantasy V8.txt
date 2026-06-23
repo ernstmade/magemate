@@ -1,0 +1,126 @@
+1 Ardenn, Intrepid Archaeologist (CMR) 10
+1 Argentum Armor (GN3) 113
+1 Armored Skyhunter (CMR) 11
+2 Armory Automaton (FIC) 336
+1 Barret, Avalanche Leader (FIC) 79
+1 Basilisk Collar (PIP) 225
+1 Blazing Sunsteel (CMR) 364
+1 Bloodforged Battle-Axe (PIP) 226
+1 Bugenhagen, Wise Elder (FIC) 66
+1 Canopy Vista (FIC) 378
+1 Citizen's Crowbar (SNC) 8
+1 Clifftop Retreat (FIC) 381
+4 Colossus Hammer (FIC) 338
+1 Conformer Shuriken (FIC) 98
+3 Envoy of the Ancestors (MH3) 23
+1 Firion, Wild Rose Warrior (FIN) 137
+1 Forest (FIN) 307
+1 Forest (FIN) 306
+1 Godsend (J25) 204
+2 Golden-Tail Trainer (MH3) 187
+1 Hammer of Nazahn (CMM) 388
+1 Heartseeker (DST) 124
+2 Jungle Shrine (FIC) 406
+1 Kodama of the West Tree (J25) 78
+1 Meteor Sword (TLA) 258
+1 Mountain (FIN) 304
+1 Mountain (FIN) 305
+1 Plains (FIN) 294
+2 Plains (FIN) 295
+2 Plains (FIN) 296
+3 Puresteel Paladin (FIC) 250
+1 Quietus Spike (NCC) 377
+1 Radiant Summit (EOC) 23
+1 Red XIII, Proud Warrior (FIC) 91
+1 Reyav, Master Smith (CMR) 290
+4 Sheltering Landscape (MH3) 227
+1 Sol Ring (FIC) 357
+3 Spire of Industry (FIC) 426
+2 Stonehewer Giant (2XM) 32
+1 Summoner's Grimoire (FIN) 205
+1 Sunpetal Grove (FIC) 432
+1 Sword of the Animist (FIC) 362
+
+// SIDEBOARD
+1 Adelbert Steiner (FIN) 3
+1 Astor, Bearer of Blades (DMU) 194
+1 Bruenor Battlehammer (AFR) 219
+1 Bureau Headmaster (ACR) 296
+1 Chainsaw (DSK) 128
+1 Chishiro, the Shattered Blade (NEC) 1
+1 Cloud, Ex-SOLDIER (FIC) 2
+1 Conqueror's Flail (FIC) 340
+2 Crystal Barricade (FDN) 7
+1 Danitha, Benalia's Hope (DMU) 15
+1 Deathrender (LRW) 255
+1 Eivor, Battle-Ready (ACR) 274 *F*
+1 General's Kabuto (CHK) 251
+1 Gilgamesh, Master-at-Arms (FIN) 139
+1 Glimmer Lens (ONC) 6
+1 Jor Kadeen, First Goldwarden (ONE) 332
+1 Kaldra Compleat (MH2) 227
+1 Machinist's Arsenal (FIN) 23
+1 Mjölnir, Storm Hammer (ACR) 74
+1 Nazahn, Revered Bladesmith (C17) 44 *F*
+1 Nazgûl Battle-Mace (LTC) 510
+1 Neko-Te (BOK) 155
+1 Overgrown Farmland (TDC) 381
+1 Palladium Myr (CMM) 967
+1 Sephiroth, Fallen Hero (FIC) 92
+1 Sigarda, Font of Blessings (MAT) 47
+1 Sram, Senior Edificer (FCA) 3
+1 Sundown Pass (INR) 286
+1 Swiftfoot Boots (FIC) 361
+1 Sword of Vengeance (BLB) 395
+1 Tanuki Transplanter (NEC) 30
+1 Tifa, Martial Artist (FIC) 6
+1 Ultima Weapon (FIN) 563
+1 Worldslayer (M12) 222
+1 Wyleth, Soul of Steel (CMR) 362 *F*
+1 Zamriel, Seraph of Steel (GN3) 1 *F*
+
+// MAYBEBOARD
+1 Ancient Den (EOC) 148
+1 Axgard Armory (KHM) 250
+1 Bard's Bow (FIN) 174
+1 Barret Wallace (FIN) 129
+1 Beatrix, Loyal General (FIN) 554
+1 Behemoth Sledge (FIC) 320
+1 Blackblade Reforged (DMC) 178
+1 Brass Squire (CMR) 460
+1 Buster Sword (FIN) 255
+1 Caduceus, Staff of Hermes (ACR) 2
+1 Champion's Helm (FIC) 337
+1 Chromatic Lantern (LTC) 275
+1 Danitha Capashen, Paragon (FCA) 22
+1 Darksteel Plate (FIC) 342
+1 Evolving Wilds (FIC) 389
+1 Fishing Gear (FIC) 461
+1 Foundry Inspector (CMM) 385
+1 Great Furnace (EOC) 161
+1 Hero's Blade (FIC) 345
+1 Hero's Heirloom (FIC) 346
+1 Kemba's Banner (ONC) 7
+1 Kemba, Kha Regent (CMM) 671
+1 Mountain (FIN) 303
+1 Nahiri, Forged in Fury (MAT) 36
+1 Pariah's Shield (RVR) 264
+1 Power Fist (PIP) 81
+1 Rabanastre, Royal City (FIN) 287
+1 Radiant Grove (FIC) 414
+1 Resurrection Orb (40K) 165
+1 Rogue's Gloves (JMP) 479
+1 Rugged Prairie (FIC) 417
+1 Sacred Peaks (FIC) 418
+1 Samurai's Katana (FIN) 154
+1 Serah Farron (FIN) 240
+1 Sigarda's Aid (CMR) 384
+1 Sigarda, Font of Blessings (MAT) 47
+1 Stoneforge Mystic (2XM) 31
+1 Sword of Feast and Famine (ACR) 99
+1 Sword of Wealth and Power (PBIG) 26p
+1 Thousand Moons Smithy (LCI) 39
+1 Thundering Raiju (NEO) 166
+1 Tree of Tales (DSC) 319
+1 Upriser Renegade (NEO) 170
+1 Wooded Bastion (2XM) 332

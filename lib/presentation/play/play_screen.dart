@@ -14,6 +14,89 @@ import 'card_info_sheet.dart';
 import 'cast_spell_sheet.dart';
 import 'effect_suggestion_screen.dart';
 
+bool isEquipmentOrAura(CardDefinition def) {
+  final type = def.typeLine ?? '';
+  return type.contains('Equipment') || type.contains('Aura');
+}
+
+/// Zeigt einen Dialog zur Auswahl der Zielkreatur. Gibt die gewählte
+/// CardDefinition zurück, oder null wenn "Abnehmen" gewählt wurde.
+Future<CardDefinition?> showEquipmentPicker(
+  BuildContext context,
+  int deckId,
+  CardDefinition equipment,
+  WidgetRef ref,
+) async {
+  // In-Play-Kreaturen laden (synchron aus letztem Watch-Wert)
+  final grouped = ref.read(groupedCardsForDeckProvider(deckId));
+  final creatures = grouped.valueOrNull
+          ?.where(
+            (g) =>
+                g.board == 'main' &&
+                g.inPlayCount > 0 &&
+                (g.definition.typeLine?.contains('Creature') ?? false) &&
+                g.definition.id != equipment.id,
+          )
+          .toList() ??
+      [];
+
+  final l10n = AppL10n.of(context);
+  final isDe = Localizations.localeOf(context).languageCode == 'de';
+
+  // Aktuelle Zuordnung
+  final attachments =
+      ref.read(attachmentsForDeckProvider(deckId)).valueOrNull ?? {};
+  final currentTargetId = attachments[equipment.id];
+
+  return showDialog<CardDefinition?>(
+    context: context,
+    builder: (ctx) => SimpleDialog(
+      title: Text(l10n.equipmentPickerTitle),
+      children: [
+        if (creatures.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Text(
+              l10n.inPlayEmpty,
+              style: Theme.of(ctx).textTheme.bodyMedium,
+            ),
+          ),
+        for (final g in creatures)
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(ctx).pop(g.definition),
+            child: Row(
+              children: [
+                if (g.definition.id == currentTargetId)
+                  const Icon(Icons.check, size: 18)
+                else
+                  const SizedBox(width: 18),
+                const SizedBox(width: 8),
+                Text(
+                  isDe
+                      ? (g.definition.printedName ?? g.definition.name)
+                      : g.definition.name,
+                ),
+              ],
+            ),
+          ),
+        if (currentTargetId != null) ...[
+          const Divider(),
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(ctx).pop(null),
+            child: Row(
+              children: [
+                const Icon(Icons.link_off, size: 18),
+                const SizedBox(width: 8),
+                Text(l10n.equipmentDetach),
+              ],
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
+}
+
 /// Sortieroptionen für die Kartenlisten in "Deck" und "Im Spiel".
 enum SortMode { alphabetical, byTypeAlpha, byTypeCmc }
 
@@ -250,6 +333,27 @@ class PlayScreen extends ConsumerWidget {
           suggestions.add((def, effect));
         }
       }
+
+      // Second pass: auto-insert continuousEffect entries for ALL cards,
+      // even those that already have other effects, skipping duplicates.
+      for (final def in definitions) {
+        if (def.oracleText == null) continue;
+        final allEffects = CardTextParser.parse(def.oracleText!, cardName: def.name, learnedRules: learnedRules);
+        for (final effect in allEffects) {
+          if (effect.trigger != TriggerType.continuousEffect) continue;
+          final alreadyPresent = await repo.hasContinuousEffectForDescription(def.id, effect.description);
+          if (alreadyPresent) continue;
+          await repo.addEffect(
+            def.id,
+            effect.trigger,
+            effect.shortLabel,
+            effect.shortLabelEn,
+            effect.description,
+            triggerConditionText: effect.triggerConditionText,
+          );
+        }
+      }
+
       if (suggestions.isEmpty || !context.mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
@@ -343,9 +447,12 @@ class _DeckTabState extends ConsumerState<_DeckTab> {
     final l10n = AppL10n.of(context);
     final groups = ref.watch(groupedCardsForDeckProvider(widget.deckId));
     final sortMode = ref.watch(sortModeProvider);
+    final attachments =
+        ref.watch(attachmentsForDeckProvider(widget.deckId)).valueOrNull ?? {};
 
     return groups.when(
-      data: (groups) {
+      data: (allGroups) {
+        final groups = allGroups.where((g) => g.board == 'main').toList();
         if (groups.isEmpty) {
           return Center(child: Text(l10n.cardsEmpty));
         }
@@ -400,13 +507,24 @@ class _DeckTabState extends ConsumerState<_DeckTab> {
                             final typeLine = group.definition.typeLine ?? '';
                             final isSpell = typeLine.contains('Instant') ||
                                 typeLine.contains('Sorcery');
+                            final showEquipSub =
+                                isEquipmentOrAura(group.definition) &&
+                                    group.inPlayCount > 0;
                             return ListTile(
                               contentPadding: const EdgeInsets.only(left: 16, right: 8),
                               leading: _EffectIndicator(
                                   cardDefinitionId: group.definition.id),
                               title: _cardTitleWidget(context, group.definition),
-                              onTap: () =>
-                                  showCardInfoSheet(context, group.definition),
+                              subtitle: showEquipSub
+                                  ? _EquipmentSubtitle(
+                                      deckId: widget.deckId,
+                                      equipmentDefId: group.definition.id,
+                                      attachments: attachments,
+                                    )
+                                  : null,
+                              onTap: () => showCardInfoSheet(
+                                  context, group.definition,
+                                  deckId: widget.deckId),
                               trailing: isSpell
                                   ? Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -427,7 +545,9 @@ class _DeckTabState extends ConsumerState<_DeckTab> {
                                       ],
                                     )
                                   : _InPlayStepper(
-                                      group: group, showRemove: false),
+                                      group: group,
+                                      deckId: widget.deckId,
+                                      showRemove: false),
                             );
                           },
                         ),
@@ -617,18 +737,44 @@ class _EffectIndicator extends ConsumerWidget {
 class _InPlayStepper extends ConsumerWidget {
   const _InPlayStepper({
     required this.group,
+    required this.deckId,
     this.showAdd = true,
     this.showRemove = true,
   });
 
   final DeckCardGroup group;
+  final int deckId;
   final bool showAdd;
   final bool showRemove;
 
+  Future<void> _handleAdd(BuildContext context, WidgetRef ref) async {
+    final repo = ref.read(deckRepositoryProvider);
+    final newCount = group.inPlayCount + 1;
+    await repo.setInPlayCount(group, newCount);
+    // Equipment/Aura zum ersten Mal ins Spiel: Ziel abfragen
+    if (newCount == 1 &&
+        isEquipmentOrAura(group.definition) &&
+        context.mounted) {
+      final target =
+          await showEquipmentPicker(context, deckId, group.definition, ref);
+      if (!context.mounted) return;
+      if (target != null) {
+        await repo.attachEquipment(deckId, group.definition.id, target.id);
+      }
+    }
+  }
+
+  Future<void> _handleRemove(WidgetRef ref) async {
+    final repo = ref.read(deckRepositoryProvider);
+    final newCount = group.inPlayCount - 1;
+    await repo.setInPlayCount(group, newCount);
+    if (newCount == 0 && isEquipmentOrAura(group.definition)) {
+      await repo.detachEquipment(deckId, group.definition.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final repo = ref.read(deckRepositoryProvider);
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -637,14 +783,14 @@ class _InPlayStepper extends ConsumerWidget {
           IconButton(
             icon: const Icon(Symbols.computer_cancel),
             onPressed: group.inPlayCount > 0
-                ? () => repo.setInPlayCount(group, group.inPlayCount - 1)
+                ? () => _handleRemove(ref)
                 : null,
           ),
         if (showAdd)
           IconButton(
             icon: const Icon(Icons.style),
             onPressed: group.inPlayCount < group.total
-                ? () => repo.setInPlayCount(group, group.inPlayCount + 1)
+                ? () => _handleAdd(context, ref)
                 : null,
           ),
       ],
@@ -688,8 +834,10 @@ class _InPlayTab extends ConsumerWidget {
     final sortMode = ref.watch(sortModeProvider);
 
     return groups.when(
-      data: (groups) {
-        final inPlay = groups.where((g) => g.inPlayCount > 0).toList();
+      data: (allGroups) {
+        final inPlay = allGroups
+            .where((g) => g.board == 'main' && g.inPlayCount > 0)
+            .toList();
         if (inPlay.isEmpty) {
           return Center(child: Text(l10n.inPlayEmpty));
         }
@@ -706,14 +854,59 @@ class _InPlayTab extends ConsumerWidget {
               contentPadding: const EdgeInsets.only(left: 16, right: 8),
               leading: _EffectIndicator(cardDefinitionId: group.definition.id),
               title: _cardTitleWidget(context, group.definition),
-              onTap: () => showCardInfoSheet(context, group.definition),
-              trailing: _InPlayStepper(group: group, showAdd: false),
+              onTap: () =>
+                  showCardInfoSheet(context, group.definition, deckId: deckId),
+              trailing: _InPlayStepper(
+                  group: group, deckId: deckId, showAdd: false),
             );
           },
         );
       },
       error: (e, _) => Center(child: Text('Error: $e')),
       loading: () => const Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _EquipmentSubtitle extends ConsumerWidget {
+  const _EquipmentSubtitle({
+    required this.deckId,
+    required this.equipmentDefId,
+    required this.attachments,
+  });
+
+  final int deckId;
+  final int equipmentDefId;
+  final Map<int, int> attachments;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppL10n.of(context);
+    final isDe = Localizations.localeOf(context).languageCode == 'de';
+    final targetId = attachments[equipmentDefId];
+    if (targetId == null) {
+      return Text(
+        l10n.equipmentNotAttached,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+    final allGroups =
+        ref.watch(groupedCardsForDeckProvider(deckId)).valueOrNull;
+    final targetDef = allGroups
+        ?.where((g) => g.definition.id == targetId)
+        .map((g) => g.definition)
+        .firstOrNull;
+    final targetName = targetDef == null
+        ? '...'
+        : (isDe ? (targetDef.printedName ?? targetDef.name) : targetDef.name);
+    return Text(
+      l10n.equipmentAttachedTo(targetName),
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        color: Theme.of(context).colorScheme.primary,
+      ),
     );
   }
 }

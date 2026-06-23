@@ -73,6 +73,7 @@ class TriggerEffectSection extends StatelessWidget {
       for (final (definition, effect) in entries)
         EffectTile(
           effect: effect,
+          definition: definition,
           cardName: isDe
               ? (definition.printedName ?? definition.name)
               : definition.name,
@@ -81,6 +82,7 @@ class TriggerEffectSection extends StatelessWidget {
               : EdgeInsets.zero,
           subtitleFirst: true,
           showLeadingIcon: false,
+          showInfoTitle: true,
           extraInfo: extraInfo,
         ),
     ];

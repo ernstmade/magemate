@@ -5,6 +5,11 @@
   "navDecks": "Decks",
   "navTriggers": "Trigger",
   "navSettings": "Einstellungen",
+  "navStatus": "Status",
+  "statusTitle": "Status",
+  "statusEmpty": "Keine Karten im Spiel mit Dauereffekten oder Schlüsselwörtern.",
+  "statusContinuousEffects": "Dauereffekte",
+  "statusKeywords": "Schlüsselwörter",
   "noActiveDeck": "Kein aktives Deck ausgewählt.",
   "selectDeckHint": "Wähle unten ein Deck als aktives Deck aus.",
   "activeDeck": "Aktives Deck",
@@ -53,6 +58,7 @@
   "castSpellDamageSummarySingleCreature": "Summe Schaden an eine Kreatur/Permanent",
   "castSpellDamageSummaryEachCreature": "Summe Schaden an jede Kreatur",
   "castSpellDamageSummaryEachOpponentCreatures": "Summe Schaden an Kreaturen jedes Gegners",
+  "castSpellDamageSummaryAnyTarget": "Summe Schaden an beliebiges Ziel",
   "cardInfoShortLabelLabel": "Kurzform (DE)",
   "cardInfoShortLabelEnLabel": "Kurzform (EN)",
   "cardInfoEffectDescriptionLabel": "Effektbeschreibung",
@@ -107,5 +113,65 @@
   },
   "effectSuggestionSelectAll": "Alle auswählen",
   "effectSuggestionDeselectAll": "Alle abwählen",
-  "effectSuggestionNone": "Keine neuen Effekte erkannt."
+  "effectSuggestionNone": "Keine neuen Effekte erkannt.",
+  "newDeckTitle": "Neues Deck",
+  "newDeckNameHint": "Deckname",
+  "newDeckImportFile": "Aus Datei importieren",
+  "newDeckFileSelected": "Datei: {name}",
+  "@newDeckFileSelected": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "analysisTitle": "Deck wird analysiert",
+  "analysisFetchingCard": "Kartendaten laden ({done}/{total})",
+  "@analysisFetchingCard": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "analysisParsing": "Effekte werden analysiert…",
+  "analysisDoneTitle": "Import abgeschlossen",
+  "analysisSummaryCards": "{count} Karten",
+  "@analysisSummaryCards": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisSummaryTriggers": "{count} Trigger-Effekte erkannt",
+  "@analysisSummaryTriggers": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisSummaryContinuous": "{count} Dauereffekte erkannt",
+  "@analysisSummaryContinuous": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisSummaryKeywords": "{count} Karten mit Keywords",
+  "@analysisSummaryKeywords": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisReviewButton": "Effekte prüfen ({count})",
+  "@analysisReviewButton": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "analysisDoneButton": "Fertig",
+  "boardMain": "Mainboard",
+  "boardSide": "Sideboard",
+  "manageDeck": "Deck verwalten",
+  "scryfallSyncButton": "Scryfall-Daten nachladen",
+  "scryfallSyncTooltip": "Fehlende Scryfall-Daten für dieses Deck abrufen",
+  "scryfallSynced": "Scryfall-Daten vorhanden",
+  "scryfallMissing": "Scryfall-Daten fehlen",
+  "scryfallNoSetInfo": "Kein Set-Code – manuell erfasst",
+  "analyseEffectsTooltip": "Effekte analysieren und erfassen",
+  "effectsNotParsed": "Noch keine Effekte erfasst",
+  "effectsParsed": "{count} Effekt(e) erfasst",
+  "@effectsParsed": { "placeholders": { "count": { "type": "int" } } },
+  "equipmentPickerTitle": "Anlegen an...",
+  "equipmentAttachedTo": "Angelegt an: {name}",
+  "@equipmentAttachedTo": { "placeholders": { "name": { "type": "String" } } },
+  "equipmentNotAttached": "Nicht angelegt",
+  "equipmentDetach": "Abnehmen",
+  "equipmentReattach": "Umanlegen",
+  "ceScopeSelf": "Eigene Karte",
+  "ceScopeOneTarget": "Equipment / Aura",
+  "ceScopeGlobal": "Alle eigenen",
+  "ceScopeConditional": "Bedingt"
 }
